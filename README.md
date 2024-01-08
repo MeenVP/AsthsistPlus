@@ -1,6 +1,6 @@
 # asthsist_plus
 
-A new Flutter project.
+A Mobile Application for Assisting Asthma Management
 
 ## Getting Started
 
