@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1028917026002",
+    "project_id": "sp2023-asthsist-plus",
+    "storage_bucket": "sp2023-asthsist-plus.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1028917026002:android:ff488943be519ff878a10b",
+        "android_client_info": {
+          "package_name": "com.example.asthsist_plus"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAc78amLHjpS65wC7iHW-BVpoOcp18zSBs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
