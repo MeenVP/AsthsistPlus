@@ -12,7 +12,12 @@
           "package_name": "com.example.asthsist_plus"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "1028917026002-s7haiqcprmplesro4k9d4glavtghmbvo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAc78amLHjpS65wC7iHW-BVpoOcp18zSBs"
@@ -20,7 +25,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1028917026002-s7haiqcprmplesro4k9d4glavtghmbvo.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1028917026002-4ka3rv1288ip0t8pekvletim46ilsih1.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.asthsistPlus.RunnerTests"
+              }
+            }
+          ]
         }
       }
     }
