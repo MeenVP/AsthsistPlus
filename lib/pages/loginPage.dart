@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 class LoginPage extends StatefulWidget {
   @override
   _LoginPageState createState() => _LoginPageState();
+  const LoginPage({Key? key}) : super(key: key);
+  static const String routeName = '/login';
 }
 
 class _LoginPageState extends State<LoginPage> {
@@ -18,58 +20,60 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              Text(
-                'Asthsist+',
-                style: TextStyle(
-                  fontSize: 32.0,
-                  fontWeight: FontWeight.bold,
+        child: Center(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.symmetric(horizontal: 24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                Text(
+                  'Asthsist+',
+                  style: TextStyle(
+                    fontSize: 32.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: 10.0),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  TextButton(
-                    onPressed: () {
-                      if (!_showLogin) _toggleForm();
-                    },
-                    child: Text(
-                      'Login',
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: _showLogin ? Colors.tealAccent[400] : Colors.deepPurple,
-                        fontWeight: _showLogin ? FontWeight.bold : FontWeight.normal,
+                SizedBox(height: 10.0),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    TextButton(
+                      onPressed: () {
+                        if (!_showLogin) _toggleForm();
+                      },
+                      child: Text(
+                        'Login',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: _showLogin ? Colors.tealAccent[400] : Colors.deepPurple,
+                          fontWeight: _showLogin ? FontWeight.bold : FontWeight.normal,
+                        ),
                       ),
                     ),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      if (_showLogin) _toggleForm();
-                    },
-                    child: Text(
-                      'Register',
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: _showLogin ? Colors.deepPurple : Colors.tealAccent[400],
-                        fontWeight: !_showLogin ? FontWeight.bold : FontWeight.normal,
+                    TextButton(
+                      onPressed: () {
+                        if (_showLogin) _toggleForm();
+                      },
+                      child: Text(
+                        'Register',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: _showLogin ? Colors.deepPurple : Colors.tealAccent[400],
+                          fontWeight: !_showLogin ? FontWeight.bold : FontWeight.normal,
+                        ),
                       ),
                     ),
-                  ),
+                  ],
+                ),
+                if (_showLogin) ...[
+                  _buildLogin(),
+                ] else ...[
+                  _buildRegister(),
                 ],
-              ),
-              if (_showLogin) ...[
-                _buildLogin(),
-              ] else ...[
-                _buildRegister(),
               ],
-            ],
+            ),
           ),
         ),
       ),
@@ -300,7 +304,7 @@ class _LoginPageState extends State<LoginPage> {
               groupValue: 'Gender',
               onChanged: (String? value) {
                 setState(() {
-                  _gender = value ?? _gender;;
+                  _gender = value ?? _gender;
                 });
                 // Handle radio value changed
               },
@@ -311,7 +315,7 @@ class _LoginPageState extends State<LoginPage> {
               groupValue: 'Gender',
               onChanged: (String? value) {
                 setState(() {
-                  _gender = value ?? _gender;;
+                  _gender = value ?? _gender;
                 });
                 // Handle radio value changed
               },
