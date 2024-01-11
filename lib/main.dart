@@ -1,5 +1,6 @@
 import 'package:asthsist_plus/pages/home_page.dart';
 import 'package:asthsist_plus/pages/loginPage.dart';
+import 'package:asthsist_plus/pages/navigation_bar.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -12,8 +13,10 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-    statusBarColor: Color(0xFFF1F4F8),
+    statusBarColor: Colors.transparent,
+    systemNavigationBarColor: Colors.transparent,
     statusBarIconBrightness: Brightness.dark,
+    systemNavigationBarIconBrightness:Brightness.dark,
   ));
   runApp(const MyApp());
 }
@@ -26,7 +29,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: HomePage(),
+      home: NavigationBarApp()
+      //home: HomePage(),
+      //home: LoginPage(),
 
 
     );

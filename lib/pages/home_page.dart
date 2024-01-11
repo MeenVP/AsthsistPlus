@@ -1,3 +1,4 @@
+import 'package:asthsist_plus/style.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -14,87 +15,137 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFF1F4F8),
+      backgroundColor: Style.primaryBackground,
+      appBar: AppBar(
+        backgroundColor: Style.primaryBackground,
+        elevation: 0,
+        title:  Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Padding(
+                padding: EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
+                child: Text(
+                  'Asthsist',
+                  style: GoogleFonts.outfit(
+                    textStyle: const TextStyle(
+                      fontWeight: FontWeight.normal,
+                      fontSize: 32,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+              ),
+              Align(
+                alignment: AlignmentDirectional(0, -1),
+                child: Text(
+                  '+',
+                  style: GoogleFonts.outfit(
+                    textStyle: const TextStyle(
+                      fontWeight: FontWeight.normal,
+                      fontSize: 32,
+                      color: Style.primaryColor,
+                    ),
+                  ),
+                ),
+              )
+            ],
+          ),
+        actions: [
+          Padding(
+            padding: EdgeInsetsDirectional.fromSTEB(0, 16, 8, 0),
+            child: IconButton(
+              icon: const Icon(
+                Icons.notifications_outlined,
+                size: 28,
+              ),
+              tooltip: 'Show Snackbar',
+              onPressed: () {},
+            ),
+          )
+        ],
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsetsDirectional.fromSTEB(20, 32, 20, 0),
+            padding: const EdgeInsetsDirectional.fromSTEB(16, 0, 16, 0),
             child: Column(
               mainAxisSize: MainAxisSize.max,
               children: [
-                Row(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Card(
-                      clipBehavior: Clip.antiAliasWithSaveLayer,
-                      color: Colors.deepPurpleAccent[400],
-                      elevation: 2,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(40),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(2),
-                        child: Container(
-                          width: 60,
-                          height: 60,
-                          clipBehavior: Clip.antiAlias,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                          ),
-                          child: Align(
-                            alignment: Alignment.center,
-                            child: Image.asset(
-                              'assets/images/asthsist.jpg',
-                              fit: BoxFit.fitHeight,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Align(
-                      alignment: AlignmentDirectional(0, -1),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Align(
-                            alignment: AlignmentDirectional(0, -1),
-                            child: Padding(
-                              padding:
-                                  EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
-                              child: Text(
-                                'Asthsist',
-                                style: GoogleFonts.outfit(
-                                  textStyle: const TextStyle(
-                                    fontWeight: FontWeight.normal,
-                                    fontSize: 32,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          Align(
-                            alignment: AlignmentDirectional(0, -1),
-                            child: Text(
-                              '+',
-                              style: GoogleFonts.outfit(
-                                textStyle: TextStyle(
-                                  fontWeight: FontWeight.normal,
-                                  fontSize: 32,
-                                  color: Colors.deepPurpleAccent[400],
-                                ),
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+                // Row(
+                //   mainAxisSize: MainAxisSize.max,
+                //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //   crossAxisAlignment: CrossAxisAlignment.start,
+                //   children: [
+                //     Row(
+                //       mainAxisSize: MainAxisSize.max,
+                //       mainAxisAlignment: MainAxisAlignment.end,
+                //       crossAxisAlignment: CrossAxisAlignment.center,
+                //       children: [
+                //         Align(
+                //           alignment: AlignmentDirectional(0, -1),
+                //           child: Padding(
+                //             padding:
+                //             EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
+                //             child: Text(
+                //               'Asthsist',
+                //               style: GoogleFonts.outfit(
+                //                 textStyle: const TextStyle(
+                //                   fontWeight: FontWeight.normal,
+                //                   fontSize: 32,
+                //                   color: Colors.black,
+                //                 ),
+                //               ),
+                //             ),
+                //           ),
+                //         ),
+                //         Align(
+                //           alignment: AlignmentDirectional(0, -1),
+                //           child: Text(
+                //             '+',
+                //             style: GoogleFonts.outfit(
+                //               textStyle: const TextStyle(
+                //                 fontWeight: FontWeight.normal,
+                //                 fontSize: 32,
+                //                 color: Style.primaryColor,
+                //               ),
+                //             ),
+                //           ),
+                //         )
+                //       ],
+                //     ),
+                //     Align(
+                //       alignment: AlignmentDirectional(0, -1),
+                //       child: Card(
+                //         clipBehavior: Clip.antiAliasWithSaveLayer,
+                //         color: Colors.deepPurpleAccent[400],
+                //         elevation: 2,
+                //         shape: RoundedRectangleBorder(
+                //           borderRadius: BorderRadius.circular(40),
+                //         ),
+                //         child: Padding(
+                //           padding: const EdgeInsets.all(2),
+                //           child: Container(
+                //             width: 50,
+                //             height: 50,
+                //             clipBehavior: Clip.antiAlias,
+                //             decoration: const BoxDecoration(
+                //               shape: BoxShape.circle,
+                //             ),
+                //             child: Align(
+                //               alignment: Alignment.center,
+                //               child: Image.asset(
+                //                 'assets/images/asthsist.jpg',
+                //                 fit: BoxFit.fitHeight,
+                //               ),
+                //             ),
+                //           ),
+                //         ),
+                //       ),
+                //     ),
+                //   ],
+                // ),
                 Padding(
                   padding: EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
                   child: Row(
@@ -130,197 +181,136 @@ class _HomePageState extends State<HomePage> {
                 ),
                 Padding(
                   padding: EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
-                  child: Card(
-                    clipBehavior: Clip.antiAliasWithSaveLayer,
-                    color: Color(0xFF0EC863),
-                    elevation: 4,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Align(
-                          alignment: AlignmentDirectional(-1, -1),
-                          child: Padding(
-                            padding:
-                                EdgeInsetsDirectional.fromSTEB(10, 10, 0, 0),
-                            child: Text(
-                              'Your current risk',
-                              style: GoogleFonts.outfit(
-                                textStyle: TextStyle(
-                                  fontWeight: FontWeight.normal,
-                                  fontSize: 14,
-                                  color: Colors.white,
+                  child: Material(
+                    borderRadius: BorderRadius.all(Radius.circular(16)),
+                    elevation: 2,
+                    child: Container(
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(16),
+                          color: Style.success),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Align(
+                            alignment: AlignmentDirectional(-1, -1),
+                            child: Padding(
+                              padding:
+                                  EdgeInsetsDirectional.fromSTEB(16, 10, 0, 0),
+                              child: Text(
+                                'Your current risk',
+                                style: GoogleFonts.outfit(
+                                  textStyle: const TextStyle(
+                                    fontWeight: FontWeight.normal,
+                                    fontSize: 14,
+                                    color: Style.tertiaryText,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                        Align(
-                          alignment: AlignmentDirectional(0, 0),
-                          child: Padding(
-                            padding:
-                                EdgeInsetsDirectional.fromSTEB(0, 32, 0, 32),
-                            child: Text(
-                              'Green',
-                              style: GoogleFonts.outfit(
-                                textStyle: TextStyle(
-                                  fontWeight: FontWeight.normal,
-                                  fontSize: 48,
-                                  color: Colors.white,
+                          Align(
+                            alignment: AlignmentDirectional(0, 0),
+                            child: Padding(
+                              padding:
+                                  EdgeInsetsDirectional.fromSTEB(0, 32, 0, 32),
+                              child: Text(
+                                'SAFE',
+                                style: GoogleFonts.outfit(
+                                  textStyle: const TextStyle(
+                                    fontWeight: FontWeight.normal,
+                                    fontSize: 48,
+                                    color: Style.tertiaryText,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                        Align(
-                          alignment: AlignmentDirectional(1, 1),
-                          child: Padding(
-                            padding:
-                                EdgeInsetsDirectional.fromSTEB(0, 0, 10, 10),
-                            child: Text(
-                              'Great job! ',
-                              textAlign: TextAlign.end,
-                              style: GoogleFonts.outfit(
-                                textStyle: TextStyle(
-                                  fontWeight: FontWeight.normal,
-                                  fontSize: 14,
-                                  color: Colors.white,
+                          Align(
+                            alignment: AlignmentDirectional(1, 1),
+                            child: Padding(
+                              padding:
+                                  EdgeInsetsDirectional.fromSTEB(0, 0, 10, 10),
+                              child: Text(
+                                'Great job! ',
+                                textAlign: TextAlign.end,
+                                style: GoogleFonts.outfit(
+                                  textStyle: const TextStyle(
+                                    fontWeight: FontWeight.normal,
+                                    fontSize: 14,
+                                    color: Style.tertiaryText,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                        ListView(
-                          padding: EdgeInsets.zero,
-                          shrinkWrap: true,
-                          scrollDirection: Axis.vertical,
-                          children: [
-                            ListTile(
-                              title: Text(
-                                'Current Peak Flow',
-                                style: GoogleFonts.outfit(
-                                  textStyle: TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 22,
-                                    color: Colors.black,
-                                  ),
+                          Container(
+                            decoration: const BoxDecoration(
+                                borderRadius: BorderRadius.only(
+                                  bottomLeft: Radius.circular(16),
+                                  bottomRight: Radius.circular(16),
                                 ),
-                              ),
-                              subtitle: Text(
-                                '450',
-                                textAlign: TextAlign.start,
-                                style: GoogleFonts.outfit(
-                                  textStyle: TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 12,
-                                    color: Colors.black,
+                                color: Style.secondaryBackground),
+                            child: ListView(
+                              padding: EdgeInsets.zero,
+                              shrinkWrap: true,
+                              scrollDirection: Axis.vertical,
+                              children: ListTile
+                                  .divideTiles(context: context, tiles: [
+                                ListTile(
+                                  title: primaryTileText('Current Peak Flow'),
+                                  subtitle: secondaryTileText('450'),
+                                  trailing: Icon(
+                                    Icons.arrow_forward_ios,
+                                    color: Colors.grey[600],
+                                    size: 20,
                                   ),
+                                  tileColor: Colors.white,
+                                  dense: false,
                                 ),
-                              ),
-                              trailing: Icon(
-                                Icons.arrow_forward_ios,
-                                color: Colors.grey[600],
-                                size: 20,
-                              ),
-                              tileColor: Colors.white,
-                              dense: false,
+                                ListTile(
+                                  title: primaryTileText('Medication Usage'),
+                                  subtitle:
+                                      secondaryTileText('1, Medication name'),
+                                  trailing: const Icon(
+                                    Icons.arrow_forward_ios,
+                                    color: Colors.black,
+                                    size: 20,
+                                  ),
+                                  tileColor: Colors.transparent,
+                                  dense: false,
+                                ),
+                                ListTile(
+                                  title: primaryTileText('Heart Rate'),
+                                  subtitle: secondaryTileText('85 bpm'),
+                                  trailing: const Icon(
+                                    Icons.arrow_forward_ios,
+                                    color: Colors.black,
+                                    size: 20,
+                                  ),
+                                  tileColor: Colors.transparent,
+                                  dense: false,
+                                ),
+                                ListTile(
+                                  title: primaryTileText('Weather & AQI'),
+                                  subtitle:
+                                      secondaryTileText('Clear, 33°C, 45 AQI'),
+                                  trailing: const Icon(
+                                    Icons.arrow_forward_ios,
+                                    color: Colors.black,
+                                    size: 20,
+                                  ),
+                                  tileColor: Colors.transparent,
+                                  dense: false,
+                                ),
+                              ]).toList(),
                             ),
-                            ListTile(
-                              title: Text(
-                                'Medication usage',
-                                style: GoogleFonts.outfit(
-                                  textStyle: TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 22,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ),
-                              subtitle: Text(
-                                '1, Medicine name',
-                                style: GoogleFonts.outfit(
-                                  textStyle: TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 18,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ),
-                              trailing: Icon(
-                                Icons.arrow_forward_ios,
-                                color: Colors.black,
-                                size: 20,
-                              ),
-                              tileColor: Colors.white,
-                              dense: false,
-                            ),
-                            ListTile(
-                              title: Text(
-                                'Heart Rates',
-                                style: GoogleFonts.outfit(
-                                  textStyle: TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 22,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ),
-                              subtitle: Text(
-                                '85 bpm',
-                                style: GoogleFonts.outfit(
-                                  textStyle: TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 12,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ),
-                              trailing: Icon(
-                                Icons.arrow_forward_ios,
-                                color: Colors.black,
-                                size: 20,
-                              ),
-                              tileColor: Colors.white,
-                              dense: false,
-                            ),
-                            ListTile(
-                              title: Text(
-                                'Weather & AQI',
-                                style: GoogleFonts.outfit(
-                                  textStyle: TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 22,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ),
-                              subtitle: Text(
-                                'Clear, 33°C',
-                                style: GoogleFonts.outfit(
-                                  textStyle: TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 12,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ),
-                              trailing: Icon(
-                                Icons.arrow_forward_ios,
-                                color: Colors.black,
-                                size: 20,
-                              ),
-                              tileColor: Colors.white,
-                              dense: false,
-                            ),
-                          ],
-                        ),
-                      ],
+                          )
+                        ],
+                      ),
                     ),
                   ),
-                ),
+                )
               ],
             ),
           ),
