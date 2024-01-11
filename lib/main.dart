@@ -1,5 +1,5 @@
-import 'package:asthsist_plus/pages/home_page.dart';
-import 'package:asthsist_plus/pages/loginPage.dart';
+// import 'package:asthsist_plus/pages/home_page.dart';
+// import 'package:asthsist_plus/pages/loginPage.dart';
 import 'package:asthsist_plus/pages/navigation_bar.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
