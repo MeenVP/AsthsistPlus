@@ -25,7 +25,7 @@ class _HomePageState extends State<HomePage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Padding(
-                padding: EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
+                padding: const EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
                 child: Text(
                   'Asthsist',
                   style: GoogleFonts.outfit(
@@ -38,7 +38,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               Align(
-                alignment: AlignmentDirectional(0, -1),
+                alignment: const AlignmentDirectional(0, -1),
                 child: Text(
                   '+',
                   style: GoogleFonts.outfit(
@@ -54,7 +54,7 @@ class _HomePageState extends State<HomePage> {
           ),
         actions: [
           Padding(
-            padding: EdgeInsetsDirectional.fromSTEB(0, 16, 8, 0),
+            padding: const EdgeInsetsDirectional.fromSTEB(0, 16, 8, 0),
             child: IconButton(
               icon: const Icon(
                 Icons.notifications_outlined,
@@ -147,7 +147,7 @@ class _HomePageState extends State<HomePage> {
                 //   ],
                 // ),
                 Padding(
-                  padding: EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
+                  padding: const EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
                   child: Row(
                     mainAxisSize: MainAxisSize.max,
                     children: [
@@ -180,9 +180,9 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
                 Padding(
-                  padding: EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
+                  padding: const EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
                   child: Material(
-                    borderRadius: BorderRadius.all(Radius.circular(16)),
+                    borderRadius: const BorderRadius.all(Radius.circular(16)),
                     elevation: 2,
                     child: Container(
                       decoration: BoxDecoration(
@@ -193,10 +193,10 @@ class _HomePageState extends State<HomePage> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Align(
-                            alignment: AlignmentDirectional(-1, -1),
+                            alignment: const AlignmentDirectional(-1, -1),
                             child: Padding(
                               padding:
-                                  EdgeInsetsDirectional.fromSTEB(16, 10, 0, 0),
+                                  const EdgeInsetsDirectional.fromSTEB(16, 10, 0, 0),
                               child: Text(
                                 'Your current risk',
                                 style: GoogleFonts.outfit(
@@ -210,10 +210,10 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                           Align(
-                            alignment: AlignmentDirectional(0, 0),
+                            alignment: const AlignmentDirectional(0, 0),
                             child: Padding(
                               padding:
-                                  EdgeInsetsDirectional.fromSTEB(0, 32, 0, 32),
+                                  const EdgeInsetsDirectional.fromSTEB(0, 32, 0, 32),
                               child: Text(
                                 'SAFE',
                                 style: GoogleFonts.outfit(
@@ -227,10 +227,10 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                           Align(
-                            alignment: AlignmentDirectional(1, 1),
+                            alignment: const AlignmentDirectional(1, 1),
                             child: Padding(
                               padding:
-                                  EdgeInsetsDirectional.fromSTEB(0, 0, 10, 10),
+                                  const EdgeInsetsDirectional.fromSTEB(0, 0, 10, 10),
                               child: Text(
                                 'Great job! ',
                                 textAlign: TextAlign.end,

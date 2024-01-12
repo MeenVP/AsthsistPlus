@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import '../style.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -7,16 +10,237 @@ class LoginPage extends StatefulWidget {
   static const String routeName = '/login';
 }
 
-class _LoginPageState extends State<LoginPage> {
-  bool _showLogin = true; // Toggle between login and register
+class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
+  late final TabController _tabController;
 
-  void _toggleForm() {
-    setState(() {
-      _showLogin = !_showLogin;
-    });
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
   }
 
   @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        backgroundColor: Style.primaryBackground,
+        body: SafeArea(
+            child: Padding(
+                padding: const EdgeInsetsDirectional.fromSTEB(0, 160, 0, 0),
+                  child: Column(mainAxisSize: MainAxisSize.max, children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Align(
+                          alignment: const AlignmentDirectional(0, 0),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.max,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Align(
+                                alignment: const AlignmentDirectional(0, 1),
+                                child: Text(
+                                  'Asthsist',
+                                  style: GoogleFonts.outfit(
+                                    textStyle: const TextStyle(
+                                      fontWeight: FontWeight.normal,
+                                      fontSize: 48,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Align(
+                                alignment: const AlignmentDirectional(0, 1),
+                                child: Padding(
+                                  padding: const EdgeInsetsDirectional.fromSTEB(
+                                      0, 0, 0, 32),
+                                  child: Text(
+                                    '+',
+                                    style: GoogleFonts.outfit(
+                                      textStyle: const TextStyle(
+                                        fontWeight: FontWeight.normal,
+                                        fontSize: 48,
+                                        color: Style.primaryColor,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
+                    Padding(
+                        padding:
+                            const EdgeInsetsDirectional.fromSTEB(64, 32, 64, 0),
+                        child: Column(children: [
+                          TabBar(
+                            controller: _tabController,
+                            indicatorPadding: const EdgeInsets.all(0.0),
+                            indicatorWeight: 4.0,
+                            indicatorSize: TabBarIndicatorSize.tab,
+                            indicator: const ShapeDecoration(
+                                shape: UnderlineInputBorder(
+                              borderSide: BorderSide(
+                                  color: Style.tertiaryColor,
+                                  width: 2,
+                                  style: BorderStyle.solid),
+                            )),
+                            dividerColor: Colors.transparent,
+                            labelColor: Style.tertiaryColor,
+                            labelStyle: GoogleFonts.outfit(
+                              textStyle: const TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 21,
+                                color: Style.tertiaryColor,
+                              ),
+                            ),
+                            unselectedLabelStyle: GoogleFonts.outfit(
+                              textStyle: const TextStyle(
+                                fontWeight: FontWeight.normal,
+                                fontSize: 18,
+                                color: Style.accent2,
+                              ),
+                            ),
+                            tabs: const <Widget>[
+                              Tab(
+                                text: 'Login',
+                              ),
+                              Tab(
+                                text: 'Register',
+                              ),
+                            ],
+                          )
+                        ])),
+                    Flexible(
+                      child: TabBarView(
+                        controller: _tabController,
+                        children: const <Widget>[
+                          Login(),
+                          Text('Specifications tab'),
+                        ],
+                      ),
+                    ),
+                  ]
+                )
+            )
+        )
+    );
+  }
+}
+
+class Login extends StatefulWidget {
+  const Login({Key? key}) : super(key: key);
+
+  @override
+  _LoginState createState() => _LoginState();
+}
+
+class _LoginState extends State<Login> {
+  final _formKey = GlobalKey<FormState>();
+
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+        key: _formKey,
+        child: Padding(
+          padding: const EdgeInsetsDirectional.fromSTEB(20, 16, 20, 0),
+          child: Column(
+            children: <Widget>[
+              TextFormField(
+                decoration: InputDecoration(
+                    labelText: 'Email Address',
+                    labelStyle: GoogleFonts.outfit(
+                      textStyle: const TextStyle(
+                        fontWeight: FontWeight.normal,
+                        color: Style.accent2,
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                      borderSide: const BorderSide(color: Colors.transparent),
+                    ),
+                    filled: true,
+                    fillColor: Color(0xFFE1E3E9)),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your email';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16.0),
+              TextFormField(
+                decoration: InputDecoration(
+                  labelText: 'Password',
+                  labelStyle: GoogleFonts.outfit(
+                    textStyle: const TextStyle(
+                      fontWeight: FontWeight.normal,
+                      color: Style.accent2,
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                    borderSide: const BorderSide(color: Colors.transparent),
+                  ),
+                  filled: true,
+                  fillColor: Color(0xFFE1E3E9),
+                  suffixIcon: const Icon(Icons.visibility_off),
+                ),
+                obscureText: true,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your password';
+                  }
+                  return null;
+                },
+              ),
+              Padding(
+                padding: const EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Style.tertiaryText,
+                    backgroundColor: Style.primaryColor,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    minimumSize: const Size(double.infinity, 60),
+                  ),
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      // Process data.
+                    }
+                  },
+                  child: Text(
+                    'Login',
+                    style: GoogleFonts.outfit(
+                      textStyle: GoogleFonts.outfit(
+                        textStyle: const TextStyle(
+                          fontWeight: FontWeight.normal,
+                          fontSize: 18,
+                          color: Style.secondaryBackground,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              )
+            ],
+          ),
+        ));
+  }
+}
+
+/*@override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
@@ -345,4 +569,4 @@ class _LoginPageState extends State<LoginPage> {
       ],
     );
   }
-}
+}*/
