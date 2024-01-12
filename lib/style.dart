@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 class Style {
   static const Color primaryColor = Color(0xFF4B39EF);
   static const Color secondaryColor = Color(0xFF1976D2);
+  static const Color tertiaryColor = Color(0xFF39D2C0);
   static const Color primaryText = Color(0xFF000000);
   static const Color secondaryText = Color(0xFF8b97a2);
   static const Color tertiaryText = Color(0xFFFFFFFF);
