@@ -28,6 +28,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        resizeToAvoidBottomInset: true,
         backgroundColor: Style.primaryBackground,
         body: SafeArea(
             child: Padding(
@@ -125,8 +126,8 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                       child: TabBarView(
                         controller: _tabController,
                         children: const <Widget>[
-                          Login(),
-                          Text('Specifications tab'),
+                          SingleChildScrollView(child: Login()), // Wrapped in SingleChildScrollView
+                          SingleChildScrollView(child: Register()),
                         ],
                       ),
                     ),
@@ -147,6 +148,8 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   final _formKey = GlobalKey<FormState>();
+  final _passwordController = TextEditingController();
+  bool passwordVisible = true;
 
   @override
   Widget build(BuildContext context) {
@@ -180,6 +183,8 @@ class _LoginState extends State<Login> {
               ),
               const SizedBox(height: 16.0),
               TextFormField(
+                controller: _passwordController,
+                obscureText: passwordVisible,
                 decoration: InputDecoration(
                   labelText: 'Password',
                   labelStyle: GoogleFonts.outfit(
@@ -194,9 +199,20 @@ class _LoginState extends State<Login> {
                   ),
                   filled: true,
                   fillColor: Color(0xFFE1E3E9),
-                  suffixIcon: const Icon(Icons.visibility_off),
+                  suffixIcon: IconButton(
+                    icon: Icon(passwordVisible
+                        ? Icons.visibility
+                        : Icons.visibility_off),
+                    onPressed: () {
+                      setState(
+                            () {
+                          passwordVisible = !passwordVisible;
+                        },
+                      );
+                    },
+                  ),
                 ),
-                obscureText: true,
+                // obscureText: true,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your password';
@@ -239,6 +255,168 @@ class _LoginState extends State<Login> {
         ));
   }
 }
+
+class Register extends StatefulWidget {
+  const Register({Key? key}) : super(key: key);
+
+  @override
+  _RegisterState createState() => _RegisterState();
+}
+
+class _RegisterState extends State<Register> {
+  final _formKey = GlobalKey<FormState>();
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+  bool passwordVisible = true;
+
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+      key: _formKey,
+      child: Padding(
+        padding: const EdgeInsetsDirectional.fromSTEB(20, 16, 20, 0),
+        child: Column(
+          children: <Widget>[
+            TextFormField(
+              decoration: InputDecoration(
+                  labelText: 'Email Address',
+                  labelStyle: GoogleFonts.outfit(
+                    textStyle: const TextStyle(
+                      fontWeight: FontWeight.normal,
+                      color: Style.accent2,
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                    borderSide: const BorderSide(color: Colors.transparent),
+                  ),
+                  filled: true,
+                  fillColor: Color(0xFFE1E3E9)),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter your email';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 16.0),
+            TextFormField(
+              controller: _passwordController,
+              obscureText: passwordVisible,
+              decoration: InputDecoration(
+                labelText: 'Password',
+                labelStyle: GoogleFonts.outfit(
+                  textStyle: const TextStyle(
+                    fontWeight: FontWeight.normal,
+                    color: Style.accent2,
+                  ),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                  borderSide: const BorderSide(color: Colors.transparent),
+                ),
+                filled: true,
+                fillColor: Color(0xFFE1E3E9),
+                suffixIcon: IconButton(
+                  icon: Icon(passwordVisible
+                      ? Icons.visibility
+                      : Icons.visibility_off),
+                  onPressed: () {
+                    setState(
+                          () {
+                        passwordVisible = !passwordVisible;
+                      },
+                    );
+                  },
+                ),
+              ),
+              // obscureText: true,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter your password';
+                }
+                if (value.length < 8) {
+                  return 'Password must be at least 8 characters long';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 16.0),
+            TextFormField(
+              controller: _confirmPasswordController,
+              obscureText: passwordVisible,
+              decoration: InputDecoration(
+                labelText: 'Confirm Password',
+                labelStyle: GoogleFonts.outfit(
+                  textStyle: const TextStyle(
+                    fontWeight: FontWeight.normal,
+                    color: Style.accent2,
+                  ),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                  borderSide: const BorderSide(color: Colors.transparent),
+                ),
+                filled: true,
+                fillColor: Color(0xFFE1E3E9),
+                suffixIcon: IconButton(
+                  icon: Icon(passwordVisible
+                      ? Icons.visibility
+                      : Icons.visibility_off),
+                  onPressed: () {
+                    setState(
+                          () {
+                        passwordVisible = !passwordVisible;
+                      },
+                    );
+                  },
+                ),
+              ),
+              // obscureText: true,
+              validator: (value) {
+                if (value != _passwordController.text) {
+                  return 'Passwords do not match';
+                }
+                return null;
+              },
+            ),
+            Padding(
+              padding: const EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Style.tertiaryText,
+                  backgroundColor: Style.primaryColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  minimumSize: const Size(double.infinity, 60),
+                ),
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    // Process data.
+                  }
+                },
+                child: Text(
+                  'Register',
+                  style: GoogleFonts.outfit(
+                    textStyle: GoogleFonts.outfit(
+                      textStyle: const TextStyle(
+                        fontWeight: FontWeight.normal,
+                        fontSize: 18,
+                        color: Style.secondaryBackground,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 
 /*@override
   Widget build(BuildContext context) {
