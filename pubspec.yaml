@@ -41,6 +41,8 @@ dependencies:
   permission_handler: ^11.1.0
   cloud_firestore: ^4.14.0
   firebase_auth: ^4.16.0
+  syncfusion_flutter_calendar: ^24.1.45
+  table_calendar: ^3.0.9
 
 dev_dependencies:
   flutter_test:
@@ -51,7 +53,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^2.0.0
+  flutter_lints: ^3.0.1
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

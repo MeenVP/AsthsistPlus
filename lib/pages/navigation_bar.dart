@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:asthsist_plus/pages/home_page.dart';
 import 'package:asthsist_plus/style.dart';
 
+import 'calendar_page.dart';
+
 class NavigationBarApp extends StatefulWidget {
   const NavigationBarApp({super.key});
 
@@ -13,9 +15,7 @@ class _NavigationState extends State<NavigationBarApp> {
   int currentPageIndex = 0;
   static const List<Widget> _widgetOptions = <Widget>[
     HomePage(),
-    Text(
-      'Index 1: Calendar',
-    ),
+    CalendarPage(),
     Text(
       'Index 2: Health Info',
     ),
