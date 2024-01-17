@@ -2,6 +2,8 @@ import 'package:asthsist_plus/style.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'notification_page.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -61,7 +63,12 @@ class _HomePageState extends State<HomePage> {
                 size: 28,
               ),
               tooltip: 'Show Snackbar',
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => NotificationsPage()),
+                );
+              },
             ),
           )
         ],
