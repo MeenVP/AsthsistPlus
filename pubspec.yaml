@@ -43,6 +43,7 @@ dependencies:
   firebase_auth: ^4.16.0
   syncfusion_flutter_calendar: ^24.1.45
   table_calendar: ^3.0.9
+  intl: ^0.18.1
 
 dev_dependencies:
   flutter_test:

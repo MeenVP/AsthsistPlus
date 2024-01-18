@@ -1,3 +1,4 @@
+import 'package:asthsist_plus/pages/settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:asthsist_plus/pages/home_page.dart';
 import 'package:asthsist_plus/style.dart';
@@ -19,9 +20,7 @@ class _NavigationState extends State<NavigationBarApp> {
     Text(
       'Index 2: Health Info',
     ),
-    Text(
-      'Index 3: Settings',
-    ),
+    SettingsPage(),
   ];
 
   @override
