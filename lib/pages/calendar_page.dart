@@ -88,8 +88,6 @@ class _CalendarState extends State<CalendarPage> with TickerProviderStateMixin {
                                       _buildMinimizedCalendar(),
                                       ElevatedButton(
                                         style: ElevatedButton.styleFrom(
-                                          primary: Style.secondaryBackground,
-                                          onPrimary: Style.primaryColor,
                                           shape: const CircleBorder(),
                                         ),
                                         child: const Icon(Icons.calendar_month),
