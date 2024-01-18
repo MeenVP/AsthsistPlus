@@ -5,7 +5,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'notification_page.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({super.key});
+
 
   static const String routeName = '/home';
 
@@ -14,6 +15,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final String userName = 'Username';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -159,7 +161,7 @@ class _HomePageState extends State<HomePage> {
                     mainAxisSize: MainAxisSize.max,
                     children: [
                       Text(
-                        'Good Morning',
+                        'Welcome Back',
                         style: GoogleFonts.outfit(
                           textStyle: const TextStyle(
                             fontWeight: FontWeight.w500,
@@ -175,12 +177,12 @@ class _HomePageState extends State<HomePage> {
                   mainAxisSize: MainAxisSize.max,
                   children: [
                     Text(
-                      'Username 👋',
+                      '$userName 👋',
                       style: GoogleFonts.outfit(
-                        textStyle: TextStyle(
+                        textStyle: const TextStyle(
                           fontWeight: FontWeight.w700,
                           fontSize: 28,
-                          color: Colors.deepPurpleAccent[400],
+                          color: Style.primaryColor,
                         ),
                       ),
                     ),
