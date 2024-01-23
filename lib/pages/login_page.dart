@@ -1,3 +1,4 @@
+import 'package:asthsist_plus/pages/navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -7,7 +8,7 @@ class LoginPage extends StatefulWidget {
   @override
   _LoginPageState createState() => _LoginPageState();
   const LoginPage({Key? key}) : super(key: key);
-  static const String routeName = '/login';
+  // static const String routeName = '/login';
 }
 
 class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
@@ -233,6 +234,8 @@ class _LoginState extends State<Login> {
                   ),
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
+                      Navigator.pushReplacement(context,
+                          MaterialPageRoute(builder: (context) => const NavigationBarApp()));
                       // Process data.
                     }
                   },
