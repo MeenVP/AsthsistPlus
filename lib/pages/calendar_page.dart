@@ -147,10 +147,10 @@ class _CalendarState extends State<CalendarPage> with TickerProviderStateMixin {
                         child: TabBarView(
                           controller: _tabController,
                           children: <Widget>[
-                            buildCategoryView('Category1'),
-                            buildCategoryView('Category2'),
-                            buildCategoryView('Category3'),
-                            buildCategoryView('Category4'),
+                            CategoryList(category: 'Category1'),
+                            CategoryList(category: 'Category2'),
+                            CategoryList(category: 'Category3'),
+                            CategoryList(category: 'Category4'),
                           ],
                         ),
                       ),
