@@ -1,6 +1,7 @@
 // import 'package:asthsist_plus/pages/home_page.dart';
 import 'package:asthsist_plus/pages/login_page.dart';
 import 'package:asthsist_plus/pages/navigation_bar.dart';
+import 'package:asthsist_plus/widget_tree.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -32,7 +33,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       // home: NavigationBarApp()
       //home: HomePage(),
-      home: LoginPage(),
+      home: WidgetTree(),
 
 
     );

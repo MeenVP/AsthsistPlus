@@ -19,6 +19,11 @@ class Style {
   static const Color success = Color(0xFF0EC863);
   static const Color danger = Color(0xFFF44336);
   static const Color warning = Color(0xFFf99e2f);
+  static const Color heartrate = Color(0xffFB6C81);
+  static const Color medication = Color(0xff64C68F);
+  static const Color pef = Color(0xff1976D2);
+  static const Color weather = Color(0xffe8a548);
+  static const Color air = Color(0xff757575);
 
 }
 

@@ -1,8 +1,10 @@
 import 'package:asthsist_plus/pages/navigation_bar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
+import '../backend/auth.dart';
 import '../style.dart';
+import 'complete_profile_page.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -34,109 +36,106 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
         body: SafeArea(
             child: Padding(
                 padding: const EdgeInsetsDirectional.fromSTEB(0, 160, 0, 0),
-                  child: Column(mainAxisSize: MainAxisSize.max, children: [
-                    Row(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Align(
-                          alignment: const AlignmentDirectional(0, 0),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.max,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Align(
-                                alignment: const AlignmentDirectional(0, 1),
+                child: Column(mainAxisSize: MainAxisSize.max, children: [
+                  Row(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Align(
+                        alignment: const AlignmentDirectional(0, 0),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Align(
+                              alignment: const AlignmentDirectional(0, 1),
+                              child: Text(
+                                'Asthsist',
+                                style: GoogleFonts.outfit(
+                                  textStyle: const TextStyle(
+                                    fontWeight: FontWeight.normal,
+                                    fontSize: 48,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Align(
+                              alignment: const AlignmentDirectional(0, 1),
+                              child: Padding(
+                                padding: const EdgeInsetsDirectional.fromSTEB(
+                                    0, 0, 0, 32),
                                 child: Text(
-                                  'Asthsist',
+                                  '+',
                                   style: GoogleFonts.outfit(
                                     textStyle: const TextStyle(
                                       fontWeight: FontWeight.normal,
                                       fontSize: 48,
-                                      color: Colors.black,
+                                      color: Style.primaryColor,
                                     ),
                                   ),
                                 ),
                               ),
-                              Align(
-                                alignment: const AlignmentDirectional(0, 1),
-                                child: Padding(
-                                  padding: const EdgeInsetsDirectional.fromSTEB(
-                                      0, 0, 0, 32),
-                                  child: Text(
-                                    '+',
-                                    style: GoogleFonts.outfit(
-                                      textStyle: const TextStyle(
-                                        fontWeight: FontWeight.normal,
-                                        fontSize: 48,
-                                        color: Style.primaryColor,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                  Padding(
+                      padding:
+                          const EdgeInsetsDirectional.fromSTEB(64, 32, 64, 0),
+                      child: Column(children: [
+                        TabBar(
+                          controller: _tabController,
+                          indicatorPadding: const EdgeInsets.all(0.0),
+                          indicatorWeight: 4.0,
+                          indicatorSize: TabBarIndicatorSize.tab,
+                          indicator: const ShapeDecoration(
+                              shape: UnderlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Style.tertiaryColor,
+                                width: 2,
+                                style: BorderStyle.solid),
+                          )),
+                          dividerColor: Colors.transparent,
+                          labelColor: Style.tertiaryColor,
+                          labelStyle: GoogleFonts.outfit(
+                            textStyle: const TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 21,
+                              color: Style.tertiaryColor,
+                            ),
                           ),
+                          unselectedLabelStyle: GoogleFonts.outfit(
+                            textStyle: const TextStyle(
+                              fontWeight: FontWeight.normal,
+                              fontSize: 18,
+                              color: Style.accent2,
+                            ),
+                          ),
+                          tabs: const <Widget>[
+                            Tab(
+                              text: 'Sign in',
+                            ),
+                            Tab(
+                              text: 'Register',
+                            ),
+                          ],
                         )
+                      ])),
+                  Flexible(
+                    child: TabBarView(
+                      controller: _tabController,
+                      children: const <Widget>[
+                        SingleChildScrollView(
+                            child: Login()), // Wrapped in SingleChildScrollView
+                        SingleChildScrollView(child: Register()),
                       ],
                     ),
-                    Padding(
-                        padding:
-                            const EdgeInsetsDirectional.fromSTEB(64, 32, 64, 0),
-                        child: Column(children: [
-                          TabBar(
-                            controller: _tabController,
-                            indicatorPadding: const EdgeInsets.all(0.0),
-                            indicatorWeight: 4.0,
-                            indicatorSize: TabBarIndicatorSize.tab,
-                            indicator: const ShapeDecoration(
-                                shape: UnderlineInputBorder(
-                              borderSide: BorderSide(
-                                  color: Style.tertiaryColor,
-                                  width: 2,
-                                  style: BorderStyle.solid),
-                            )),
-                            dividerColor: Colors.transparent,
-                            labelColor: Style.tertiaryColor,
-                            labelStyle: GoogleFonts.outfit(
-                              textStyle: const TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 21,
-                                color: Style.tertiaryColor,
-                              ),
-                            ),
-                            unselectedLabelStyle: GoogleFonts.outfit(
-                              textStyle: const TextStyle(
-                                fontWeight: FontWeight.normal,
-                                fontSize: 18,
-                                color: Style.accent2,
-                              ),
-                            ),
-                            tabs: const <Widget>[
-                              Tab(
-                                text: 'Login',
-                              ),
-                              Tab(
-                                text: 'Register',
-                              ),
-                            ],
-                          )
-                        ])),
-                    Flexible(
-                      child: TabBarView(
-                        controller: _tabController,
-                        children: const <Widget>[
-                          SingleChildScrollView(child: Login()), // Wrapped in SingleChildScrollView
-                          SingleChildScrollView(child: Register()),
-                        ],
-                      ),
-                    ),
-                  ]
-                )
-            )
-        )
-    );
+                  ),
+                ]))));
   }
 }
 
@@ -149,8 +148,21 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool passwordVisible = true;
+  String? errorMessage = '';
+
+  Future<void> signInWithEmailAndPassword() async {
+    try {
+      await FirebaseAuthService().signInWithEmailAndPassword(
+          _emailController.text, _passwordController.text);
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        errorMessage = 'Wrong email or password';
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -161,6 +173,7 @@ class _LoginState extends State<Login> {
           child: Column(
             children: <Widget>[
               TextFormField(
+                controller: _emailController,
                 decoration: InputDecoration(
                     labelText: 'Email Address',
                     labelStyle: GoogleFonts.outfit(
@@ -206,7 +219,7 @@ class _LoginState extends State<Login> {
                         : Icons.visibility_off),
                     onPressed: () {
                       setState(
-                            () {
+                        () {
                           passwordVisible = !passwordVisible;
                         },
                       );
@@ -221,6 +234,7 @@ class _LoginState extends State<Login> {
                   return null;
                 },
               ),
+              _error(),
               Padding(
                 padding: const EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
                 child: ElevatedButton(
@@ -233,14 +247,10 @@ class _LoginState extends State<Login> {
                     minimumSize: const Size(double.infinity, 60),
                   ),
                   onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      Navigator.pushReplacement(context,
-                          MaterialPageRoute(builder: (context) => const NavigationBarApp()));
-                      // Process data.
-                    }
+                    signInWithEmailAndPassword();
                   },
                   child: Text(
-                    'Login',
+                    'Sign in',
                     style: GoogleFonts.outfit(
                       textStyle: GoogleFonts.outfit(
                         textStyle: const TextStyle(
@@ -252,8 +262,55 @@ class _LoginState extends State<Login> {
                     ),
                   ),
                 ),
+              ),
+              Padding(
+                padding: const EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Style.tertiaryText,
+                    backgroundColor: Style.secondaryBackground,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    minimumSize: const Size(double.infinity, 60),
+                  ),
+                  onPressed: () {},
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.g_mobiledata, color: Style.primaryText),
+                      Text(
+                        'Sign in with Google',
+                        style: GoogleFonts.outfit(
+                          textStyle: GoogleFonts.outfit(
+                            textStyle: const TextStyle(
+                              fontWeight: FontWeight.normal,
+                              fontSize: 18,
+                              color: Style.primaryText,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               )
             ],
+          ),
+        ));
+  }
+
+  Widget _error() {
+    return Padding(
+        padding: const EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
+        child: Text(
+          errorMessage!,
+          style: GoogleFonts.outfit(
+            textStyle: const TextStyle(
+              fontWeight: FontWeight.normal,
+              fontSize: 18,
+              color: Colors.red,
+            ),
           ),
         ));
   }
@@ -268,9 +325,45 @@ class Register extends StatefulWidget {
 
 class _RegisterState extends State<Register> {
   final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   bool passwordVisible = true;
+  String? errorMessage = '';
+  bool error = false;
+
+  Future<void> createUserWithEmailAndPassword() async {
+    try {
+      await FirebaseAuthService().createUserWithEmailAndPassword(
+          _emailController.text, _passwordController.text);
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => CompleteProfilePage(),
+        ),
+      );
+    } on FirebaseAuthException catch (e) {
+      print(e.message);
+      setState(() {
+        errorMessage = e.message;
+      });
+    }
+  }
+
+
+  Widget _error() {
+    return Padding(
+        padding: const EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
+        child: Text(
+          errorMessage!,
+          style: GoogleFonts.outfit(
+            textStyle: const TextStyle(
+              fontWeight: FontWeight.normal,
+              fontSize: 18,
+              color: Colors.red,
+            ),
+          ),
+        ));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -281,6 +374,7 @@ class _RegisterState extends State<Register> {
         child: Column(
           children: <Widget>[
             TextFormField(
+              controller: _emailController,
               decoration: InputDecoration(
                   labelText: 'Email Address',
                   labelStyle: GoogleFonts.outfit(
@@ -319,14 +413,14 @@ class _RegisterState extends State<Register> {
                   borderSide: const BorderSide(color: Colors.transparent),
                 ),
                 filled: true,
-                fillColor: Color(0xFFE1E3E9),
+                fillColor: const Color(0xFFE1E3E9),
                 suffixIcon: IconButton(
                   icon: Icon(passwordVisible
                       ? Icons.visibility
                       : Icons.visibility_off),
                   onPressed: () {
                     setState(
-                          () {
+                      () {
                         passwordVisible = !passwordVisible;
                       },
                     );
@@ -368,7 +462,7 @@ class _RegisterState extends State<Register> {
                       : Icons.visibility_off),
                   onPressed: () {
                     setState(
-                          () {
+                      () {
                         passwordVisible = !passwordVisible;
                       },
                     );
@@ -383,6 +477,7 @@ class _RegisterState extends State<Register> {
                 return null;
               },
             ),
+            _error(),
             Padding(
               padding: const EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
               child: ElevatedButton(
@@ -394,9 +489,12 @@ class _RegisterState extends State<Register> {
                   ),
                   minimumSize: const Size(double.infinity, 60),
                 ),
-                onPressed: () {
+                onPressed: () async {
                   if (_formKey.currentState!.validate()) {
-                    // Process data.
+                    final navigator = Navigator.of(context);
+                    final buildContext = context;
+                    await createUserWithEmailAndPassword();
+                    errorMessage == '' ? error = false : error = true;
                   }
                 },
                 child: Text(
@@ -419,335 +517,3 @@ class _RegisterState extends State<Register> {
     );
   }
 }
-
-
-/*@override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: EdgeInsets.symmetric(horizontal: 24.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                Text(
-                  'Asthsist+',
-                  style: TextStyle(
-                    fontSize: 32.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: 10.0),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    TextButton(
-                      onPressed: () {
-                        if (!_showLogin) _toggleForm();
-                      },
-                      child: Text(
-                        'Login',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: _showLogin ? Colors.tealAccent[400] : Colors.deepPurple,
-                          fontWeight: _showLogin ? FontWeight.bold : FontWeight.normal,
-                        ),
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        if (_showLogin) _toggleForm();
-                      },
-                      child: Text(
-                        'Register',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: _showLogin ? Colors.deepPurple : Colors.tealAccent[400],
-                          fontWeight: !_showLogin ? FontWeight.bold : FontWeight.normal,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                if (_showLogin) ...[
-                  _buildLogin(),
-                ] else ...[
-                  _buildRegister(),
-                ],
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLogin() {
-    return Column(
-      children: <Widget>[
-        SizedBox(height: 40),
-        TextFormField(
-          decoration: InputDecoration(
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(15.0),
-              borderSide: BorderSide.none,
-            ),
-            labelText: 'Email Address',
-            hintText: 'Enter your email...',
-            floatingLabelStyle: const TextStyle(
-              height: 4,
-              color: Colors.grey,
-            ),
-            filled: true,
-            fillColor: Colors.grey[200],
-            prefixIcon: const Icon(Icons.person),
-          ),
-        ),
-        SizedBox(height: 15.0),
-        TextFormField(
-          decoration: InputDecoration(
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(15.0),
-              borderSide: BorderSide.none,
-            ),
-            labelText: 'Password',
-            hintText: 'Enter your password...',
-            floatingLabelStyle: const TextStyle(
-              height: 4,
-              color: Colors.grey,
-            ),
-            filled: true,
-            fillColor: Colors.grey[200],
-            prefixIcon: const Icon(Icons.lock),
-          ),
-        ),
-        SizedBox(height: 24.0),
-        ElevatedButton(
-          child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 10.0),
-            child: Text(
-              'Login',
-              style: TextStyle(fontSize: 15),
-            ),
-          ),
-          style: ElevatedButton.styleFrom(
-            shape: StadiumBorder(),
-            primary: Colors.deepPurple,
-            onPrimary: Colors.white,
-            minimumSize: Size(double.infinity, 26), // <-- match parent width and fixed height
-          ),
-          onPressed: () {
-            // Implement login logic
-          },
-        ),
-        TextButton(
-            child: Text(
-              'Forgot Password',
-          ),
-          onPressed: () {
-            // Implement login logic
-          },
-        ),
-        SizedBox(height: 16.0),
-        Divider(),
-        SizedBox(height: 16.0),
-//               // ElevatedButton.icon(
-//               //   // icon: Image.asset('assets/google_logo.png', height: 18.0),
-//               //   label: Text('Sign in with Google'),
-//               //   onPressed: () {
-//               //     // Implement Google sign-in logic
-//               //   },
-//               //   style: ElevatedButton.styleFrom(
-//               //     primary: Colors.white, // Background color
-//               //     onPrimary: Colors.black, // Text Color
-//               //   ),
-//               // ),
-//               // SizedBox(height: 8.0),
-//               // ElevatedButton.icon(
-//               //   icon: Icon(Icons.apple, size: 18.0),
-//               //   label: Text('Sign in with Apple'),
-//               //   onPressed: () {
-//               //     // Implement Apple sign-in logic
-//               //   },
-//               //   style: ElevatedButton.styleFrom(
-//               //     primary: Colors.black, // Background color
-//               //     onPrimary: Colors.white, // Text Color
-//               //   ),
-//               // ),
-      ],
-    );
-  }
-
-  Widget _buildRegister() {
-    String _gender = 'Male';
-    return Column(
-      children: <Widget>[
-        SizedBox(height: 40),
-        TextFormField(
-          decoration: InputDecoration(
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(15.0),
-              borderSide: BorderSide.none,
-            ),
-            labelText: 'Firstname',
-            hintText: 'Please enter a valid name',
-            floatingLabelStyle: const TextStyle(
-              height: 4,
-              color: Colors.grey,
-            ),
-            filled: true,
-            fillColor: Colors.grey[200],
-            prefixIcon: const Icon(Icons.person),
-          ),
-        ),
-        SizedBox(height: 15.0),
-        TextFormField(
-          decoration: InputDecoration(
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(15.0),
-              borderSide: BorderSide.none,
-            ),
-            labelText: 'Lastname',
-            hintText: 'Please enter a valid name',
-            floatingLabelStyle: const TextStyle(
-              height: 4,
-              color: Colors.grey,
-            ),
-            filled: true,
-            fillColor: Colors.grey[200],
-            prefixIcon: const Icon(Icons.person_outline),
-          ),
-        ),
-        SizedBox(height: 15.0),
-        TextFormField(
-          decoration: InputDecoration(
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(15.0),
-              borderSide: BorderSide.none,
-            ),
-            labelText: 'Date of Birth',
-            hintText: 'Please select a valid date',
-            floatingLabelStyle: const TextStyle(
-              height: 4,
-              color: Colors.grey,
-            ),
-            filled: true,
-            fillColor: Colors.grey[200],
-            prefixIcon: const Icon(Icons.calendar_today),
-          ),
-        ),
-        SizedBox(height: 15.0),
-        Row(
-          children: <Widget>[
-            Expanded(
-              child: TextFormField(
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(15.0),
-                    borderSide: BorderSide.none,
-                  ),
-                  labelText: 'Weight',
-                  hintText: 'Weight in kg',
-                  floatingLabelStyle: const TextStyle(
-                    height: 4,
-                    color: Colors.grey,
-                  ),
-                  filled: true,
-                  fillColor: Colors.grey[200],
-                ),
-              ),
-            ),
-            SizedBox(width: 15.0),
-            Expanded(
-              child: TextFormField(
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(15.0),
-                    borderSide: BorderSide.none,
-                  ),
-                  labelText: 'Height',
-                  hintText: 'Height in cm',
-                  floatingLabelStyle: const TextStyle(
-                    height: 4,
-                    color: Colors.grey,
-                  ),
-                  filled: true,
-                  fillColor: Colors.grey[200],
-                ),
-              ),
-            ),
-          ],
-        ),
-        SizedBox(height: 15.0),
-        TextFormField(
-          decoration: InputDecoration(
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(15.0),
-              borderSide: BorderSide.none,
-            ),
-            labelText: 'Personal best Peak Flow',
-            hintText: 'Please enter a valid number',
-            floatingLabelStyle: const TextStyle(
-              height: 4,
-              color: Colors.grey,
-            ),
-            filled: true,
-            fillColor: Colors.grey[200],
-            prefixIcon: const Icon(Icons.fitness_center),
-            suffixIcon: const Icon(Icons.help_outline),
-          ),
-        ),
-        SizedBox(height: 24.0),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Radio(
-              value: 'Male',
-              groupValue: 'Gender',
-              onChanged: (String? value) {
-                setState(() {
-                  _gender = value ?? _gender;
-                });
-                // Handle radio value changed
-              },
-            ),
-            Text('Male'),
-            Radio(
-              value: 'Female',
-              groupValue: 'Gender',
-              onChanged: (String? value) {
-                setState(() {
-                  _gender = value ?? _gender;
-                });
-                // Handle radio value changed
-              },
-            ),
-            Text('Female'),
-          ],
-        ),
-        SizedBox(height: 24.0),
-        ElevatedButton(
-          child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 10.0),
-            child: Text(
-              'Complete Profile',
-              style: TextStyle(fontSize: 20),
-            ),
-          ),
-          style: ElevatedButton.styleFrom(
-            shape: StadiumBorder(),
-            primary: Colors.deepPurple,
-            onPrimary: Colors.white,
-            minimumSize: Size(double.infinity, 50), // Set a larger height
-          ),
-          onPressed: () {
-            // Implement register logic
-          },
-        ),
-      ],
-    );
-  }
-}*/

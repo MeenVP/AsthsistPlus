@@ -1,20 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../backend/auth.dart';
 
-import '../style.dart'; // Import the flutter_health package
+import '../style.dart';
+import '../widget_tree.dart';
+import 'edit_profile_page.dart'; // Import the flutter_health package
 
-class SettingsPage extends StatelessWidget {
+class SettingsPage extends StatefulWidget{
+  const SettingsPage({super.key});
   final bool isDarkModeEnabled = false;
+
+  @override
+  State<SettingsPage> createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends State<SettingsPage> {
+
   static const String username = 'Username';
   final String age = 'Age';
   final String email = 'email@email.com';
-  const SettingsPage({super.key});
 
+  final isDarkModeEnabled = false;
+  Future<void> signOut() async {
+    await FirebaseAuthService().signOut();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Style.primaryBackground,
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           title: Padding(
               padding: const EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
               child: Text(
@@ -53,13 +68,22 @@ class SettingsPage extends StatelessWidget {
                       IconButton(
                         icon: const Icon(Icons.edit),
                         onPressed: () {
-                          // Implement your edit profile functionality here
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const EditProfilePage()
+                            ),
+                          );
                         },
                       ),
                       IconButton(
                         icon: const Icon(Icons.logout),
                         onPressed: () {
-                          // Implement your edit profile functionality here
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const WidgetTree()),
+                          );
+                          signOut();
                         },
                       ),
                     ],
