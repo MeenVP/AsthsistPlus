@@ -1,6 +1,7 @@
 import 'package:asthsist_plus/pages/navigation_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../style.dart';
 
@@ -81,17 +82,47 @@ class _AsthmaControlTestPageState extends State<AsthmaControlTestPage> {
       backgroundColor: Style.primaryBackground,
       appBar: AppBar(
         backgroundColor: Style.primaryBackground,
-        title: const Text('Asthma Control Test'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          }
+        automaticallyImplyLeading: false,
+        leading: Padding(
+        padding: const EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
+    child: InkWell(
+          splashColor: Colors.transparent,
+          focusColor: Colors.transparent,
+          hoverColor: Colors.transparent,
+          highlightColor: Colors.transparent,
+          onTap: () async {
+            Navigator.of(context).pop();
+          },
+          child: Icon(
+            Icons.chevron_left_rounded,
+            color: Style.accent2,
+            size: 32,
+          ),
         ),
+        ),
+        title: Padding(
+    padding: const EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
+    child: Align(
+          alignment: AlignmentDirectional(-1.3, 0),
+          child: Text(
+            'Asthma Control Test',
+            style: GoogleFonts.outfit(
+              textStyle: const TextStyle(
+                fontWeight: FontWeight.normal,
+                fontSize: 24,
+                color: Colors.black,
+              ),
+            ),
+          )
+        ),
+        ),
+        actions: [],
+        centerTitle: false,
+        elevation: 0,
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(16),
           child: Column(
             children: [
               // The '...' (spread operator) is used to insert all the elements of the list into the children array.
@@ -99,21 +130,20 @@ class _AsthmaControlTestPageState extends State<AsthmaControlTestPage> {
                 // This map function transforms each question map into a widget.
                 // It takes the current question map and finds its index in the _questions list.
                 int questionIndex = _questions.indexOf(question);
-                return Card(
-                  color: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
+                return Padding(padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 16)
+                ,child:Material(
+                    borderRadius:
+                    const BorderRadius.all(Radius.circular(16)),
+                elevation: 2,
+                child: Container(
+                decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                color: Style.secondaryBackground),
+                child: Column(
                     children: [
                       ListTile(
-                        title: Text(
-                          question['question'],
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        title: primaryTileText(
+                          question['question'],),
                       ),
                       // The '...' (spread operator) is used again to insert all option widgets into the children array.
                       ...question['options'].map<Widget>((option) {
@@ -131,9 +161,8 @@ class _AsthmaControlTestPageState extends State<AsthmaControlTestPage> {
                       }).toList(), // Convert the iterable returned by map to a list.
                     ],
                   ),
-                );
-              }).toList(),
-              const SizedBox(height: 16), // Provide some spacing before the save button.
+                )));
+              }).toList(), // Provide some spacing before the save button.
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   primary: Style.primaryColor, // Use your style for buttons here.
