@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../pages/navigation_bar.dart';
 import '../pages/login_page.dart';
-import '../backend/auth.dart';
+import '../backend/firebase.dart';
 
 class WidgetTree extends StatefulWidget {
   const WidgetTree({Key? key}) : super(key: key);
@@ -14,7 +14,7 @@ class _WidgetTreeState extends State<WidgetTree> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-      stream: FirebaseAuthService().authStateChanges,
+      stream: FirebaseService().authStateChanges,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           return const NavigationBarApp();

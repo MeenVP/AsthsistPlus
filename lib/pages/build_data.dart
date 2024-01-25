@@ -1,3 +1,4 @@
+import 'package:asthsist_plus/backend/firebase.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -30,43 +31,77 @@ import '../style.dart';
 
 class CategoryList extends StatefulWidget {
   final String category;
+  final DateTime date;
 
-  CategoryList({Key? key, required this.category}) : super(key: key);
+  CategoryList({Key? key, required this.category, required this.date}) : super(key: key);
 
   @override
   _CategoryListState createState() => _CategoryListState();
 }
 
 class _CategoryListState extends State<CategoryList> {
-  late Map<String, List<Map<String, dynamic>>> data;
+  late DateTime _selectedDay;
+
+  late Map<String, List<Map<String, dynamic>>> data = {
+    'Category1': [],
+    'Category2': [],
+    'Category3': [],
+    'pef': [],
+  };
+
+  @override
+  void didUpdateWidget(CategoryList oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.date != oldWidget.date) {
+      setState(() {
+        _selectedDay = widget.date;
+        FirebaseService().getPefValuesForDay(_selectedDay).then((pefValues) {
+          FirebaseService().getMedicationForDay(_selectedDay).then((medications) {
+            FirebaseService().getHRForDay(_selectedDay).then((hr) {
+              updateData(pefValues, medications, hr);
+            });
+          });
+        });
+        // Fetch data for _selectedDay
+      });
+    }
+  }
+
+
 
   @override
   void initState() {
+    _selectedDay = widget.date;
     super.initState();
-    data = {
-      'Category1': [
-        {'data': 'Data 1', 'time': DateTime.now().subtract(Duration(days: 1))},
-        {'data': 'Data 2', 'time': DateTime.now().subtract(Duration(days: 2))},
-        {'data': 'Data 1', 'time': DateTime.now().subtract(Duration(days: 1))},
-        {'data': 'Data 2', 'time': DateTime.now().subtract(Duration(days: 2))},
-        {'data': 'Data 1', 'time': DateTime.now().subtract(Duration(days: 1))},
-        {'data': 'Data 2', 'time': DateTime.now().subtract(Duration(days: 2))},
-      ],
-      'Category2': [
-        {'data': 'Data 3', 'time': DateTime.now().subtract(Duration(days: 3))},
-        {'data': 'Data 4', 'time': DateTime.now().subtract(Duration(days: 4))},
-      ],
-      'Category3': [
-        {'data': 'Data 5', 'time': DateTime.now().subtract(Duration(days: 5))},
-        {'data': 'Data 6', 'time': DateTime.now().subtract(Duration(days: 6))},
-      ],
-      'Category4': [
-        {'data': 'Data 7', 'time': DateTime.now().subtract(Duration(days: 7))},
-        {'data': 'Data 8', 'time': DateTime.now().subtract(Duration(days: 8))},
-      ],
-    };
+    FirebaseService().getPefValuesForDay(_selectedDay).then((pefValues) {
+      FirebaseService().getMedicationForDay(_selectedDay).then((medications) {
+        FirebaseService().getHRForDay(_selectedDay).then((hr) {
+          updateData(pefValues, medications, hr);
+        });
+      });
+    });
     super.initState();
   }
+
+  void updateData(List<Map<String, dynamic>> pefValues, List<Map<String, dynamic>>medications, List<Map<String, dynamic>> hr) {
+    print(pefValues);
+    setState(() {
+      data = {
+        'HeartRate': hr,
+        'Medications': medications,
+        'Category3': [
+          {'data': 'Data 1', 'time': DateTime.now().subtract(Duration(days: 1))},
+          {'data': 'Data 2', 'time': DateTime.now().subtract(Duration(days: 2))},
+          {'data': 'Data 1', 'time': DateTime.now().subtract(Duration(days: 1))},
+          {'data': 'Data 2', 'time': DateTime.now().subtract(Duration(days: 2))},
+          {'data': 'Data 1', 'time': DateTime.now().subtract(Duration(days: 1))},
+          {'data': 'Data 2', 'time': DateTime.now().subtract(Duration(days: 2))},
+        ],
+        'pef': pefValues,
+      };
+    });
+  }
+
   Widget build(BuildContext context) {
     return buildCategoryView(widget.category, context);
   }

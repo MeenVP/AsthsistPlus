@@ -1,9 +1,10 @@
+import 'package:asthsist_plus/backend/firebase.dart';
 import 'package:asthsist_plus/pages/asthma_control_test_page.dart';
 import 'package:asthsist_plus/style.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import 'notification_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -16,7 +17,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final String userName = 'Username';
   final int heartRate = 85;
   final String weather = 'clear';
   final int tem = 33;
@@ -26,19 +26,56 @@ class _HomePageState extends State<HomePage> {
 
   void _showAddPeakFlowDialog(BuildContext context) {
     TextEditingController peakFlowController = TextEditingController();
+    String? errorMessage = '';
+    bool error = false;
+
+    Future<void> addPeakFlow() async {
+      try {
+        await FirebaseService().addPef(peakFlowController.text);
+        Navigator.of(context).pop();
+      } on FirebaseAuthException catch (e) {
+        print(e.message);
+        setState(() {
+          errorMessage = e.message;
+        });
+      }
+    }
+
+    Widget showError() {
+      return Text(
+        errorMessage!,
+        style: GoogleFonts.outfit(
+          textStyle: const TextStyle(
+            fontWeight: FontWeight.normal,
+            fontSize: 18,
+            color: Colors.red,
+          ),
+        ),
+      );
+    }
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Add Peak Flow Data'),
-          content: TextField(
-            controller: peakFlowController,
-            keyboardType: TextInputType.number,
-            decoration: InputDecoration(hintText: "Enter peak flow value"),
-            inputFormatters: <TextInputFormatter>[
-              FilteringTextInputFormatter.digitsOnly // Only allow digits
-            ],
+          content: SizedBox(
+            height: 100,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                showError(),
+                TextField(
+                  controller: peakFlowController,
+                  keyboardType: TextInputType.number,
+                  decoration:
+                      InputDecoration(hintText: "Enter peak flow value"),
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.digitsOnly // Only allow digits
+                  ],
+                ),
+              ],
+            ),
           ),
           actions: <Widget>[
             TextButton(
@@ -49,8 +86,12 @@ class _HomePageState extends State<HomePage> {
             ),
             TextButton(
               child: Text('Add'),
-              onPressed: () {
-                Navigator.of(context).pop();
+              onPressed: () async {
+                final navigator = Navigator.of(context);
+                final buildContext = context;
+                await addPeakFlow();
+                errorMessage == '' ? error = false : error = true;
+                setState(() {});
               },
             ),
           ],
@@ -62,14 +103,52 @@ class _HomePageState extends State<HomePage> {
   void _showAddMedicationDialog(BuildContext context) {
     TextEditingController medicationController = TextEditingController();
 
+    String? errorMessage = '';
+    bool error = false;
+
+    Future<void> addMedication() async {
+      try {
+        await FirebaseService().addMedication(medicationController.text);
+        Navigator.of(context).pop();
+      } on FirebaseAuthException catch (e) {
+        print(e.message);
+        setState(() {
+          errorMessage = e.message;
+        });
+      }
+    }
+
+    Widget showError() {
+      return Text(
+        errorMessage!,
+        style: GoogleFonts.outfit(
+          textStyle: const TextStyle(
+            fontWeight: FontWeight.normal,
+            fontSize: 18,
+            color: Colors.red,
+          ),
+        ),
+      );
+    }
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Add Medication'),
-          content: TextField(
-            controller: medicationController,
-            decoration: InputDecoration(hintText: "Enter medication details"),
+          content: SizedBox(
+            height: 100,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                showError(),
+                TextField(
+                  controller: medicationController,
+                  decoration:
+                      InputDecoration(hintText: "Enter medication details"),
+                ),
+              ],
+            ),
           ),
           actions: <Widget>[
             TextButton(
@@ -80,8 +159,12 @@ class _HomePageState extends State<HomePage> {
             ),
             TextButton(
               child: Text('Add'),
-              onPressed: () {
-                Navigator.of(context).pop();
+              onPressed: () async {
+                final navigator = Navigator.of(context);
+                final buildContext = context;
+                await addMedication();
+                errorMessage == '' ? error = false : error = true;
+                setState(() {});
               },
             ),
           ],
@@ -95,6 +178,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: Style.primaryBackground,
       appBar: AppBar(
+        surfaceTintColor: Colors.transparent,
         automaticallyImplyLeading: false,
         backgroundColor: Style.primaryBackground,
         elevation: 0,
@@ -177,16 +261,30 @@ class _HomePageState extends State<HomePage> {
                 Row(
                   mainAxisSize: MainAxisSize.max,
                   children: [
-                    Text(
-                      '$userName 👋',
-                      style: GoogleFonts.outfit(
-                        textStyle: const TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 28,
-                          color: Style.primaryColor,
-                        ),
-                      ),
-                    ),
+                    FutureBuilder<String>(
+                      future: FirebaseService()
+                          .getUserName(), // The Future returned by the function
+                      builder: (BuildContext context,
+                          AsyncSnapshot<String> snapshot) {
+                        // Check if the Future is resolved
+                        if (snapshot.connectionState == ConnectionState.done) {
+                          // If the Future is complete, display the data
+                          return Text(
+                            '${snapshot.data} 👋',
+                            style: GoogleFonts.outfit(
+                              textStyle: const TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 28,
+                                color: Style.primaryColor,
+                              ),
+                            ),
+                          );
+                        } else {
+                          // If the Future is not complete, display a loading indicator
+                          return CircularProgressIndicator();
+                        }
+                      },
+                    )
                   ],
                 ),
                 Padding(
@@ -272,25 +370,53 @@ class _HomePageState extends State<HomePage> {
                                       10, 10, 10, 10),
                                   child: Column(
                                     mainAxisSize: MainAxisSize.max,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     children: [
                                       const Icon(
                                         Icons.favorite_outline,
                                         size: 24,
                                         color: Style.heartrate,
                                       ),
+                                      FutureBuilder<String>(
+                                          future: FirebaseService()
+                                              .getLatestHR(),
+                                          builder: (context, snapshot) {
+                                            if (snapshot.connectionState ==
+                                                ConnectionState.done) {
+                                              // If the Future is complete, display the data
+                                              if (snapshot.data == 'NaN') {
+                                                return Padding(
+                                                  padding: const EdgeInsets.only(top: 6,bottom: 6),
+                                                  child: Text(
+                                                    'No Data',
+                                                    style: GoogleFonts.outfit(
+                                                      textStyle: const TextStyle(
+                                                          fontWeight:
+                                                          FontWeight.normal,
+                                                          fontSize: 14,
+                                                          color: Style.primaryText),
+                                                    ),
+                                                  ),
+                                                );
+                                              }else{
+                                                return Text(
+                                                  '${snapshot.data}',
+                                                  style: GoogleFonts.outfit(
+                                                    textStyle: const TextStyle(
+                                                        fontWeight:
+                                                        FontWeight.normal,
+                                                        fontSize: 24,
+                                                        color: Style.primaryText),
+                                                  ),
+                                                );
+                                              }
+                                            }else{
+                                              return const CircularProgressIndicator();
+                                            }
+                                          }),
                                       Text(
-                                        '$heartRate',
-                                        style: GoogleFonts.outfit(
-                                          textStyle: const TextStyle(
-                                            fontWeight: FontWeight.normal,
-                                            fontSize: 24,
-                                            color: Style.primaryText
-                                          ),
-                                        ),
-                                      ),
-                                      Text(
-                                        'Bmp',
+                                        'bpm',
                                         style: GoogleFonts.outfit(
                                           textStyle: const TextStyle(
                                             fontWeight: FontWeight.w300,
@@ -310,24 +436,43 @@ class _HomePageState extends State<HomePage> {
                                     children: [
                                       const Icon(Icons.medication_outlined,
                                           size: 24, color: Style.medication),
-                                      Text(
-                                        '$medi',
-                                        style: GoogleFonts.outfit(
-                                          textStyle: const TextStyle(
-                                              fontWeight: FontWeight.normal,
-                                              fontSize: 24,
-                                              color: Style.primaryText
-                                          ),
-                                        ),
-                                      ),
+                                      FutureBuilder<String>(
+                                          future: FirebaseService()
+                                              .getTodayMedicationCount(),
+                                          builder: (context, snapshot) {
+                                            if (snapshot.connectionState ==
+                                                ConnectionState.done) {
+                                              // If the Future is complete, display the data
+                                              return Text(
+                                                '${snapshot.data}',
+                                                style: GoogleFonts.outfit(
+                                                  textStyle: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.normal,
+                                                      fontSize: 24,
+                                                      color: Style.primaryText),
+                                                ),
+                                              );
+                                            } else {
+                                              return Text(
+                                                '0',
+                                                style: GoogleFonts.outfit(
+                                                  textStyle: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.normal,
+                                                      fontSize: 24,
+                                                      color: Style.primaryText),
+                                                ),
+                                              );
+                                            }
+                                          }),
                                       Text(
                                         'Taken',
                                         style: GoogleFonts.outfit(
                                           textStyle: const TextStyle(
-                                              fontWeight: FontWeight.normal,
+                                              fontWeight: FontWeight.w300,
                                               fontSize: 16,
-                                              color: Style.accent2
-                                          ),
+                                              color: Style.accent2),
                                         ),
                                       ),
                                     ],
@@ -347,18 +492,16 @@ class _HomePageState extends State<HomePage> {
                                           textStyle: const TextStyle(
                                               fontWeight: FontWeight.normal,
                                               fontSize: 24,
-                                              color: Style.primaryText
-                                          ),
+                                              color: Style.primaryText),
                                         ),
                                       ),
                                       Text(
                                         '$weather',
                                         style: GoogleFonts.outfit(
                                           textStyle: const TextStyle(
-                                              fontWeight: FontWeight.normal,
+                                              fontWeight: FontWeight.w300,
                                               fontSize: 16,
-                                              color: Style.accent2
-                                          ),
+                                              color: Style.accent2),
                                         ),
                                       ),
                                     ],
@@ -378,18 +521,16 @@ class _HomePageState extends State<HomePage> {
                                           textStyle: const TextStyle(
                                               fontWeight: FontWeight.normal,
                                               fontSize: 24,
-                                              color: Style.primaryText
-                                          ),
+                                              color: Style.primaryText),
                                         ),
                                       ),
                                       Text(
                                         'AQI',
                                         style: GoogleFonts.outfit(
                                           textStyle: const TextStyle(
-                                              fontWeight: FontWeight.normal,
+                                              fontWeight: FontWeight.w300,
                                               fontSize: 16,
-                                              color: Style.accent2
-                                          ),
+                                              color: Style.accent2),
                                         ),
                                       ),
                                     ],
@@ -405,24 +546,56 @@ class _HomePageState extends State<HomePage> {
                                           Icons.health_and_safety_outlined,
                                           size: 24,
                                           color: Style.pef),
-                                      Text(
-                                        '$pf',
-                                        style: GoogleFonts.outfit(
-                                          textStyle: const TextStyle(
-                                              fontWeight: FontWeight.normal,
-                                              fontSize: 24,
-                                              color: Style.primaryText
-                                          ),
-                                        ),
-                                      ),
+                                      FutureBuilder<String>(
+                                          future: FirebaseService()
+                                              .getLatestPefValue(),
+                                          builder: (context, snapshot) {
+                                            if (snapshot.connectionState ==
+                                                ConnectionState.done) {
+                                              // If the Future is complete, display the data
+                                              if (snapshot.data == 'NaN') {
+                                                return Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          top: 6, bottom: 6),
+                                                  child: Text(
+                                                    'No Data',
+                                                    style: GoogleFonts.outfit(
+                                                      textStyle:
+                                                          const TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .normal,
+                                                              fontSize: 14,
+                                                              color: Style
+                                                                  .primaryText),
+                                                    ),
+                                                  ),
+                                                );
+                                              } else {
+                                                return Text(
+                                                  '${snapshot.data}',
+                                                  style: GoogleFonts.outfit(
+                                                    textStyle: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.normal,
+                                                        fontSize: 24,
+                                                        color:
+                                                            Style.primaryText),
+                                                  ),
+                                                );
+                                              }
+                                            } else {
+                                              return const CircularProgressIndicator();
+                                            }
+                                          }),
                                       Text(
                                         'PEF',
                                         style: GoogleFonts.outfit(
                                           textStyle: const TextStyle(
-                                              fontWeight: FontWeight.normal,
+                                              fontWeight: FontWeight.w300,
                                               fontSize: 16,
-                                              color: Style.accent2
-                                          ),
+                                              color: Style.accent2),
                                         ),
                                       ),
                                     ],
@@ -447,8 +620,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                       minimumSize: const Size(double.infinity, 80),
                     ),
-                    onPressed: () {
-                    },
+                    onPressed: () {},
                     child: Text(
                       'I have an Attack!',
                       style: GoogleFonts.outfit(
@@ -472,86 +644,86 @@ class _HomePageState extends State<HomePage> {
                       Expanded(
                         child: Padding(
                           padding: const EdgeInsets.only(right: 8.0),
-                          child:
-                          Material(
+                          child: Material(
                             borderRadius:
-                            const BorderRadius.all(Radius.circular(16)),
+                                const BorderRadius.all(Radius.circular(16)),
                             elevation: 2,
-                            child:ElevatedButton.icon(
-                            style: ElevatedButton.styleFrom(
-                              elevation:0,
-                              backgroundColor: Colors.transparent,
-                              primary: Style.tertiaryText,
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 20.0),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                            ),
-                            onPressed: () {
-                              _showAddPeakFlowDialog(context);
-                            },
-                            label: Text(
-                              'add peakflow',
-                              style: GoogleFonts.outfit(
-                                textStyle: const TextStyle(
-                                  fontWeight: FontWeight.normal,
-                                  fontSize: 16,
-                                  color: Style.primaryText,
+                            child: ElevatedButton.icon(
+                              style: ElevatedButton.styleFrom(
+                                elevation: 0,
+                                backgroundColor: Colors.transparent,
+                                primary: Style.tertiaryText,
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 20.0),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
                                 ),
                               ),
-                            ),
-                            icon: const Icon(
-                              Icons.health_and_safety_outlined,
-                              color: Style.secondaryColor,
-                              size: 30.0,
+                              onPressed: () {
+                                _showAddPeakFlowDialog(context);
+                              },
+                              label: Text(
+                                'add peakflow',
+                                style: GoogleFonts.outfit(
+                                  textStyle: const TextStyle(
+                                    fontWeight: FontWeight.normal,
+                                    fontSize: 16,
+                                    color: Style.primaryText,
+                                  ),
+                                ),
+                              ),
+                              icon: const Icon(
+                                Icons.health_and_safety_outlined,
+                                color: Style.secondaryColor,
+                                size: 30.0,
+                              ),
                             ),
                           ),
                         ),
-                      ),
                       ),
                       Expanded(
-                        child: Material(
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 8.0),
+                          child: Material(
                             borderRadius:
-                            const BorderRadius.all(Radius.circular(16)),
+                                const BorderRadius.all(Radius.circular(16)),
                             elevation: 2,
-                            child:
-                            ElevatedButton.icon(
-                            style: ElevatedButton.styleFrom(
-                              elevation:0,
-                              backgroundColor: Colors.transparent,
-                              primary: Style.tertiaryText,
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 20.0),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                            ),
-                            onPressed: () {
-                              _showAddMedicationDialog(context);
-                            },
-                            label: Text(
-                              'add medication',
-                              style: GoogleFonts.outfit(
-                                textStyle: const TextStyle(
-                                  fontWeight: FontWeight.normal,
-                                  fontSize: 16,
-                                  color: Style.primaryText,
+                            child: ElevatedButton.icon(
+                              style: ElevatedButton.styleFrom(
+                                elevation: 0,
+                                backgroundColor: Colors.transparent,
+                                primary: Style.tertiaryText,
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 20.0),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
                                 ),
                               ),
-                            ),
-                            icon: const Icon(
-                              Icons.medication_outlined,
-                              color: Style.success,
-                              size: 30.0,
+                              onPressed: () {
+                                _showAddMedicationDialog(context);
+                              },
+                              label: Text(
+                                'add medication',
+                                style: GoogleFonts.outfit(
+                                  textStyle: const TextStyle(
+                                    fontWeight: FontWeight.normal,
+                                    fontSize: 16,
+                                    color: Style.primaryText,
+                                  ),
+                                ),
+                              ),
+                              icon: const Icon(
+                                Icons.medication_outlined,
+                                color: Style.success,
+                                size: 30.0,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                      ],
+                    ],
                   ),
                 ),
-
                 Padding(
                   padding: EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
                   child: Material(
@@ -568,7 +740,7 @@ class _HomePageState extends State<HomePage> {
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                              const AsthmaControlTestPage()),
+                                  const AsthmaControlTestPage()),
                         );
                       },
                       child: const ListTile(
@@ -601,5 +773,3 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-
-

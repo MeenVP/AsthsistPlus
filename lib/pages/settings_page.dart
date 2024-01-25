@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../backend/auth.dart';
+import 'package:health/health.dart';
+import '../backend/firebase.dart';
 
+import '../backend/health.dart';
 import '../style.dart';
 import '../widget_tree.dart';
 import 'edit_profile_page.dart'; // Import the flutter_health package
 
-class SettingsPage extends StatefulWidget{
+class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
   final bool isDarkModeEnabled = false;
 
@@ -14,21 +16,62 @@ class SettingsPage extends StatefulWidget{
   State<SettingsPage> createState() => _SettingsPageState();
 }
 
-class _SettingsPageState extends State<SettingsPage> {
+enum AppState {
+  DATA_NOT_FETCHED,
+  FETCHING_DATA,
+  DATA_READY,
+  NO_DATA,
+  AUTHORIZED,
+  AUTH_NOT_GRANTED,
+  DATA_ADDED,
+  DATA_DELETED,
+  DATA_NOT_ADDED,
+  DATA_NOT_DELETED,
+  STEPS_READY,
+}
 
+class _SettingsPageState extends State<SettingsPage> {
+  AppState _state = AppState.DATA_NOT_FETCHED;
   static const String username = 'Username';
   final String age = 'Age';
   final String email = 'email@email.com';
 
+  String? errorMessage = '';
+  bool error = false;
+
   final isDarkModeEnabled = false;
   Future<void> signOut() async {
-    await FirebaseAuthService().signOut();
+    await FirebaseService().signOut();
   }
+
+  Future<void> fetchData() async {
+    try{
+      await Health().fetchData();
+    }catch (e) {
+      print(e);
+      setState(() {
+        errorMessage = e.toString();
+      });
+    }
+  }
+
+  Future<void> connect() async {
+    try {
+      await Health().authorize();
+    } catch (e) {
+      print(e);
+      setState(() {
+        errorMessage = e.toString();
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Style.primaryBackground,
         appBar: AppBar(
+          surfaceTintColor: Colors.transparent,
           automaticallyImplyLeading: false,
           title: Padding(
               padding: const EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
@@ -53,16 +96,25 @@ class _SettingsPageState extends State<SettingsPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 mainAxisSize: MainAxisSize.max,
                 children: [
-                  Text(
-                    '$username  ',
-                    style: GoogleFonts.outfit(
-                      textStyle: const TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 36,
-                        color: Style.primaryColor,
-                      ),
-                    ),
-                  ),
+                  FutureBuilder<String>(
+                      future: FirebaseService().getUserName(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.done) {
+                          // If the Future is complete, display the data
+                          return Text(
+                            '${snapshot.data}',
+                            style: GoogleFonts.outfit(
+                              textStyle: const TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 28,
+                                color: Style.primaryColor,
+                              ),
+                            ),
+                          );
+                        } else {
+                          return const CircularProgressIndicator();
+                        }
+                      }),
                   Row(
                     children: [
                       IconButton(
@@ -70,8 +122,8 @@ class _SettingsPageState extends State<SettingsPage> {
                         onPressed: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => const EditProfilePage()
-                            ),
+                            MaterialPageRoute(
+                                builder: (context) => const EditProfilePage()),
                           );
                         },
                       ),
@@ -90,16 +142,25 @@ class _SettingsPageState extends State<SettingsPage> {
                   )
                 ],
               ),
-              Text(
-                email,
-                style: GoogleFonts.outfit(
-                  textStyle: const TextStyle(
-                    fontWeight: FontWeight.normal,
-                    fontSize: 18,
-                    color: Style.accent2,
-                  ),
-                ),
-              ),
+              FutureBuilder<String>(
+                  future: FirebaseService().getUserEmail(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.done) {
+                      // If the Future is complete, display the data
+                      return Text(
+                        '${snapshot.data}',
+                        style: GoogleFonts.outfit(
+                          textStyle: const TextStyle(
+                            fontWeight: FontWeight.normal,
+                            fontSize: 18,
+                            color: Style.accent2,
+                          ),
+                        ),
+                      );
+                    } else {
+                      return const CircularProgressIndicator();
+                    }
+                  }),
               const Divider(),
               Padding(
                 padding: const EdgeInsetsDirectional.fromSTEB(0, 8, 0, 8),
@@ -153,6 +214,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         ),
                         onPressed: () {
                           // Implement your Google Fit connection functionality here
+                          connect();
                         },
                         child: Text(
                           'Connect',
@@ -190,6 +252,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                 BorderRadius.all(Radius.circular(12))),
                       ),
                       onPressed: () {
+                        fetchData();
                         // Implement your Google health connect connection functionality here
                       },
                       child: Text(

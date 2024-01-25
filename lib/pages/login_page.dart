@@ -2,7 +2,7 @@ import 'package:asthsist_plus/pages/navigation_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../backend/auth.dart';
+import '../backend/firebase.dart';
 import '../style.dart';
 import 'complete_profile_page.dart';
 
@@ -155,7 +155,7 @@ class _LoginState extends State<Login> {
 
   Future<void> signInWithEmailAndPassword() async {
     try {
-      await FirebaseAuthService().signInWithEmailAndPassword(
+      await FirebaseService().signInWithEmailAndPassword(
           _emailController.text, _passwordController.text);
     } on FirebaseAuthException catch (e) {
       setState(() {
@@ -334,7 +334,7 @@ class _RegisterState extends State<Register> {
 
   Future<void> createUserWithEmailAndPassword() async {
     try {
-      await FirebaseAuthService().createUserWithEmailAndPassword(
+      await FirebaseService().createUserWithEmailAndPassword(
           _emailController.text, _passwordController.text);
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
@@ -515,5 +515,13 @@ class _RegisterState extends State<Register> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
   }
 }
