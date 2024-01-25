@@ -81,6 +81,7 @@ class _AsthmaControlTestPageState extends State<AsthmaControlTestPage> {
     return Scaffold(
       backgroundColor: Style.primaryBackground,
       appBar: AppBar(
+        surfaceTintColor: Colors.transparent,
         backgroundColor: Style.primaryBackground,
         automaticallyImplyLeading: false,
         leading: Padding(

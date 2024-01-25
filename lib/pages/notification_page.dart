@@ -21,6 +21,7 @@ class NotificationsPage extends StatelessWidget {
     child: Padding(
     padding: EdgeInsets.only(top: 20.0), // Change this value to adjust the padding
     child: AppBar(
+      surfaceTintColor: Colors.transparent,
           automaticallyImplyLeading: false,
           backgroundColor: Style.primaryBackground,
           title: Text(

@@ -98,6 +98,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        surfaceTintColor: Colors.transparent,
         title: Text('Edit Profile'),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),

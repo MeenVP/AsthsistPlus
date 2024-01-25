@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
+import '../backend/firebase.dart';
 import '../style.dart';
+import '../widget_tree.dart';
 
 class CompleteProfilePage extends StatefulWidget {
   @override
@@ -57,37 +59,39 @@ class DOBInputField extends StatelessWidget {
   }
 }
 
-void _showSaveConfirmationDialog(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (BuildContext dialogContext) {
-      return AlertDialog(
-        title: Text('Confirm'),
-        content: Text('Are you sure you want to save the changes?'),
-        actions: <Widget>[
-          TextButton(
-            child: Text('Cancel'),
-            onPressed: () {
-              Navigator.of(dialogContext).pop(); // Dismiss the dialog
-            },
-          ),
-          TextButton(
-            child: Text('Save'),
-            onPressed: () {
-              //save logic
-              Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (context) => NavigationBarApp()));
-              // Implement your edit profile functionality here
-            },
-          ),
-        ],
-      );
-    },
-  );
-}
+// void _showSaveConfirmationDialog(BuildContext context) {
+//   showDialog(
+//     context: context,
+//     builder: (BuildContext dialogContext) {
+//       return AlertDialog(
+//         title: Text('Confirm'),
+//         content: Text('Are you sure you want to save the changes?'),
+//         actions: <Widget>[
+//           TextButton(
+//             child: Text('Cancel'),
+//             onPressed: () {
+//               Navigator.of(dialogContext).pop(); // Dismiss the dialog
+//             },
+//           ),
+//           TextButton(
+//             child: Text('Save'),
+//             onPressed: () {
+//               //save logic
+//               Navigator.pushReplacement(context,
+//                   MaterialPageRoute(builder: (context) => NavigationBarApp()));
+//               // Implement your edit profile functionality here
+//             },
+//           ),
+//         ],
+//       );
+//     },
+//   );
+// }
 
 class _CompleteProfilePageState extends State<CompleteProfilePage> {
   String _gender = 'Male';
+  String? errorMessage = '';
+  bool error = false;
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _dobController = TextEditingController();
@@ -95,17 +99,51 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
   final TextEditingController _heightController = TextEditingController();
   final TextEditingController _peakFlowController = TextEditingController();
 
+  Future<void> completeUserProfile() async {
+    try {
+      await FirebaseService().addUserDetails(
+          firstname: _firstNameController.text,
+          lastname: _lastNameController.text,
+          dob: _dobController.text,
+          gender: _gender,
+          weight: _weightController.text,
+          height: _heightController.text,
+          bestpef: _peakFlowController.text);
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => WidgetTree(),
+        ),
+      );
+    } on FirebaseAuthException catch (e) {
+      print(e.message);
+      setState(() {
+        errorMessage = e.message;
+      });
+    }
+  }
+
+  Widget _error() {
+    return Padding(
+        padding: const EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
+        child: Text(
+          errorMessage!,
+          style: GoogleFonts.outfit(
+            textStyle: const TextStyle(
+              fontWeight: FontWeight.normal,
+              fontSize: 18,
+              color: Colors.red,
+            ),
+          ),
+        ));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Edit Profile'),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.pop(context);
-            }
-        ),
+        surfaceTintColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        title: Text('Complete Profile'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -167,24 +205,29 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
             SizedBox(height: 24.0),
             _genderRadio(),
             SizedBox(height: 24.0),
+            _error(),
+            SizedBox(height: 24.0),
             ElevatedButton(
-              child: Padding(
+              style: ElevatedButton.styleFrom(
+                shape: const StadiumBorder(),
+                primary: Colors.deepPurple,
+                onPrimary: Colors.white,
+                minimumSize: const Size(double.infinity, 50), // Set a larger height
+              ),
+              onPressed: () async {
+                  final navigator = Navigator.of(context);
+                  final buildContext = context;
+                  await completeUserProfile();
+                  errorMessage == '' ? error = false : error = true;
+                // Implement save logic
+              },
+              child: const Padding(
                 padding: EdgeInsets.symmetric(vertical: 10.0),
                 child: Text(
                   'Save Change',
                   style: TextStyle(fontSize: 20),
                 ),
               ),
-              style: ElevatedButton.styleFrom(
-                shape: StadiumBorder(),
-                primary: Colors.deepPurple,
-                onPrimary: Colors.white,
-                minimumSize: Size(double.infinity, 50), // Set a larger height
-              ),
-              onPressed: () {
-                _showSaveConfirmationDialog(context);
-                // Implement save logic
-              },
             ),
           ],
         ),
