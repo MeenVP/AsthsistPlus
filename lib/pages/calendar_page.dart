@@ -30,7 +30,7 @@ class _CalendarState extends State<CalendarPage> with TickerProviderStateMixin {
   _initTabController() async {
     await Future.delayed(Duration.zero);
     setState(() {
-      _tabController = TabController(length: 4, vsync: this);
+      _tabController = TabController(length: 6, vsync: this);
     });
   }
 
@@ -45,7 +45,7 @@ class _CalendarState extends State<CalendarPage> with TickerProviderStateMixin {
     return SafeArea(
         child: DefaultTabController(
             // Added
-            length: 4, // Added
+            length: 6, // Added
             initialIndex: 0, //Added
             child: Scaffold(
                 appBar: AppBar(
@@ -151,6 +151,14 @@ class _CalendarState extends State<CalendarPage> with TickerProviderStateMixin {
                                         icon: Icon(Icons.heart_broken_outlined,
                                         color: Style.primaryColor),
                                       ),
+                                      Tab(
+                                        icon: Icon(Icons.inventory_outlined,
+                                            color: Style.primaryColor),
+                                      ),
+                                      Tab(
+                                        icon: Icon(Icons.cloud_outlined,
+                                            color: Style.primaryColor),
+                                      ),
                                     ],
                                   )))),
                       Flexible(
@@ -160,7 +168,9 @@ class _CalendarState extends State<CalendarPage> with TickerProviderStateMixin {
                             CategoryList(category: 'HeartRate',date: _selectedDay,),
                             CategoryList(category: 'Medications',date: _selectedDay),
                             CategoryList(category: 'pef',date: _selectedDay),
-                            CategoryList(category: 'Category 3',date: _selectedDay),
+                            CategoryList(category: 'Attack',date: _selectedDay),
+                            CategoryList(category: 'ACT',date: _selectedDay),
+                            CategoryList(category: 'Weather',date: _selectedDay),
                           ],
                         ),
                       ),

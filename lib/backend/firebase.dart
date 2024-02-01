@@ -124,6 +124,61 @@ class FirebaseService {
     });
   }
 
+  Future<void> addAttack(String attack) async {
+    // Get the current date and time
+    DateTime now = DateTime.now();
+
+    // Create a new DateTime object with only the year, month, day, hour, and minute
+    DateTime datetime = DateTime(now.year, now.month, now.day, now.hour, now.minute);
+
+    final Map<String, dynamic> pefData = {
+      'datetime': datetime,
+      'severity': attack,
+    };
+
+    final FirebaseFirestore db = FirebaseFirestore.instance;
+    final DocumentReference userDocRef = db.collection('users').doc(_firebaseAuth.currentUser?.uid);
+
+    // Format the current date as 'yyyy-MM-dd'
+    final String formattedDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+    final CollectionReference dateRef = userDocRef.collection('attack').doc(formattedDate).collection('entries');
+
+    await dateRef.add(pefData).catchError((error) {
+      log(error);
+    });
+  }
+// add control test
+  Future<void> addACT(List<int?> act) async {
+    // Get the current date and time
+    DateTime now = DateTime.now();
+
+    // Create a new DateTime object with only the year, month, day, hour, and minute
+    DateTime datetime = DateTime(now.year, now.month, now.day, now.hour, now.minute);
+
+    final Map<String, dynamic> pefData = {
+      'datetime': datetime,
+      '1': act[0],
+      '2': act[1],
+      '3': act[2],
+      '4': act[3],
+      '5': act[4],
+      'sum': act.reduce((value, element) => value! + element!),
+    };
+
+    final FirebaseFirestore db = FirebaseFirestore.instance;
+    final DocumentReference userDocRef = db.collection('users').doc(_firebaseAuth.currentUser?.uid);
+
+    // Format the current date as 'yyyy-MM-dd'
+    final String formattedDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+    final CollectionReference dateRef = userDocRef.collection('act').doc(formattedDate).collection('entries');
+
+    await dateRef.add(pefData).catchError((error) {
+      log(error);
+    });
+  }
+
   //get email
   Future<String> getUserEmail() async {
     User? user = _firebaseAuth.currentUser;
@@ -294,6 +349,81 @@ class FirebaseService {
     }
 
     return hrValues;
+  }
+
+  Future<List<Map<String, dynamic>>> getAttackForDay(DateTime date) async {
+    User? user = FirebaseAuth.instance.currentUser;
+    final FirebaseFirestore db = FirebaseFirestore.instance;
+
+    // Format the date as 'yyyy-MM-dd'
+    final String formattedDate = DateFormat('yyyy-MM-dd').format(date);
+    final DocumentReference dateDocRef = db.collection('users').doc(user?.uid).collection('attack').doc(formattedDate);
+    final CollectionReference entriesRef = dateDocRef.collection('entries');
+
+    QuerySnapshot querySnapshot = await entriesRef.orderBy('datetime', descending: true).get();
+    List<Map<String, dynamic>> attack = [];
+
+    for (var doc in querySnapshot.docs) {
+      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+      DateTime datetime = (data['datetime'] as Timestamp).toDate();
+      String value = data['severity'] as String;
+      attack.add({
+        'data': value,
+        'time': datetime,
+      });
+    }
+
+    return attack;
+  }
+
+  Future<List<Map<String, dynamic>>> getActForDay(DateTime date) async {
+    User? user = FirebaseAuth.instance.currentUser;
+    final FirebaseFirestore db = FirebaseFirestore.instance;
+
+    // Format the date as 'yyyy-MM-dd'
+    final String formattedDate = DateFormat('yyyy-MM-dd').format(date);
+    final DocumentReference dateDocRef = db.collection('users').doc(user?.uid).collection('act').doc(formattedDate);
+    final CollectionReference entriesRef = dateDocRef.collection('entries');
+
+    QuerySnapshot querySnapshot = await entriesRef.orderBy('datetime', descending: true).get();
+    List<Map<String, dynamic>> act = [];
+
+    for (var doc in querySnapshot.docs) {
+      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+      DateTime datetime = (data['datetime'] as Timestamp).toDate();
+      String value = data['sum'].toString();
+      act.add({
+        'data': value,
+        'time': datetime,
+      });
+    }
+
+    return act;
+  }
+
+  Future<List<Map<String, dynamic>>> getWeatherForDay(DateTime date) async {
+    User? user = FirebaseAuth.instance.currentUser;
+    final FirebaseFirestore db = FirebaseFirestore.instance;
+
+    // Format the date as 'yyyy-MM-dd'
+    final String formattedDate = DateFormat('yyyy-MM-dd').format(date);
+    final DocumentReference dateDocRef = db.collection('users').doc(user?.uid).collection('weather').doc(formattedDate);
+    final CollectionReference entriesRef = dateDocRef.collection('entries');
+
+    QuerySnapshot querySnapshot = await entriesRef.orderBy('datetime', descending: true).get();
+    List<Map<String, dynamic>> weather = [];
+
+    for (var doc in querySnapshot.docs) {
+      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+      DateTime datetime = (data['datetime'] as Timestamp).toDate();
+      String value = '${data['temperature'].toString()}°C, ${data['humidity'.toString()]}%, AQI:${data['aqi'].toString()}';
+      weather.add({
+        'data': value,
+        'time': datetime,
+      });
+    }
+
+    return weather;
   }
 
 

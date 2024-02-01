@@ -24,6 +24,91 @@ class _HomePageState extends State<HomePage> {
   final int pf = 450;
   final int medi = 1;
 
+  void _showAddAttackDialog(BuildContext context) {
+    String? errorMessage = '';
+    bool error = false;
+    String selectedSeverity = 'Mild'; // Set default to 'Mild'
+
+    List<String> severities = ['Mild', 'Moderate', 'Severe'];
+
+    Future<void> addAttack() async {
+      try {
+        await FirebaseService().addAttack(selectedSeverity);
+        Navigator.of(context).pop();
+      } on FirebaseAuthException catch (e) {
+        print(e.message);
+        setState(() {
+          errorMessage = e.message;
+        });
+      }
+    }
+
+    Widget showError() {
+      return Text(
+        errorMessage!,
+        style: GoogleFonts.outfit(
+          textStyle: const TextStyle(
+            fontWeight: FontWeight.normal,
+            fontSize: 18,
+            color: Colors.red,
+          ),
+        ),
+      );
+    }
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder( // Add this line
+          builder: (BuildContext context, StateSetter setState) { // Modify this line
+            return AlertDialog(
+              title: Text('Add Attack'),
+              content: SizedBox(
+                height: 200, // Increase height to accommodate radio buttons
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    showError(),
+                    ...severities.map((severity) => RadioListTile<String>(
+                      title: Text(severity),
+                      value: severity,
+                      groupValue: selectedSeverity,
+                      onChanged: (String? value) {
+                        setState(() {
+                          selectedSeverity = value!;
+                        });
+                      },
+                    )).toList(),
+                  ],
+                ),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: Text('Cancel'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                TextButton(
+                  child: Text('Add'),
+                  onPressed: () async {
+                    final navigator = Navigator.of(context);
+                    final buildContext = context;
+                    await addAttack();
+                    errorMessage == '' ? error = false : error = true;
+                    setState(() {});
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+
+
   void _showAddPeakFlowDialog(BuildContext context) {
     TextEditingController peakFlowController = TextEditingController();
     String? errorMessage = '';
@@ -467,7 +552,7 @@ class _HomePageState extends State<HomePage> {
                                             }
                                           }),
                                       Text(
-                                        'Taken',
+                                        'Used',
                                         style: GoogleFonts.outfit(
                                           textStyle: const TextStyle(
                                               fontWeight: FontWeight.w300,
@@ -496,7 +581,7 @@ class _HomePageState extends State<HomePage> {
                                         ),
                                       ),
                                       Text(
-                                        '$weather',
+                                        'Temp',
                                         style: GoogleFonts.outfit(
                                           textStyle: const TextStyle(
                                               fontWeight: FontWeight.w300,
@@ -620,7 +705,9 @@ class _HomePageState extends State<HomePage> {
                       ),
                       minimumSize: const Size(double.infinity, 80),
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      _showAddAttackDialog(context);
+                    },
                     child: Text(
                       'I have an Attack!',
                       style: GoogleFonts.outfit(

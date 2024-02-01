@@ -50,6 +50,8 @@ dependencies:
   firebase_auth: ^4.16.0
   firebase_messaging: ^14.7.10
   workmanager: ^0.5.2
+  fl_chart: ^0.66.1
+  background_fetch: ^1.2.2
 
 dev_dependencies:
   flutter_test:

@@ -1,3 +1,4 @@
+import 'package:asthsist_plus/backend/firebase.dart';
 import 'package:asthsist_plus/pages/navigation_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -61,7 +62,7 @@ class _AsthmaControlTestPageState extends State<AsthmaControlTestPage> {
       ]
     },
     {
-      'question': '5. How would you rate your asthma contol during the past 4 weeks?',
+      'question': '5. How would you rate your asthma control during the past 4 weeks?',
       'options': [
         'Not controlled',
         'Poorly controlled',
@@ -74,6 +75,7 @@ class _AsthmaControlTestPageState extends State<AsthmaControlTestPage> {
 
   void _saveTestResults() {
     print(_selectedOptions);
+    FirebaseService().addACT(_selectedOptions);
   }
 
   @override

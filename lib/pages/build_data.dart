@@ -43,10 +43,13 @@ class _CategoryListState extends State<CategoryList> {
   late DateTime _selectedDay;
 
   late Map<String, List<Map<String, dynamic>>> data = {
-    'Category1': [],
-    'Category2': [],
-    'Category3': [],
+    'HeartRate': [],
+    'Medications': [],
     'pef': [],
+    'Attack': [],
+    'ACT': [],
+    'Weather': [],
+
   };
 
   @override
@@ -58,7 +61,13 @@ class _CategoryListState extends State<CategoryList> {
         FirebaseService().getPefValuesForDay(_selectedDay).then((pefValues) {
           FirebaseService().getMedicationForDay(_selectedDay).then((medications) {
             FirebaseService().getHRForDay(_selectedDay).then((hr) {
-              updateData(pefValues, medications, hr);
+              FirebaseService().getAttackForDay(_selectedDay).then((attack) {
+                FirebaseService().getActForDay(_selectedDay).then((act) {
+                  FirebaseService().getWeatherForDay(_selectedDay).then((weather) {
+                    updateData(pefValues, medications, hr,attack,act,weather);
+                  });
+                });
+              });
             });
           });
         });
@@ -76,28 +85,35 @@ class _CategoryListState extends State<CategoryList> {
     FirebaseService().getPefValuesForDay(_selectedDay).then((pefValues) {
       FirebaseService().getMedicationForDay(_selectedDay).then((medications) {
         FirebaseService().getHRForDay(_selectedDay).then((hr) {
-          updateData(pefValues, medications, hr);
+          FirebaseService().getAttackForDay(_selectedDay).then((attack) {
+            FirebaseService().getActForDay(_selectedDay).then((act) {
+              FirebaseService().getWeatherForDay(_selectedDay).then((weather) {
+                updateData(pefValues, medications, hr,attack,act,weather);
+              });
+            });
+          });
         });
       });
     });
     super.initState();
   }
 
-  void updateData(List<Map<String, dynamic>> pefValues, List<Map<String, dynamic>>medications, List<Map<String, dynamic>> hr) {
+  void updateData(List<Map<String, dynamic>> pefValues,
+      List<Map<String, dynamic>>medications,
+      List<Map<String, dynamic>> hr,
+      List<Map<String, dynamic>> attack,
+      List<Map<String, dynamic>> act,
+      List<Map<String, dynamic>> weather,
+      ) {
     print(pefValues);
     setState(() {
       data = {
         'HeartRate': hr,
         'Medications': medications,
-        'Category3': [
-          {'data': 'Data 1', 'time': DateTime.now().subtract(Duration(days: 1))},
-          {'data': 'Data 2', 'time': DateTime.now().subtract(Duration(days: 2))},
-          {'data': 'Data 1', 'time': DateTime.now().subtract(Duration(days: 1))},
-          {'data': 'Data 2', 'time': DateTime.now().subtract(Duration(days: 2))},
-          {'data': 'Data 1', 'time': DateTime.now().subtract(Duration(days: 1))},
-          {'data': 'Data 2', 'time': DateTime.now().subtract(Duration(days: 2))},
-        ],
+        'Attack': attack,
         'pef': pefValues,
+        'ACT': act,
+        'Weather': weather,
       };
     });
   }
