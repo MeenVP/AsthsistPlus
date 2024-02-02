@@ -1,4 +1,5 @@
 import 'package:asthsist_plus/backend/firebase.dart';
+import 'package:asthsist_plus/backend/weather.dart';
 import 'package:asthsist_plus/pages/asthma_control_test_page.dart';
 import 'package:asthsist_plus/style.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -321,7 +322,7 @@ class _HomePageState extends State<HomePage> {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsetsDirectional.fromSTEB(16, 0, 16, 0),
+            padding: const EdgeInsetsDirectional.fromSTEB(10, 0, 10, 0),
             child: Column(
               mainAxisSize: MainAxisSize.max,
               children: [
@@ -459,7 +460,7 @@ class _HomePageState extends State<HomePage> {
                                         CrossAxisAlignment.center,
                                     children: [
                                       const Icon(
-                                        Icons.favorite_outline,
+                                        Icons.favorite,
                                         size: 24,
                                         color: Style.heartrate,
                                       ),
@@ -571,15 +572,29 @@ class _HomePageState extends State<HomePage> {
                                     children: [
                                       const Icon(Icons.thermostat,
                                           size: 24, color: Style.weather),
-                                      Text(
-                                        '$tem°C',
-                                        style: GoogleFonts.outfit(
-                                          textStyle: const TextStyle(
-                                              fontWeight: FontWeight.normal,
-                                              fontSize: 24,
-                                              color: Style.primaryText),
-                                        ),
-                                      ),
+                                      FutureBuilder<String>(
+                                          future: FirebaseService().getLatestTemperature(),
+                                          builder: (context, snapshot) {
+                                            if (snapshot.connectionState ==
+                                                ConnectionState.done) {
+                                              // If the Future is complete, display the data
+                                              return Text(
+                                                '${snapshot.data}°C',
+                                                style: GoogleFonts.outfit(
+                                                  textStyle: const TextStyle(
+                                                      fontWeight:
+                                                      FontWeight.normal,
+                                                      fontSize: 21,
+                                                      color: Style.primaryText),
+                                                ),
+                                              );
+                                            } else {
+                                              return const CircularProgressIndicator(
+                                                color: Style.accent2,
+
+                                              );
+                                            }
+                                          }),
                                       Text(
                                         'Temp',
                                         style: GoogleFonts.outfit(
@@ -600,15 +615,28 @@ class _HomePageState extends State<HomePage> {
                                     children: [
                                       const Icon(Icons.air,
                                           size: 24, color: Style.air),
-                                      Text(
-                                        '$aqi',
-                                        style: GoogleFonts.outfit(
-                                          textStyle: const TextStyle(
-                                              fontWeight: FontWeight.normal,
-                                              fontSize: 24,
-                                              color: Style.primaryText),
-                                        ),
-                                      ),
+                                      FutureBuilder<String>(
+                                          future: FirebaseService().getLatestAQI(),
+                                          builder: (context, snapshot) {
+                                            if (snapshot.connectionState ==
+                                                ConnectionState.done) {
+                                              // If the Future is complete, display the data
+                                              return Text(
+                                                '${snapshot.data}',
+                                                style: GoogleFonts.outfit(
+                                                  textStyle: const TextStyle(
+                                                      fontWeight:
+                                                      FontWeight.normal,
+                                                      fontSize: 21,
+                                                      color: Style.primaryText),
+                                                ),
+                                              );
+                                            } else {
+                                              return const CircularProgressIndicator(
+                                                color: Style.accent2,
+                                              );
+                                            }
+                                          }),
                                       Text(
                                         'AQI',
                                         style: GoogleFonts.outfit(

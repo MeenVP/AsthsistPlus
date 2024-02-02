@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:asthsist_plus/backend/weather.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:health/health.dart';
@@ -70,6 +71,33 @@ class FirebaseService {
           'value': data.value.toString()
         });
       }
+    }
+  }
+// add weather data
+  Future addWeatherToFirebase() async {
+    double temp = double.parse(await getTemperature());
+    double humid = double.parse(await getHumidity());
+    Map<String, dynamic> airPollution = await getAirPollutionData();
+    int aqi = int.parse(await getAirQualityIndex());
+    CollectionReference users = FirebaseFirestore.instance.collection('users');
+    CollectionReference weather = users.doc(_firebaseAuth.currentUser?.uid).collection('weather');
+
+      String date = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      CollectionReference entries = weather.doc(date).collection('entries');
+
+      // Check for duplicates
+      QuerySnapshot query = await entries.where('datetime', isEqualTo: DateTime.now()).get();
+      if (query.docs.isEmpty) {
+        // No duplicate found, add the new data
+        await entries.add({
+          'datetime': DateTime.now(),
+          'temperature': temp,
+          'humidity': humid,
+          'aqi': aqi,
+          'no2': airPollution['no2'],
+          'so2': airPollution['so2'],
+          'pm2_5': airPollution['pm2_5'],
+        });
     }
   }
 
@@ -239,7 +267,6 @@ class FirebaseService {
       Map<String, dynamic> latestPefData = querySnapshot.docs.first.data() as Map<String, dynamic>;
       return latestPefData['value'] as String;
     } else {
-      log('No PEF data found for today');
       return 'NaN';
     }
 
@@ -316,7 +343,6 @@ class FirebaseService {
       var hr = latestHRData['value'].toString().split('.');
       return hr[0];
     } else {
-      log('No HR found for today');
       return 'NaN';
     }
 
@@ -350,7 +376,6 @@ class FirebaseService {
 
     return hrValues;
   }
-
   Future<List<Map<String, dynamic>>> getAttackForDay(DateTime date) async {
     User? user = FirebaseAuth.instance.currentUser;
     final FirebaseFirestore db = FirebaseFirestore.instance;
@@ -425,9 +450,47 @@ class FirebaseService {
 
     return weather;
   }
+  //get latest temperature
+  Future<String> getLatestTemperature() async {
+    // Get a reference to the user's 'weather' collection
+    CollectionReference users = FirebaseFirestore.instance.collection('users');
+    CollectionReference weather = users.doc(_firebaseAuth.currentUser?.uid).collection('weather');
+    // Get today's date
+    String date = DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+    // Get a reference to today's 'entries' collection
+    CollectionReference entries = weather.doc(date).collection('entries');
+
+    // Get the last entry
+    QuerySnapshot query = await entries.orderBy('datetime', descending: true).limit(1).get();
+    DocumentSnapshot lastEntry = query.docs.first;
+
+    // Extract the temperature and return it
+    double temperature = lastEntry['temperature'];
+    return temperature.toString();
+  }
+  //get latest humidity
+  Future<String> getLatestAQI() async {
+    // Get a reference to the user's 'weather' collection
+    CollectionReference users = FirebaseFirestore.instance.collection('users');
+    CollectionReference weather = users.doc(_firebaseAuth.currentUser?.uid).collection('weather');
+
+    // Get today's date
+    String date = DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+    // Get a reference to today's 'entries' collection
+    CollectionReference entries = weather.doc(date).collection('entries');
+
+    // Get the last entry
+    QuerySnapshot query = await entries.orderBy('datetime', descending: true).limit(1).get();
+    DocumentSnapshot lastEntry = query.docs.first;
+
+    // Extract the humidity and return it
+    int aqi = lastEntry['aqi'];
+    return aqi.toString();
+  }
 
 
-  // get
 
 
 

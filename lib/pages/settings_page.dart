@@ -4,6 +4,7 @@ import 'package:health/health.dart';
 import '../backend/firebase.dart';
 
 import '../backend/health.dart';
+import '../backend/weather.dart';
 import '../style.dart';
 import '../widget_tree.dart';
 import 'edit_profile_page.dart'; // Import the flutter_health package
@@ -292,7 +293,9 @@ class _SettingsPageState extends State<SettingsPage> {
                                   BorderRadius.all(Radius.circular(12))),
                         ),
                         onPressed: () {
-                          // Implement your Google Fit connection functionality here
+                          getHumidity();
+                          getAirPollutionData();
+                          FirebaseService().addWeatherToFirebase();
                         },
                         child: Text(
                           'Connect',

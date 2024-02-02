@@ -68,7 +68,7 @@ class _CalendarState extends State<CalendarPage> with TickerProviderStateMixin {
                 backgroundColor: Style.primaryBackground,
                 body: Padding(
                     padding:
-                        const EdgeInsetsDirectional.fromSTEB(16, 16, 16, 16),
+                        const EdgeInsetsDirectional.fromSTEB(10, 10, 10, 10),
                     child: Column(children: [
                       Material(
                         borderRadius:
@@ -81,7 +81,7 @@ class _CalendarState extends State<CalendarPage> with TickerProviderStateMixin {
                           child: Column(children: [
                             Padding(
                                 padding: const EdgeInsetsDirectional.fromSTEB(
-                                    0, 8, 0, 8),
+                                    0, 5, 0, 8),
                                 child: Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
@@ -109,7 +109,7 @@ class _CalendarState extends State<CalendarPage> with TickerProviderStateMixin {
                       ),
                       Padding(
                           padding:
-                              const EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
+                              const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
                           child: Material(
                               borderRadius:
                                   const BorderRadius.all(Radius.circular(10)),
@@ -153,11 +153,11 @@ class _CalendarState extends State<CalendarPage> with TickerProviderStateMixin {
                                       ),
                                       Tab(
                                         icon: Icon(Icons.inventory_outlined,
-                                            color: Style.primaryColor),
+                                            color: Style.primaryColorLight),
                                       ),
                                       Tab(
                                         icon: Icon(Icons.cloud_outlined,
-                                            color: Style.primaryColor),
+                                            color: Style.air),
                                       ),
                                     ],
                                   )))),

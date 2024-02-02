@@ -5,30 +5,6 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 
 import '../style.dart';
 
-// Mock data
-// Map<String, List<Map<String, dynamic>>> data = {
-//   'Category1': [
-//     {'data': 'Data 1', 'time': DateTime.now().subtract(Duration(days: 1))},
-//     {'data': 'Data 2', 'time': DateTime.now().subtract(Duration(days: 2))},
-//     {'data': 'Data 1', 'time': DateTime.now().subtract(Duration(days: 1))},
-//     {'data': 'Data 2', 'time': DateTime.now().subtract(Duration(days: 2))},
-//     {'data': 'Data 1', 'time': DateTime.now().subtract(Duration(days: 1))},
-//     {'data': 'Data 2', 'time': DateTime.now().subtract(Duration(days: 2))},
-//   ],
-//   'Category2': [
-//     {'data': 'Data 3', 'time': DateTime.now().subtract(Duration(days: 3))},
-//     {'data': 'Data 4', 'time': DateTime.now().subtract(Duration(days: 4))},
-//   ],
-//   'Category3': [
-//     {'data': 'Data 5', 'time': DateTime.now().subtract(Duration(days: 5))},
-//     {'data': 'Data 6', 'time': DateTime.now().subtract(Duration(days: 6))},
-//   ],
-//   'Category4': [
-//     {'data': 'Data 7', 'time': DateTime.now().subtract(Duration(days: 7))},
-//     {'data': 'Data 8', 'time': DateTime.now().subtract(Duration(days: 8))},
-//   ],
-// };
-
 class CategoryList extends StatefulWidget {
   final String category;
   final DateTime date;
@@ -105,7 +81,6 @@ class _CategoryListState extends State<CategoryList> {
       List<Map<String, dynamic>> act,
       List<Map<String, dynamic>> weather,
       ) {
-    print(pefValues);
     setState(() {
       data = {
         'HeartRate': hr,
@@ -124,7 +99,7 @@ class _CategoryListState extends State<CategoryList> {
 
   Widget buildCategoryView(String category, BuildContext context) {
     return Padding(
-      padding: const EdgeInsetsDirectional.fromSTEB(0, 14, 0, 0),
+      padding: const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
       child: ListView.builder(
         itemCount: data[category]?.length ?? 0,
         itemBuilder: (context, index) {

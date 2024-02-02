@@ -44,7 +44,7 @@ class Health{
     List<HealthDataPoint> _healthDataList = [];
     // get data within the last 15 minutes
     final now = DateTime.now();
-    final fifteenMinutesAgo = now.subtract(Duration(hours:24));
+    final fifteenMinutesAgo = now.subtract(Duration(hours: 12));
     // Clear old data points
     _healthDataList.clear();
     try {
@@ -60,9 +60,6 @@ class Health{
     _healthDataList = HealthFactory.removeDuplicates(_healthDataList);
     // print the results
     _healthDataList.forEach((x) => {
-      print(x.type),
-      print(x.value),
-      print(x.dateTo),
     });
     await FirebaseService().addHRToFirebase(_healthDataList);
 
