@@ -38,7 +38,7 @@ dependencies:
   firebase_core: ^2.24.2
   google_fonts: ^6.1.0
   health: ^8.1.0
-  permission_handler: ^11.1.0
+  permission_handler: ^11.2.0
 #  cloud_firestore: ^4.14.0
 #  firebase_auth: ^4.16.0
   syncfusion_flutter_calendar: ^24.1.45
