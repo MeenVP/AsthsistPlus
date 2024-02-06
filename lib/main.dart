@@ -5,14 +5,16 @@ import 'package:flutter/services.dart';
 import 'backend/firebase.dart';
 import 'backend/health.dart';
 import 'firebase_options.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:workmanager/workmanager.dart';
 
-@pragma(
-    'vm:entry-point')
 void callbackDispatcher(){
   Workmanager().executeTask((task, inputData) async {
         print("Native called background task: $task");
-        await Health().fetchData();
+        await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform,
+        );
+        await Health().fetchHeartRate();
         await FirebaseService().addWeatherToFirebase();
     return Future.value(true);
   });
@@ -20,6 +22,14 @@ void callbackDispatcher(){
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await [
+    Permission.location,
+    Permission.activityRecognition,
+    Permission.notification,
+  ].request();
+
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -36,7 +46,7 @@ void main() async {
       isInDebugMode: true // If enabled it will post a notification whenever the task is running. Handy for debugging tasks
   );
   await Workmanager().registerPeriodicTask(
-    '2',
+    '1',
     'fetchData',
     initialDelay: const Duration(minutes: 15),
   );
