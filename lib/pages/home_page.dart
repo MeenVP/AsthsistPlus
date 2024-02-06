@@ -464,39 +464,26 @@ class _HomePageState extends State<HomePage> {
                                         size: 24,
                                         color: Style.heartrate,
                                       ),
-                                      FutureBuilder<String>(
+                                      FutureBuilder<Map<String,dynamic>>(
                                           future: FirebaseService()
                                               .getLatestHR(),
                                           builder: (context, snapshot) {
+                                            var heartRate = snapshot.data?['value'].toString().split('.');
+
                                             if (snapshot.connectionState ==
                                                 ConnectionState.done) {
                                               // If the Future is complete, display the data
-                                              if (snapshot.data == 'NaN') {
-                                                return Padding(
-                                                  padding: const EdgeInsets.only(top: 6,bottom: 6),
-                                                  child: Text(
-                                                    'No Data',
-                                                    style: GoogleFonts.outfit(
-                                                      textStyle: const TextStyle(
-                                                          fontWeight:
-                                                          FontWeight.normal,
-                                                          fontSize: 14,
-                                                          color: Style.primaryText),
-                                                    ),
-                                                  ),
-                                                );
-                                              }else{
+
                                                 return Text(
-                                                  '${snapshot.data}',
+                                                  '${heartRate?[0]}',
                                                   style: GoogleFonts.outfit(
                                                     textStyle: const TextStyle(
                                                         fontWeight:
                                                         FontWeight.normal,
                                                         fontSize: 24,
                                                         color: Style.primaryText),
-                                                  ),
+                                            )
                                                 );
-                                              }
                                             }else{
                                               return const CircularProgressIndicator();
                                             }

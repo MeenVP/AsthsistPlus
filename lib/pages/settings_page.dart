@@ -47,7 +47,8 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Future<void> fetchData() async {
     try{
-      await Health().fetchData();
+      await Health().fetchHeartRate();
+      await Health().fetchSteps();
     }catch (e) {
       print(e);
       setState(() {

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:workmanager/workmanager.dart';
 import '../pages/navigation_bar.dart';
 import '../pages/login_page.dart';
 import '../backend/firebase.dart';
