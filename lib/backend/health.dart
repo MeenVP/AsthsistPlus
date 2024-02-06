@@ -40,31 +40,52 @@ class Health{
     }
   }
 
-  Future fetchData() async {
-    List<HealthDataPoint> _healthDataList = [];
+  Future fetchHeartRate() async {
+    List<HealthDataPoint> healthDataList = [];
     // get data within the last 15 minutes
     final now = DateTime.now();
     final fifteenMinutesAgo = now.subtract(Duration(hours: 12));
     // Clear old data points
-    _healthDataList.clear();
+    healthDataList.clear();
     try {
       // fetch health data
       List<HealthDataPoint> healthData =
       await health.getHealthDataFromTypes(fifteenMinutesAgo, now, [HealthDataType.HEART_RATE],);
       // save all the new data points
-      _healthDataList.addAll(healthData);
+      healthDataList.addAll(healthData);
     } catch (error) {
       print("Exception in getHealthDataFromTypes: $error");
     }
     // filter out duplicates
-    _healthDataList = HealthFactory.removeDuplicates(_healthDataList);
-    // print the results
-    _healthDataList.forEach((x) => {
-    });
-    await FirebaseService().addHRToFirebase(_healthDataList);
+    healthDataList = HealthFactory.removeDuplicates(healthDataList);
+    await FirebaseService().addHRToFirebase(healthDataList);
 
     // update the UI to display the results
   }
+
+  Future fetchSteps() async {
+    List<HealthDataPoint> healthDataList = [];
+    // get data within the last 15 minutes
+    final now = DateTime.now();
+    final fifteenMinutesAgo = now.subtract(Duration(hours: 48));
+    // Clear old data points
+    healthDataList.clear();
+    try {
+      // fetch health data
+      List<HealthDataPoint> healthData =
+      await health.getHealthDataFromTypes(fifteenMinutesAgo, now, [HealthDataType.STEPS]);
+      // save all the new data points
+      healthDataList.addAll(healthData);
+    } catch (error) {
+      print("Exception in getHealthDataFromTypes: $error");
+    }
+    // filter out duplicates
+    healthDataList = HealthFactory.removeDuplicates(healthDataList);
+    await FirebaseService().addStepToFirebase(healthDataList);
+
+    // update the UI to display the results
+  }
+
 
 
 

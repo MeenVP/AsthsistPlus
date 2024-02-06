@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
+import '../backend/firebase.dart';
 import '../style.dart';
 
 class EditProfilePage extends StatefulWidget {
@@ -18,10 +19,13 @@ class DOBInputField extends StatelessWidget {
   final String label;
   final IconData icon;
 
+  final String showDate;
+
   DOBInputField({
     Key? key,
     required this.dobController,
     required this.label,
+    required this.showDate,
     this.icon = Icons.calendar_today, // Default icon if one is not provided
   }) : super(key: key);
 
@@ -43,7 +47,7 @@ class DOBInputField extends StatelessWidget {
       onTap: () async {
         DateTime? pickedDate = await showDatePicker(
           context: context,
-          initialDate: DateTime.now(),
+          initialDate: DateTime.parse(showDate),
           firstDate: DateTime(1900),
           lastDate: DateTime.now(),
         );
@@ -56,36 +60,11 @@ class DOBInputField extends StatelessWidget {
   }
 }
 
-void _showSaveConfirmationDialog(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (BuildContext dialogContext) {
-      return AlertDialog(
-        title: Text('Confirm'),
-        content: Text('Are you sure you want to save the changes?'),
-        actions: <Widget>[
-          TextButton(
-            child: Text('Cancel'),
-            onPressed: () {
-              Navigator.of(dialogContext).pop(); // Dismiss the dialog
-            },
-          ),
-          TextButton(
-            child: Text('Save'),
-            onPressed: () {
-              //save logic
-              Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (context) => NavigationBarApp()));
-              // Implement your edit profile functionality here
-            },
-          ),
-        ],
-      );
-    },
-  );
-}
+
 
 class _EditProfilePageState extends State<EditProfilePage> {
+
+
   String _gender = 'Male';
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
@@ -94,6 +73,28 @@ class _EditProfilePageState extends State<EditProfilePage> {
   final TextEditingController _heightController = TextEditingController();
   final TextEditingController _peakFlowController = TextEditingController();
 
+  Future<Map<String, dynamic>> getUserDetails() async {
+    final userDetails = await FirebaseService().getUserDetails();
+    return userDetails;
+  }
+
+
+@override
+  void initState() {
+    super.initState();
+    getUserDetails().then((userData) {
+      _firstNameController.text = userData['firstname'];
+      _lastNameController.text = userData['lastname'];
+      _dobController.text = userData['dob'];
+      _weightController.text = userData['weight'];
+      _heightController.text = userData['height'];
+      _peakFlowController.text = userData['bestpef'];
+      print(userData['dob']);
+      setState(() {
+        _gender = userData['gender'];  // Set _gender to the user's current gender
+      });
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -131,6 +132,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             DOBInputField(
               dobController: _dobController,
               label: 'Date of Birth',
+              showDate: _dobController.text,
             ),
             SizedBox(height: 15.0),
             Row(
@@ -182,8 +184,40 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 minimumSize: Size(double.infinity, 50), // Set a larger height
               ),
               onPressed: () {
-                _showSaveConfirmationDialog(context);
-                // Implement save logic
+                showDialog(
+                  context: context,
+                  builder: (BuildContext dialogContext) {
+                    return AlertDialog(
+                      title: Text('Confirm'),
+                      content: Text('Are you sure you want to save the changes?'),
+                      actions: <Widget>[
+                        TextButton(
+                          child: Text('Cancel'),
+                          onPressed: () {
+                            Navigator.of(dialogContext).pop(); // Dismiss the dialog
+                          },
+                        ),
+                        TextButton(
+                          child: Text('Save'),
+                          onPressed: () {
+                            FirebaseService().updateUserDetails(
+                              firstname: _firstNameController.text,
+                              lastname: _lastNameController.text,
+                              dob: _dobController.text,
+                              gender: _gender,  // Assuming the gender is not changed
+                              weight: _weightController.text,
+                              height: _heightController.text,
+                              bestpef: _peakFlowController.text,
+                            );
+                            Navigator.pushReplacement(context,
+                                MaterialPageRoute(builder: (context) => NavigationBarApp()));
+                            // Implement your edit profile functionality here
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                );
               },
             ),
           ],

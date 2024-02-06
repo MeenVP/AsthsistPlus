@@ -27,13 +27,42 @@ class FirebaseService {
     required bestpef,
   }) async {
     User? user = _firebaseAuth.currentUser;
+
+    //calculate age
+    final DateTime currentDate = DateTime.now();
+    num age = currentDate.year - dob.year;
+    if (currentDate.month < dob.month ||
+        (currentDate.month == dob.month && currentDate.day < dob.day)) {
+      age--;
+    }
+
+    // Calculate BMI
+    double heightInMeters = height / 100;  // convert height to meters
+    double bmi = weight / (heightInMeters * heightInMeters);
+
+    // Categorize BMI
+    int bmiCategory;
+    if (bmi < 18.5) {
+      bmiCategory = 0;  // Underweight
+    } else if (bmi < 23) {
+      bmiCategory = 1;  // Normal
+    } else if (bmi < 25) {
+      bmiCategory = 2;  // Pre-obesity
+    } else {
+      bmiCategory = 3;  // Obesity
+    }
+
+
     final Map<String, dynamic> userData = {
       'firstname': firstname,
       'lastname': lastname,
       'dob': dob,
+      'age': age,
       'gender': gender,
       'weight': weight,
       'height': height,
+      'bmi':bmi,
+      'bmiCategory': bmiCategory,
       'bestpef': bestpef,
     };
     final FirebaseFirestore db = FirebaseFirestore.instance;
@@ -43,6 +72,83 @@ class FirebaseService {
       log(error);
     });
   }
+
+  // get user data
+  Future<Map<String, dynamic>> getUserDetails() async {
+    User? user = _firebaseAuth.currentUser;
+    final FirebaseFirestore db = FirebaseFirestore.instance;
+    final CollectionReference usersRef = db.collection('users');
+    final DocumentReference userDocRef = usersRef.doc(user?.uid);
+
+    DocumentSnapshot docSnapshot = await userDocRef.get();
+
+    if (docSnapshot.exists) {
+      Map<String, dynamic> userData = docSnapshot.data() as Map<String, dynamic>;
+      return userData;
+    } else {
+      throw Exception('User not found!');
+    }
+  }
+
+  // update user data
+  Future<void> updateUserDetails({
+    required String firstname,
+    required String lastname,
+    required String dob,
+    required String gender,
+    required weight,
+    required height,
+    required bestpef,
+  }) async {
+    User? user = _firebaseAuth.currentUser;
+    DateTime dobTime = DateTime.parse(dob);
+    // Calculate age
+    final DateTime currentDate = DateTime.now();
+    num age = currentDate.year - dobTime.year;
+    if (currentDate.month < dobTime.month ||
+        (currentDate.month == dobTime.month && currentDate.day < dobTime.day)) {
+      age--;
+    }
+
+    // Calculate BMI
+    double heightInMeters = double.parse(height) / 100;  // convert height to meters
+    double bmi = double.parse(weight) / (heightInMeters * heightInMeters);
+
+    // Categorize BMI
+    int bmiCategory;
+    if (bmi < 18.5) {
+      bmiCategory = 0;  // Underweight
+    } else if (bmi < 23) {
+      bmiCategory = 1;  // Normal
+    } else if (bmi < 25) {
+      bmiCategory = 2;  // Pre-obesity
+    } else {
+      bmiCategory = 4;  // Obesity
+    }
+
+    final Map<String, dynamic> userData = {
+      'firstname': firstname,
+      'lastname': lastname,
+      'dob': dob,
+      'age': age,
+      'gender': gender,
+      'weight': weight,
+      'height': height,
+      'bmi': bmi,
+      'bmiCategory': bmiCategory,
+      'bestpef': bestpef,
+    };
+
+    final FirebaseFirestore db = FirebaseFirestore.instance;
+    final CollectionReference usersRef = db.collection('users');
+    final DocumentReference userDocRef = usersRef.doc(user?.uid);
+
+    await userDocRef.update(userData).catchError((error) {
+      log(error);
+    });
+  }
+
+
 // Sign-in
   Future<void> signInWithEmailAndPassword(String email, String password) async {
     await _firebaseAuth.signInWithEmailAndPassword(email: email, password: password);
@@ -61,6 +167,26 @@ class FirebaseService {
     for (HealthDataPoint data in healthDataList) {
       String date = DateFormat('yyyy-MM-dd').format(data.dateFrom);
       CollectionReference entries = heartrate.doc(date).collection('entries');
+
+      // Check for duplicates
+      QuerySnapshot query = await entries.where('datetime', isEqualTo: data.dateTo).get();
+      if (query.docs.isEmpty) {
+        // No duplicate found, add the new data
+        await entries.add({
+          'datetime': data.dateTo,
+          'value': data.value.toString()
+        });
+      }
+    }
+  }
+  // add step
+  Future addStepToFirebase(List<HealthDataPoint> healthDataList) async {
+    CollectionReference users = FirebaseFirestore.instance.collection('users');
+    CollectionReference steps = users.doc(_firebaseAuth.currentUser?.uid).collection('steps');
+
+    for (HealthDataPoint data in healthDataList) {
+      String date = DateFormat('yyyy-MM-dd').format(data.dateFrom);
+      CollectionReference entries = steps.doc(date).collection('entries');
 
       // Check for duplicates
       QuerySnapshot query = await entries.where('datetime', isEqualTo: data.dateTo).get();
@@ -326,7 +452,7 @@ class FirebaseService {
   }
 
   //get latest heart rate
-  Future<String> getLatestHR() async {
+  Future<Map<String, dynamic>> getLatestHR() async {
     User? user = FirebaseAuth.instance.currentUser;
     final FirebaseFirestore db = FirebaseFirestore.instance;
 
@@ -338,16 +464,8 @@ class FirebaseService {
 
     QuerySnapshot querySnapshot = await entriesRef.orderBy('datetime', descending: true).limit(1).get();
 
-    if (querySnapshot.docs.isNotEmpty) {
       Map<String, dynamic> latestHRData = querySnapshot.docs.first.data() as Map<String, dynamic>;
-      var hr = latestHRData['value'].toString().split('.');
-      return hr[0];
-    } else {
-      return 'NaN';
-    }
-
-
-
+      return latestHRData;
   }
 
   //get daily heart rate
@@ -376,6 +494,44 @@ class FirebaseService {
 
     return hrValues;
   }
+  // get weekly heart rate
+  Future<List<Map<String, dynamic>>> getHRForWeek(DateTime anyDate) async {
+    User? user = FirebaseAuth.instance.currentUser;
+    final FirebaseFirestore db = FirebaseFirestore.instance;
+
+    // Calculate the start and end dates of the week
+    int daysFromStart = anyDate.weekday - 1; // weekday returns 1 for Monday and 7 for Sunday
+    DateTime startDate = anyDate.subtract(Duration(days: daysFromStart));
+    DateTime endDate = startDate.add(Duration(days: 6));
+
+    List<Map<String, dynamic>> hrValues = [];
+
+    for (DateTime date = startDate; date.isBefore(endDate) || date.isAtSameMomentAs(endDate); date = date.add(Duration(days: 1))) {
+      // Format the date as 'yyyy-MM-dd'
+      final String formattedDate = DateFormat('yyyy-MM-dd').format(date);
+      final DocumentReference dateDocRef = db.collection('users').doc(user?.uid).collection('heartrate').doc(formattedDate);
+      final CollectionReference entriesRef = dateDocRef.collection('entries');
+
+      QuerySnapshot querySnapshot = await entriesRef.orderBy('datetime', descending: true).get();
+
+      for (var doc in querySnapshot.docs) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        DateTime datetime = (data['datetime'] as Timestamp).toDate();
+        var value = data['value'].toString().split('.');
+        String hr = value[0];
+        hrValues.add({
+          'data': '$hr bpm',
+          'time': datetime,
+        });
+      }
+    }
+
+    return hrValues;
+  }
+
+
+
+  // get daily attack
   Future<List<Map<String, dynamic>>> getAttackForDay(DateTime date) async {
     User? user = FirebaseAuth.instance.currentUser;
     final FirebaseFirestore db = FirebaseFirestore.instance;
@@ -400,7 +556,7 @@ class FirebaseService {
 
     return attack;
   }
-
+// get daily asthma control test
   Future<List<Map<String, dynamic>>> getActForDay(DateTime date) async {
     User? user = FirebaseAuth.instance.currentUser;
     final FirebaseFirestore db = FirebaseFirestore.instance;
