@@ -33,31 +33,45 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
   }
 
   void getHeartRateDataForChart(DateTime date) async {
-    var firebaseService = FirebaseService(); // Create an instance of FirebaseService
+    var firebaseService = FirebaseService(); // Your service instance
     var hrData = await firebaseService.getHRForDay(date); // Fetch the heart rate data
 
-    // Convert the data to FlSpot objects for the chart
-    List<FlSpot> heartRateSpots = hrData.map((data) {
-      final x = (data['time'] as DateTime).millisecondsSinceEpoch.toDouble();
-      final y = double.parse(data['data'].replaceAll(' bpm', ''));
-      return FlSpot(x, y);
-    }).where((spot) {
-      // Filter out any heart rate values that are not within the typical range
-      return spot.y >= 0 && spot.y <= 150;
-    }).toList();
+    // Check if we received any data
+    if (hrData.isNotEmpty) {
+      // Convert the fetched data into FlSpot objects for plotting on the chart
+      List<FlSpot> heartRateSpots = hrData.map((data) {
+        final x = (data['time'] as DateTime).millisecondsSinceEpoch.toDouble();
+        final y = double.parse(data['data'].replaceAll(' bpm', ''));
+        return FlSpot(x, y);
+      }).toList();
 
-    // Update the state to reflect the new data
-    setState(() {
-      // Assuming you have a member variable to hold the chart data
-      this.heartRateData = heartRateSpots;
-      // Update the current heart rate and timestamp to the latest data point
-      if (heartRateSpots.isNotEmpty) {
-        final latestSpot = heartRateSpots.last;
-        updateDisplayedHeartRate(latestSpot.y.toInt(), DateTime.now());
-      }else{
-        Text('no data');
-      }
-    });
+      // Find the latest entry based on the timestamp
+      // Assuming the data is already sorted by datetime, the first entry is the most recent
+      DateTime latestDataTimestamp = hrData.first['time'];
+      double latestHeartRate = double.parse(hrData.first['data'].replaceAll(' bpm', ''));
+
+      setState(() {
+        this.heartRateData = heartRateSpots;
+        // Set the timestamp of the latest data entry as the current timestamp
+        currentTimestamp = latestDataTimestamp;
+        // Update the displayed heart rate with the value from the latest entry
+        // Convert to int if necessary or keep it as double based on your display needs
+        currentHeartRate = latestHeartRate.toInt();
+      });
+    } else {
+      // Handle the case where no data is available for the selected date
+      setState(() {
+        // choose to either reset the currentHeartRate to a default value
+        // or keep the last known value, depending on your application's needs
+        currentHeartRate = 0; // Placeholder or default value
+        // Consider setting a specific "no data" timestamp or message, or keep it unchanged
+        heartRateData.clear(); // Clear the chart data
+        // Optionally inform the user that no data is available
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text("No heart rate data available."),
+        ));
+      });
+    }
   }
 
   @override
@@ -103,8 +117,10 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
     }).toList();
 
     print('Number of Spots for $timeSpan: ${spots.length}');
+
     for (var spot in spots) {
-      print('x: ${spot.x}, y: ${spot.y}');
+      final timeX = DateTime.fromMillisecondsSinceEpoch(spot.x.toInt());
+      print('x: ${timeX}, y: ${spot.y}');
     }
 
     return spots;
@@ -288,8 +304,8 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
                     child: Container(
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        color: Style.secondaryBackground
+                          borderRadius: BorderRadius.circular(12),
+                          color: Style.secondaryBackground
                       ),
                       child: Padding(
                         padding: EdgeInsetsDirectional.fromSTEB(20, 10, 20, 10),
@@ -318,24 +334,24 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
                                     ),
                                   ),
                                   Row(
-                                    mainAxisSize: MainAxisSize.max,
-                                    children: [
-                                      Text(
-                                        '$average',
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.black,
+                                      mainAxisSize: MainAxisSize.max,
+                                      children: [
+                                        Text(
+                                          '$average',
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.black,
+                                          ),
                                         ),
-                                      ),
-                                      SizedBox(width: 10),
-                                      const Text(
-                                        'BPM',
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.black,
+                                        SizedBox(width: 10),
+                                        const Text(
+                                          'BPM',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.black,
+                                          ),
                                         ),
-                                      ),
-                                    ]
+                                      ]
                                   ),
                                 ],
                               ),
@@ -354,24 +370,24 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
                                     ),
                                   ),
                                   Row(
-                                    mainAxisSize: MainAxisSize.max,
-                                    children: [
-                                      Text(
-                                        '$maximum',
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.black,
+                                      mainAxisSize: MainAxisSize.max,
+                                      children: [
+                                        Text(
+                                          '$maximum',
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.black,
+                                          ),
                                         ),
-                                      ),
-                                      SizedBox(width: 10),
-                                      const Text(
-                                        'BPM',
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.black,
+                                        SizedBox(width: 10),
+                                        const Text(
+                                          'BPM',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.black,
+                                          ),
                                         ),
-                                      ),
-                                    ]
+                                      ]
                                   ),
                                 ],
                               ),
@@ -448,7 +464,7 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
         AspectRatio(
           aspectRatio: 2.0,
           child: Padding(
-            padding: EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
+            padding: EdgeInsetsDirectional.fromSTEB(0, 20, 0, 0),
             child: LineChart(
               mainData(spots),
             ),
@@ -458,29 +474,33 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
     );
   }
 
-  LineChartData mainData(List<FlSpot> spots) {
+  LineChartData mainData(List<FlSpot> reversedSpots) {
+    reversedSpots = List.from(heartRateData.reversed);
     // Set a fixed range for minY and maxY
     double minY = 0;
     double maxY = 150;
 
     // Calculate minX and maxX based on the spots data
-    double minX = spots.isNotEmpty ? spots.first.x : 0;
-    double maxX = spots.isNotEmpty ? spots.last.x : 0;
+    double minX = reversedSpots.isNotEmpty ? reversedSpots.first.x : 0;
+    // final sum = DateTime.fromMillisecondsSinceEpoch(minX.toInt());
+    // print('${sum} testFirst');
+    double maxX = reversedSpots.isNotEmpty ? reversedSpots.last.x : 0;
+    // print('${minX} test');
+    // double minX = 0;
+    // double maxX = 24;
 
 
-    FlSpot lastSpot = spots.isNotEmpty ? spots.last : FlSpot(0, 0);
-
-    // double interval = 2 * 60 * 60 * 1000;
+    FlSpot lasttSpot = reversedSpots.isNotEmpty ? reversedSpots.last : FlSpot(0, 0);
+    print('test list reversed: ${reversedSpots}');
 
     // Adjust maxY slightly higher to ensure the top data point isn't at the very edge
-    // maxY += 1;
 
     return LineChartData(
       gridData: FlGridData(
         show: true,
         drawVerticalLine: true,
         horizontalInterval: 50,
-        verticalInterval: 1,
+        // verticalInterval: 1,
         getDrawingHorizontalLine: (value) {
           return FlLine(
             color: const Color(0xffe7e8ec),
@@ -497,51 +517,58 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
           sideTitles: SideTitles(
             showTitles: true,
             reservedSize: 30,
-            interval: 1,
-            getTitlesWidget: bottomTitleWidgets,
+            getTitlesWidget: bottomTitleWidgets, // Your modified function
+            // interval: 0,
+          ),
+        ),
+        rightTitles: AxisTitles(
+          sideTitles: SideTitles(
+            showTitles: true,
+            getTitlesWidget: rightTitleWidgets, // Custom function for left titles
+            reservedSize: 42,
           ),
         ),
         leftTitles: AxisTitles(
           sideTitles: SideTitles(
             showTitles: true,
             getTitlesWidget: leftTitleWidgets, // Custom function for left titles
-            reservedSize: 42,
+            reservedSize: 50,
           ),
         ),
       ),
       borderData: FlBorderData(
         show: false,
       ),
-    extraLinesData: ExtraLinesData(
-      horizontalLines: [
-        HorizontalLine(
-          y: 0,
-          color: const Color(0xffe7e8ec),
-          strokeWidth: 1,
-        ),
-        HorizontalLine(
-          y: 150,
-          color: const Color(0xffe7e8ec),
-          strokeWidth: 1,
-        ),
-      ],
-    ),
+      extraLinesData: ExtraLinesData(
+        horizontalLines: [
+          HorizontalLine(
+            y: 0,
+            color: const Color(0xffe7e8ec),
+            strokeWidth: 1,
+          ),
+          HorizontalLine(
+            y: 150,
+            color: const Color(0xffe7e8ec),
+            strokeWidth: 1,
+          ),
+        ],
+      ),
       minX: minX,
       maxX: maxX,
       minY: minY,
       maxY: maxY,
       lineBarsData: [
         LineChartBarData(
-          spots: spots,
+          spots: reversedSpots,
           isCurved: true,
           color: Style.heartrate,
-          barWidth: 2,
+          barWidth: 3,
           isStrokeCapRound: true,
           dotData: FlDotData(
             show: true,
             getDotPainter: (spot, percent, barData, index) {
               // Show a prominent dot only for the last spot or the 'current' spot
-              if (spot == lastSpot) {
+              if (spot == lasttSpot) {
                 return FlDotCirclePainter(
                   radius: 4,
                   color: Colors.white,
@@ -569,38 +596,64 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
   }
 
   Widget bottomTitleWidgets(double value, TitleMeta meta) {
-    // TextStyle style = TextStyle(
-    //   color: Colors.black,
-    //   fontWeight: FontWeight.bold,
-    //   fontSize: 16,
-    // );
-    //
-    // // Map the double values to time strings.
-    // const timeLabels = {
-    //   0: '00:00',
-    //   6: '06:00',
-    //   12: '12:00',
-    //   18: '18:00',
-    //   24: '23:59', // Assuming 24 represents the end of the day
-    // };
-    //
-    // // Only show the label if it's defined in the map.
-    // Widget text = timeLabels.containsKey(value.toInt())
-    //     ? Text(timeLabels[value.toInt()]!, style: style)
-    //     : Container(); // Return an empty container for values not in the map.
-    //
-    // return SideTitleWidget(
-    //   axisSide: meta.axisSide,
-    //   space: 8.0, // You can adjust the space for alignment
-    //   child: text,
-    // );
-    return Text('Test return');
+    const style = TextStyle(
+      color: Color(0xff68737d),
+      fontWeight: FontWeight.bold,
+      fontSize: 13,
+    );
+
+    if (heartRateData.isEmpty) {
+      return Text('');
+    }
+
+    var dateTime = DateTime.fromMillisecondsSinceEpoch(value.toInt());
+    var formattedDate = DateFormat('MMM d').format(dateTime); // Example: Jan 5
+    var formattedTime = DateFormat('HH:mm').format(dateTime); // Example: 15:04
+
+    var label = '';
+    if (_tabController?.index == 0) { // Day view
+      if (value == heartRateData.first.x) {
+        label = '$formattedTime';
+      }
+    } else if (_tabController?.index == 1 || _tabController?.index == 2) { // Week or Month view
+    }
+
+    return Padding(
+        padding: const EdgeInsets.all(5.0),
+    child: Text(label, style: style),
+    );
   }
 
-
-
+  Widget rightTitleWidgets(double value, TitleMeta meta) {
+    return Container();
+  }
 
   Widget leftTitleWidgets(double value, TitleMeta meta) {
-    return Container();
+    const textStyle = TextStyle(
+      color: Color(0xff68737d),
+      fontWeight: FontWeight.bold,
+      fontSize: 13,
+    );
+    String text;
+    switch (value.toInt()) {
+      case 0:
+        text = '0';
+        break;
+      case 50:
+        text = '50';
+        break;
+      case 100:
+        text = '100';
+        break;
+      case 150:
+        text = '150';
+        break;
+      default:
+        return Container(); // Return an empty container for non-labeled values
+    }
+    return Padding(
+      padding: const EdgeInsets.only(left: 15), // Add padding if needed
+      child: Text(text, style: textStyle),
+    );
   }
 }
