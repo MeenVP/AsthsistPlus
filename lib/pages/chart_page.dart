@@ -54,29 +54,6 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
     getHeartRateDataForChart(now, fetchType);
   }
 
-  // Fetches heart rate data from Firebase and processes it according to the fetch type.
-  void getHeartRateDataForChart(DateTime date, DataFetchType fetchType) async {
-    var firebaseService = FirebaseService();
-    List<Map<String, dynamic>> hrData = [];
-    switch (fetchType) {
-      case DataFetchType.day:
-        hrData = await firebaseService.getHRForDay(date);
-        if (mounted) {
-          processDayData(hrData);
-        }
-        break;
-      case DataFetchType.week:
-        hrData = await firebaseService.getHRForWeek(date);
-        if (mounted) {
-          processWeekData(hrData);
-        }
-        break;
-      case DataFetchType.month:
-      // Process monthly data if available
-        break;
-    }
-  }
-
   // Processes daily heart rate data and updates the state.
   void processDayData(List<Map<String, dynamic>> hrData) {
     if (!mounted) return;
@@ -114,6 +91,30 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
         ));
       }
     });
+  }
+
+  // Fetches heart rate data from Firebase and processes it according to the fetch type.
+  void getHeartRateDataForChart(DateTime date, DataFetchType fetchType) async {
+    var firebaseService = FirebaseService();
+    List<Map<String, dynamic>> hrData = [];
+    switch (fetchType) {
+      case DataFetchType.day:
+        hrData = await firebaseService.getHRForDay(date);
+        if (mounted) {
+          processDayData(hrData);
+        }
+        break;
+      case DataFetchType.week:
+        hrData = await firebaseService.getHRForWeek(date);
+        if (mounted) {
+          processWeekData(hrData);
+        }
+        break;
+      case DataFetchType.month:
+
+      // Process monthly data if available
+        break;
+    }
   }
 
   List<FlSpot> getSpotsFromData(String timeSpan) {
@@ -568,8 +569,17 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
           ],
         );
       case 2: // Month
-        List<FlSpot> monthSpots = getSpotsFromData('M');
-        return LineChart(mainData(monthSpots)); // Assuming you have a similar method for monthly data
+        return Stack(
+          children: <Widget>[
+            AspectRatio(
+              aspectRatio: 2,
+              child: Center(
+                  // padding: EdgeInsetsDirectional.fromSTEB(0, 20, 0, 0),
+                  child:Text('No data')
+              ),
+            ),
+          ],
+        );
       default:
         return Container(); // Just in case something goes wrong
     }
@@ -584,14 +594,7 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
 
     // Calculate minX and maxX based on the spots data
     double minX = reversedSpots.isNotEmpty ? reversedSpots.first.x : 0;
-    // final sum = DateTime.fromMillisecondsSinceEpoch(minX.toInt());
-    // print('testFirst x: ${sum} y: ${reversedSpots.first.y}');
     double maxX = reversedSpots.isNotEmpty ? reversedSpots.last.x : 0;
-    // final sumLast = DateTime.fromMillisecondsSinceEpoch(maxX.toInt());
-    // print('testLast x: ${sumLast} y: ${reversedSpots.last.y}');
-    // double minX = 0;
-    // double maxX = 24;
-
 
     FlSpot lasttSpot = reversedSpots.isNotEmpty ? reversedSpots.last : FlSpot(0, 0);
     // print('test list reversed: ${reversedSpots}');
@@ -775,7 +778,9 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
 
     // Create bar groups using min and max values
     List<BarChartGroupData> barGroups = List.generate(7, (index) {
+      bool isSelected = index + 1 == selectedBarIndex;
       List<double> dailyValues = minMaxByDay[index + 1] ?? [];
+      // print('Test degub: ${dailyValues}');
       double minY = dailyValues.isNotEmpty ? dailyValues.reduce(math.min) : 0;
       double maxY = dailyValues.isNotEmpty ? dailyValues.reduce(math.max) : 0;
 
@@ -785,7 +790,7 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
           BarChartRodData(
             toY: maxY,
             fromY: minY,
-            color: Style.heartrate,
+            color: isSelected ? Colors.red : Style.heartrate,
             width: 14,
             borderRadius: BorderRadius.circular(4),
           ),
