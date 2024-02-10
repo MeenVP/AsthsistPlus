@@ -61,11 +61,15 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
     switch (fetchType) {
       case DataFetchType.day:
         hrData = await firebaseService.getHRForDay(date);
-        processDayData(hrData);
+        if (mounted) {
+          processDayData(hrData);
+        }
         break;
       case DataFetchType.week:
         hrData = await firebaseService.getHRForWeek(date);
-        processWeekData(hrData);
+        if (mounted) {
+          processWeekData(hrData);
+        }
         break;
       case DataFetchType.month:
       // Process monthly data if available
@@ -98,8 +102,11 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
   void processWeekData(List<Map<String, dynamic>> hrData) {
     if (!mounted) return;
     // Update the state with new weekly data.
+    DateTime now = DateTime.now();
+    int todayIndex = now.weekday;
     setState(() {
       weeklyData = hrData;
+      selectedBarIndex = todayIndex;
       if (hrData.isEmpty) {
         // Show a message if no weekly data is available.
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -834,21 +841,17 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
       barTouchData: BarTouchData(
         handleBuiltInTouches: false,
         touchCallback: (FlTouchEvent event, BarTouchResponse? response) {
-          if (event is! FlTapUpEvent || response == null || response.spot == null) {
-            if (mounted) {
-              setState(() {
-                selectedBarIndex = null;
-              });
-            }
-            return;
-          }
-          if (mounted) {
+        if (!mounted) return;
+          if (event is FlTapUpEvent && response != null && response.spot != null) {
+            // If a bar is tapped, update the selectedBarIndex to that bar's index
             setState(() {
-              // Add 1 because DateTime.weekday is 1-based and the bar index is 0-based
               selectedBarIndex = response.spot!.touchedBarGroupIndex + 1;
             });
+          } else {
+            // Do not set selectedBarIndex to null, as we want to always display the current day's data
+            // Comment out or remove the setState call that sets selectedBarIndex to null
           }
-        },
+        }
       ),
       gridData: FlGridData(
         show: true,
