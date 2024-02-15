@@ -20,25 +20,25 @@ class FirebaseService {
   Future<void> addUserDetails({
     required String firstname,
     required String lastname,
-    required  dob,
+    required  String dob,
     required String gender,
     required  weight,
     required height,
     required bestpef,
   }) async {
     User? user = _firebaseAuth.currentUser;
-
-    //calculate age
+    DateTime dobTime = DateTime.parse(dob);
+    // Calculate age
     final DateTime currentDate = DateTime.now();
-    num age = currentDate.year - dob.year;
-    if (currentDate.month < dob.month ||
-        (currentDate.month == dob.month && currentDate.day < dob.day)) {
+    num age = currentDate.year - dobTime.year;
+    if (currentDate.month < dobTime.month ||
+        (currentDate.month == dobTime.month && currentDate.day < dobTime.day)) {
       age--;
     }
 
     // Calculate BMI
-    double heightInMeters = height / 100;  // convert height to meters
-    double bmi = weight / (heightInMeters * heightInMeters);
+    double heightInMeters = double.parse(height) / 100;  // convert height to meters
+    double bmi = double.parse(weight) / (heightInMeters * heightInMeters);
 
     // Categorize BMI
     int bmiCategory;
@@ -123,7 +123,7 @@ class FirebaseService {
     } else if (bmi < 25) {
       bmiCategory = 2;  // Pre-obesity
     } else {
-      bmiCategory = 4;  // Obesity
+      bmiCategory = 3;  // Obesity
     }
 
     final Map<String, dynamic> userData = {
@@ -277,7 +277,7 @@ class FirebaseService {
       log(error);
     });
   }
-
+  // add attack
   Future<void> addAttack(String attack) async {
     // Get the current date and time
     DateTime now = DateTime.now();
@@ -329,6 +329,31 @@ class FirebaseService {
     final CollectionReference dateRef = userDocRef.collection('act').doc(formattedDate).collection('entries');
 
     await dateRef.add(pefData).catchError((error) {
+      log(error);
+    });
+  }
+// add predictions
+  Future<void> addPrediction(String prediction) async {
+    // Get the current date and time
+    DateTime now = DateTime.now();
+
+    // Create a new DateTime object with only the year, month, day, hour, and minute
+    DateTime datetime = DateTime(now.year, now.month, now.day, now.hour, now.minute);
+
+    final Map<String, dynamic> medicationData = {
+      'datetime': datetime,
+      'result': prediction,
+    };
+
+    final FirebaseFirestore db = FirebaseFirestore.instance;
+    final DocumentReference userDocRef = db.collection('users').doc(_firebaseAuth.currentUser?.uid);
+
+    // Format the current date as 'yyyy-MM-dd'
+    final String formattedDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+    final CollectionReference dateRef = userDocRef.collection('prediction').doc(formattedDate).collection('entries');
+
+    await dateRef.add(medicationData).catchError((error) {
       log(error);
     });
   }
@@ -528,6 +553,53 @@ class FirebaseService {
 
     return hrValues;
   }
+  // get latest steps
+  Future<Map<String, dynamic>> getLatestSteps() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    final FirebaseFirestore db = FirebaseFirestore.instance;
+
+    // Format the current date as 'yyyy-MM-dd'
+    final String formattedDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+    final DocumentReference dateDocRef = db.collection('users').doc(user?.uid).collection('steps').doc(formattedDate);
+    final CollectionReference entriesRef = dateDocRef.collection('entries');
+
+    QuerySnapshot querySnapshot = await entriesRef.orderBy('datetime', descending: true).limit(1).get();
+
+    Map<String, dynamic> latestSteps = querySnapshot.docs.first.data() as Map<String, dynamic>;
+    return latestSteps;
+  }
+
+  // get daily steps
+  Future<List<Map<String, dynamic>>> getStepsForDay(DateTime date) async {
+    User? user = FirebaseAuth.instance.currentUser;
+    final FirebaseFirestore db = FirebaseFirestore.instance;
+
+    // Format the date as 'yyyy-MM-dd'
+    final String formattedDate = DateFormat('yyyy-MM-dd').format(date);
+    final DocumentReference dateDocRef = db.collection('users')
+        .doc(user?.uid)
+        .collection('steps')
+        .doc(formattedDate);
+    final CollectionReference entriesRef = dateDocRef.collection('entries');
+
+    QuerySnapshot querySnapshot = await entriesRef.orderBy(
+        'datetime', descending: true).get();
+    List<Map<String, dynamic>> hrValues = [];
+
+    for (var doc in querySnapshot.docs) {
+      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+      DateTime datetime = (data['datetime'] as Timestamp).toDate();
+      var value = data['value'].toString().split('.');
+      String steps = value[0];
+      hrValues.add({
+        'data': steps,
+        'time': datetime,
+      });
+    }
+
+    return hrValues;
+  }
 
 
 
@@ -581,6 +653,28 @@ class FirebaseService {
 
     return act;
   }
+
+  //get latest weather
+  Future<Map<String, dynamic>> getLatestWeather() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    final FirebaseFirestore db = FirebaseFirestore.instance;
+
+    // Format the date as 'yyyy-MM-dd'
+    final String formattedDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    final DocumentReference dateDocRef = db.collection('users').doc(user?.uid).collection('weather').doc(formattedDate);
+    final CollectionReference entriesRef = dateDocRef.collection('entries');
+
+    QuerySnapshot querySnapshot = await entriesRef.orderBy('datetime', descending: true).limit(1).get();
+
+    if (querySnapshot.docs.isEmpty) {
+      // Handle case when no weather data is available for the given day
+      return {'error': 'No weather data found for $formattedDate'};
+    }
+
+    Map<String, dynamic> latestWeather = querySnapshot.docs.first.data() as Map<String, dynamic>;
+    return latestWeather;
+  }
+
 
   Future<List<Map<String, dynamic>>> getWeatherForDay(DateTime date) async {
     User? user = FirebaseAuth.instance.currentUser;

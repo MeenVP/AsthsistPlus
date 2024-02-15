@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../backend/sklearn.dart';
 import 'notification_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -185,6 +186,164 @@ class _HomePageState extends State<HomePage> {
       },
     );
   }
+  Widget showPEFPrediction(){
+    return FutureBuilder<int>(
+      future: SKLearn().peakFlowPrediction(),
+      builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator();  // or your custom loader
+        } else if (snapshot.hasError) {
+          // return
+          return Container(
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.only(topLeft: Radius.circular(16), topRight: Radius.circular(16)),
+                color: Style.primaryColor),
+            child: Column(
+              children: [
+                Align(
+                  alignment: const AlignmentDirectional(-1, -1),
+                  child: Padding(
+                    padding: const EdgeInsetsDirectional.fromSTEB(
+                        16, 10, 0, 0),
+                    child: Text(
+                      'Your current risk',
+                      style: GoogleFonts.outfit(
+                        textStyle: const TextStyle(
+                          fontWeight: FontWeight.normal,
+                          fontSize: 14,
+                          color: Style.tertiaryText,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Align(
+                  alignment: const AlignmentDirectional(0, 0),
+                  child: Padding(
+                    padding: const EdgeInsetsDirectional.fromSTEB(
+                        0, 32, 0, 32),
+                    child: Text(
+                      'Error: ${snapshot.error}',
+                      style: GoogleFonts.outfit(
+                        textStyle: const TextStyle(
+                          fontWeight: FontWeight.normal,
+                          fontSize: 24,
+                          color: Style.tertiaryText,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Align(
+                  alignment: const AlignmentDirectional(1, 1),
+                  child: Padding(
+                    padding: const EdgeInsetsDirectional.fromSTEB(
+                        0, 0, 10, 10),
+                    child: Text(
+                      '-_-\'',
+                      textAlign: TextAlign.end,
+                      style: GoogleFonts.outfit(
+                        textStyle: const TextStyle(
+                          fontWeight: FontWeight.normal,
+                          fontSize: 14,
+                          color: Style.tertiaryText,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        } else {
+          int? prediction = snapshot.data;
+          String riskLevel;
+          Color riskColor;
+
+          switch (prediction) {
+            case 0:
+              riskLevel = 'SAFE';
+              riskColor = Style.success;
+              break;
+            case 1:
+              riskLevel = 'CAUTION';
+              riskColor = Style.warning;
+              break;
+            case 2:
+              riskLevel = 'DANGER';
+              riskColor = Style.danger;
+              break;
+            default:
+              riskLevel = 'UNKNOWN';
+              riskColor = Style.tertiaryText;
+          }
+
+          return Container(
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.only(topLeft: Radius.circular(16), topRight: Radius.circular(16)),
+                color: riskColor),
+            child: Column(
+              children: [
+                Align(
+                  alignment: const AlignmentDirectional(-1, -1),
+                  child: Padding(
+                    padding: const EdgeInsetsDirectional.fromSTEB(
+                        16, 10, 0, 0),
+                    child: Text(
+                      'Your current risk',
+                      style: GoogleFonts.outfit(
+                        textStyle: const TextStyle(
+                          fontWeight: FontWeight.normal,
+                          fontSize: 14,
+                          color: Style.tertiaryText,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Align(
+                  alignment: const AlignmentDirectional(0, 0),
+                  child: Padding(
+                    padding: const EdgeInsetsDirectional.fromSTEB(
+                        0, 32, 0, 32),
+                    child: Text(
+                      riskLevel,
+                      style: GoogleFonts.outfit(
+                        textStyle: const TextStyle(
+                          fontWeight: FontWeight.normal,
+                          fontSize: 48,
+                          color: Style.tertiaryText,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Align(
+                  alignment: const AlignmentDirectional(1, 1),
+                  child: Padding(
+                    padding: const EdgeInsetsDirectional.fromSTEB(
+                        0, 0, 10, 10),
+                    child: Text(
+                      'Great job!',
+                      textAlign: TextAlign.end,
+                      style: GoogleFonts.outfit(
+                        textStyle: const TextStyle(
+                          fontWeight: FontWeight.normal,
+                          fontSize: 14,
+                          color: Style.tertiaryText,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+      },
+    );
+  }
+
 
   void _showAddMedicationDialog(BuildContext context) {
     TextEditingController medicationController = TextEditingController();
@@ -379,65 +538,12 @@ class _HomePageState extends State<HomePage> {
                     borderRadius: const BorderRadius.all(Radius.circular(16)),
                     elevation: 2,
                     child: Container(
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(16),
-                          color: Style.success),
+
                       child: Column(
                         mainAxisSize: MainAxisSize.max,
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          Align(
-                            alignment: const AlignmentDirectional(-1, -1),
-                            child: Padding(
-                              padding: const EdgeInsetsDirectional.fromSTEB(
-                                  16, 10, 0, 0),
-                              child: Text(
-                                'Your current risk',
-                                style: GoogleFonts.outfit(
-                                  textStyle: const TextStyle(
-                                    fontWeight: FontWeight.normal,
-                                    fontSize: 14,
-                                    color: Style.tertiaryText,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          Align(
-                            alignment: const AlignmentDirectional(0, 0),
-                            child: Padding(
-                              padding: const EdgeInsetsDirectional.fromSTEB(
-                                  0, 32, 0, 32),
-                              child: Text(
-                                'SAFE',
-                                style: GoogleFonts.outfit(
-                                  textStyle: const TextStyle(
-                                    fontWeight: FontWeight.normal,
-                                    fontSize: 48,
-                                    color: Style.tertiaryText,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          Align(
-                            alignment: const AlignmentDirectional(1, 1),
-                            child: Padding(
-                              padding: const EdgeInsetsDirectional.fromSTEB(
-                                  0, 0, 10, 10),
-                              child: Text(
-                                'Great job!',
-                                textAlign: TextAlign.end,
-                                style: GoogleFonts.outfit(
-                                  textStyle: const TextStyle(
-                                    fontWeight: FontWeight.normal,
-                                    fontSize: 14,
-                                    color: Style.tertiaryText,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
+                          showPEFPrediction(),
                           Container(
                             padding:
                                 const EdgeInsets.symmetric(horizontal: 16.0),
