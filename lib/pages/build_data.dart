@@ -25,6 +25,7 @@ class _CategoryListState extends State<CategoryList> {
     'Attack': [],
     'ACT': [],
     'Weather': [],
+    'steps': [],
 
   };
 
@@ -40,7 +41,9 @@ class _CategoryListState extends State<CategoryList> {
               FirebaseService().getAttackForDay(_selectedDay).then((attack) {
                 FirebaseService().getActForDay(_selectedDay).then((act) {
                   FirebaseService().getWeatherForDay(_selectedDay).then((weather) {
-                    updateData(pefValues, medications, hr,attack,act,weather);
+                    FirebaseService().getStepsForDay(_selectedDay).then((steps) {
+                      updateData(pefValues, medications, hr,attack,act,weather,steps);
+                    });
                   });
                 });
               });
@@ -64,7 +67,9 @@ class _CategoryListState extends State<CategoryList> {
           FirebaseService().getAttackForDay(_selectedDay).then((attack) {
             FirebaseService().getActForDay(_selectedDay).then((act) {
               FirebaseService().getWeatherForDay(_selectedDay).then((weather) {
-                updateData(pefValues, medications, hr,attack,act,weather);
+                FirebaseService().getStepsForDay(_selectedDay).then((steps) {
+                  updateData(pefValues, medications, hr,attack,act,weather,steps);
+                });
               });
             });
           });
@@ -80,6 +85,7 @@ class _CategoryListState extends State<CategoryList> {
       List<Map<String, dynamic>> attack,
       List<Map<String, dynamic>> act,
       List<Map<String, dynamic>> weather,
+      List<Map<String, dynamic>> steps,
       ) {
     setState(() {
       data = {
@@ -89,6 +95,7 @@ class _CategoryListState extends State<CategoryList> {
         'pef': pefValues,
         'ACT': act,
         'Weather': weather,
+        'Steps': steps,
       };
     });
   }
