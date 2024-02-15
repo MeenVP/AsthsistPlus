@@ -76,16 +76,29 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
     });
   }
 
+  // void processWeekData(List<Map<String, dynamic>> hrData) {
+  //   if (!mounted) return;
+  //   // Update the state with new weekly data.
+  //   DateTime now = DateTime.now();
+  //   int todayIndex = now.weekday;
+  //   setState(() {
+  //     weeklyData = hrData;
+  //     selectedBarIndex = todayIndex;
+  //     if (hrData.isEmpty) {
+  //       // Show a message if no weekly data is available.
+  //       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+  //         content: Text("No heart rate data available."),
+  //       ));
+  //     }
+  //   });
+  // }
   void processWeekData(List<Map<String, dynamic>> hrData) {
     if (!mounted) return;
-    // Update the state with new weekly data.
-    DateTime now = DateTime.now();
-    int todayIndex = now.weekday;
+    // Assume hrData is pre-processed to minimize necessary transformations
     setState(() {
       weeklyData = hrData;
-      selectedBarIndex = todayIndex;
+      selectedBarIndex = DateTime.now().weekday; // Automatically select current day
       if (hrData.isEmpty) {
-        // Show a message if no weekly data is available.
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text("No heart rate data available."),
         ));
@@ -543,6 +556,10 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
     switch (index) {
       case 0: // Day
         List<FlSpot> daySpots = getSpotsFromData('D');
+        if (daySpots.isEmpty) {
+          // Handle the case where there's no data
+          return Center(child: Text('No data available for this day.'));
+        }
         return Stack(
           children: <Widget>[
             AspectRatio(
@@ -712,7 +729,7 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
     }
 
     var dateTime = DateTime.fromMillisecondsSinceEpoch(value.toInt());
-    var formattedDate = DateFormat('EEEE').format(dateTime); // Example: Jan 5
+    // var formattedDate = DateFormat('EEEE').format(dateTime); // Example: Jan 5
     var formattedTime = DateFormat('HH:mm').format(dateTime); // Example: 15:04
 
     var label = '';
@@ -720,10 +737,8 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
       if (value == heartRateData.first.x) {
         label = '$formattedTime';
       }
-    } else if (_tabController?.index == 1 || _tabController?.index == 2) { // Week or Month view
-      if (value == heartRateData.first.x) {
-        label = '$formattedDate';
-      }
+    } else{
+      label = '';
     }
 
     return Padding(
