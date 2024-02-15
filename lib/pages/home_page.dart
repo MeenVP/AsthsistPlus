@@ -19,12 +19,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final int heartRate = 85;
-  final String weather = 'clear';
-  final int tem = 33;
-  final int aqi = 45;
-  final int pf = 450;
-  final int medi = 1;
 
   void _showAddAttackDialog(BuildContext context) {
     String? errorMessage = '';
@@ -258,24 +252,29 @@ class _HomePageState extends State<HomePage> {
         } else {
           int? prediction = snapshot.data;
           String riskLevel;
+          String recommendation;
           Color riskColor;
 
           switch (prediction) {
             case 0:
               riskLevel = 'SAFE';
               riskColor = Style.success;
+              recommendation = 'Keep up the good work!';
               break;
             case 1:
               riskLevel = 'CAUTION';
               riskColor = Style.warning;
+              recommendation = 'Take your medication';
               break;
             case 2:
               riskLevel = 'DANGER';
               riskColor = Style.danger;
+              recommendation = 'Seek medical attention';
               break;
             default:
               riskLevel = 'UNKNOWN';
               riskColor = Style.tertiaryText;
+              recommendation = 'Error';
           }
 
           return Container(
@@ -324,7 +323,7 @@ class _HomePageState extends State<HomePage> {
                     padding: const EdgeInsetsDirectional.fromSTEB(
                         0, 0, 10, 10),
                     child: Text(
-                      'Great job!',
+                      recommendation,
                       textAlign: TextAlign.end,
                       style: GoogleFonts.outfit(
                         textStyle: const TextStyle(
@@ -345,15 +344,92 @@ class _HomePageState extends State<HomePage> {
   }
 
 
-  void _showAddMedicationDialog(BuildContext context) {
+  // void _showAddMedicationDialog(BuildContext context) {
+  //   TextEditingController medicationController = TextEditingController();
+  //
+  //   String? errorMessage = '';
+  //   bool error = false;
+  //
+  //   Future<void> addMedication() async {
+  //     try {
+  //       await FirebaseService().addMedication(medicationController.text);
+  //       Navigator.of(context).pop();
+  //     } on FirebaseAuthException catch (e) {
+  //       print(e.message);
+  //       setState(() {
+  //         errorMessage = e.message;
+  //       });
+  //     }
+  //   }
+  //   Widget showError() {
+  //     return Text(
+  //       errorMessage!,
+  //       style: GoogleFonts.outfit(
+  //         textStyle: const TextStyle(
+  //           fontWeight: FontWeight.normal,
+  //           fontSize: 18,
+  //           color: Colors.red,
+  //         ),
+  //       ),
+  //     );
+  //   }
+  //   showDialog(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return AlertDialog(
+  //         title: Text('Add Medication'),
+  //         content: SizedBox(
+  //           height: 100,
+  //           child: Column(
+  //             mainAxisAlignment: MainAxisAlignment.start,
+  //             children: [
+  //               showError(),
+  //               TextField(
+  //                 controller: medicationController,
+  //                 decoration:
+  //                     InputDecoration(hintText: "Enter medication details"),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //         actions: <Widget>[
+  //           TextButton(
+  //             child: Text('Cancel'),
+  //             onPressed: () {
+  //               Navigator.of(context).pop();
+  //             },
+  //           ),
+  //           TextButton(
+  //             child: Text('Add'),
+  //             onPressed: () async {
+  //               final navigator = Navigator.of(context);
+  //               final buildContext = context;
+  //               await addMedication();
+  //               errorMessage == '' ? error = false : error = true;
+  //               setState(() {});
+  //             },
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+  // }
+
+  void _showAddMedicationDialog(BuildContext context) async{
+    // Declare a variable to store the selected medicine name
+    String? selectedMedicine;
+    List<String> medicationNames = await FirebaseService().getMedicationNames();
+    print(medicationNames);
+    // Declare a text editing controller for the medicine name input
     TextEditingController medicationController = TextEditingController();
 
+    // Declare a variable to store the error message
     String? errorMessage = '';
-    bool error = false;
 
-    Future<void> addMedication() async {
+    // Declare a function to add a new medication to the database
+    Future<void> addMedication(String name) async {
       try {
-        await FirebaseService().addMedication(medicationController.text);
+        await FirebaseService().addMedication(name);
         Navigator.of(context).pop();
       } on FirebaseAuthException catch (e) {
         print(e.message);
@@ -363,6 +439,7 @@ class _HomePageState extends State<HomePage> {
       }
     }
 
+    // Declare a widget to show the error message
     Widget showError() {
       return Text(
         errorMessage!,
@@ -376,22 +453,39 @@ class _HomePageState extends State<HomePage> {
       );
     }
 
-    showDialog(
+    // Show the dialog using the showDialog function
+    await showDialog(
       context: context,
-      builder: (BuildContext context) {
+      builder: (context) {
         return AlertDialog(
           title: Text('Add Medication'),
           content: SizedBox(
-            height: 100,
+            height: 150,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                showError(),
+                // Add a text field for the user to type the medicine name
                 TextField(
                   controller: medicationController,
-                  decoration:
-                      InputDecoration(hintText: "Enter medication details"),
+                  decoration: InputDecoration(
+                    labelText: 'Medicine name',
+                  ), // If the user types a medicine name that is not in the list, ask if they want to add it
                 ),
+                // Add a dropdown menu for the user to choose the medicine name from the list
+                DropdownButton<String>(
+                  value: selectedMedicine,
+                  hint: Text('Choose a medicine'),
+                  items: medicationNames.map((name) => DropdownMenuItem<String>(
+                    value: name,
+                    child: Text(name),
+                  )).toList(),
+                  onChanged: (value) {
+                    // Update the selected medicine name
+                    medicationController.text = value!;
+                  },
+                ),
+                // Show the error message if any
+                showError(),
               ],
             ),
           ),
@@ -405,11 +499,42 @@ class _HomePageState extends State<HomePage> {
             TextButton(
               child: Text('Add'),
               onPressed: () async {
-                final navigator = Navigator.of(context);
-                final buildContext = context;
-                await addMedication();
-                errorMessage == '' ? error = false : error = true;
-                setState(() {});
+                // Add the selected or typed medicine to the database
+                  if (!medicationNames.contains(medicationController.text)) {
+                    await showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: Text('Add new medicine'),
+                          content: Text(
+                              'The medicine ${medicationController.text} is not in the list. Do you want to add it?'),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                // Add the new medicine to the database
+                                FirebaseService().addMedicationName(medicationController.text);
+                                addMedication(selectedMedicine ?? medicationController.text);
+                                // Close the dialog
+                                Navigator.of(context).pop();
+                              },
+                              child: Text('Yes'),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                // Close the dialog
+                                addMedication(selectedMedicine ?? medicationController.text);
+                                Navigator.of(context).pop();
+                              },
+                              child: Text('No'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  }else{
+                    addMedication(selectedMedicine ?? medicationController.text);
+                  }
+                // Close the dialog
               },
             ),
           ],
@@ -417,6 +542,8 @@ class _HomePageState extends State<HomePage> {
       },
     );
   }
+
+
 
   @override
   Widget build(BuildContext context) {

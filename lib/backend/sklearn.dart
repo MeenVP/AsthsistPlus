@@ -91,21 +91,19 @@ class SKLearn{
     List<double> X=[gender,age,bmi,smoker,pefBest,hours,temperature,humidity,aqi,no2,so2,pm25,inhaler,avgHeartRate,avgSteps];
     return X;
   }
-  Future<int> peakFlowPrediction() async{
+  Future<int> peakFlowPrediction() async {
     int result = 0;
     print('------------------------------------');
     print("RandomForestClassifier");
-    List<double> X=[
-
-    ];
+    List<double> X = await prepareData();
     RandomForestClassifier r;
-    X = await prepareData();
-    loadModel("assets/rf_model.json").then((x) {
-      print(X);
-      r = RandomForestClassifier.fromMap(json.decode(x));
-      print('Prediction result: ${r.predict(X)}');
-      result = r.predict(X);
-    });
+
+    String model = await loadModel("assets/rf_model.json");
+    r = RandomForestClassifier.fromMap(json.decode(model));
+    print(X);
+    print('Prediction result: ${r.predict(X)}');
+    result = r.predict(X);
+
     return result;
   }
-}
+  }
