@@ -67,7 +67,7 @@ class Health{
     List<HealthDataPoint> healthDataList = [];
     // get data within the last 15 minutes
     final now = DateTime.now();
-    final fifteenMinutesAgo = now.subtract(Duration(hours: 48));
+    final fifteenMinutesAgo = now.subtract(Duration(hours: 24));
     // Clear old data points
     healthDataList.clear();
     try {

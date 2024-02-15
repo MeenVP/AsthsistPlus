@@ -4,6 +4,7 @@ import 'package:health/health.dart';
 import '../backend/firebase.dart';
 
 import '../backend/health.dart';
+import '../backend/sklearn.dart';
 import '../backend/weather.dart';
 import '../style.dart';
 import '../widget_tree.dart';
@@ -49,6 +50,9 @@ class _SettingsPageState extends State<SettingsPage> {
     try{
       await Health().fetchHeartRate();
       await Health().fetchSteps();
+      await getHumidity();
+      await getAirPollutionData();
+      await FirebaseService().addWeatherToFirebase();
     }catch (e) {
       print(e);
       setState(() {
@@ -294,9 +298,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                   BorderRadius.all(Radius.circular(12))),
                         ),
                         onPressed: () {
-                          getHumidity();
-                          getAirPollutionData();
-                          FirebaseService().addWeatherToFirebase();
+                          SKLearn().peakFlowPrediction();
                         },
                         child: Text(
                           'Connect',

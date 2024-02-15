@@ -30,7 +30,7 @@ class _CalendarState extends State<CalendarPage> with TickerProviderStateMixin {
   _initTabController() async {
     await Future.delayed(Duration.zero);
     setState(() {
-      _tabController = TabController(length: 6, vsync: this);
+      _tabController = TabController(length: 7, vsync: this);
     });
   }
 
@@ -45,7 +45,7 @@ class _CalendarState extends State<CalendarPage> with TickerProviderStateMixin {
     return SafeArea(
         child: DefaultTabController(
             // Added
-            length: 6, // Added
+            length: 7, // Added
             initialIndex: 0, //Added
             child: Scaffold(
                 appBar: AppBar(
@@ -159,6 +159,10 @@ class _CalendarState extends State<CalendarPage> with TickerProviderStateMixin {
                                         icon: Icon(Icons.cloud_outlined,
                                             color: Style.air),
                                       ),
+                                      Tab(
+                                        icon: Icon(Icons.directions_walk_outlined,
+                                            color: Style.warning),
+                                      ),
                                     ],
                                   )))),
                       Flexible(
@@ -171,6 +175,7 @@ class _CalendarState extends State<CalendarPage> with TickerProviderStateMixin {
                             CategoryList(category: 'Attack',date: _selectedDay),
                             CategoryList(category: 'ACT',date: _selectedDay),
                             CategoryList(category: 'Weather',date: _selectedDay),
+                            CategoryList(category: 'Steps',date: _selectedDay),
                           ],
                         ),
                       ),
