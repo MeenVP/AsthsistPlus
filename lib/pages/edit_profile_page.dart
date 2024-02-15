@@ -66,6 +66,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
 
   String _gender = 'Male';
+  bool _isSmoker = false;
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _dobController = TextEditingController();
@@ -91,7 +92,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
       _peakFlowController.text = userData['bestpef'];
       print(userData['dob']);
       setState(() {
-        _gender = userData['gender'];  // Set _gender to the user's current gender
+        _gender = userData['gender'];
+        _isSmoker = userData['smoker'];// Set _gender to the user's current gender
       });
     });
   }
@@ -169,6 +171,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
             SizedBox(height: 24.0),
             _genderRadio(),
             SizedBox(height: 24.0),
+            _smokerCheckbox(),
+            SizedBox(height: 24.0),
             ElevatedButton(
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 10.0),
@@ -208,6 +212,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                               weight: _weightController.text,
                               height: _heightController.text,
                               bestpef: _peakFlowController.text,
+                              smoker: _isSmoker,
                             );
                             Navigator.pushReplacement(context,
                                 MaterialPageRoute(builder: (context) => NavigationBarApp()));
@@ -290,6 +295,24 @@ class _EditProfilePageState extends State<EditProfilePage> {
       ],
     );
   }
+
+  Widget _smokerCheckbox(){
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Checkbox(
+          value: _isSmoker,
+          onChanged: (bool? newValue) {
+            setState(() {
+              _isSmoker = newValue ?? false;
+            });
+          },
+        ),
+        Text('Are you a smoker?'),
+      ],
+    );
+  }
+
 
   @override
   void dispose() {

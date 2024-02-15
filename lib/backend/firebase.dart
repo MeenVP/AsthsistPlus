@@ -25,6 +25,7 @@ class FirebaseService {
     required  weight,
     required height,
     required bestpef,
+    required bool smoker,
   }) async {
     User? user = _firebaseAuth.currentUser;
     DateTime dobTime = DateTime.parse(dob);
@@ -64,6 +65,7 @@ class FirebaseService {
       'bmi':bmi,
       'bmiCategory': bmiCategory,
       'bestpef': bestpef,
+      'smoker':smoker,
     };
     final FirebaseFirestore db = FirebaseFirestore.instance;
     final CollectionReference usersRef = db.collection('users');
@@ -99,6 +101,7 @@ class FirebaseService {
     required weight,
     required height,
     required bestpef,
+    required bool smoker,
   }) async {
     User? user = _firebaseAuth.currentUser;
     DateTime dobTime = DateTime.parse(dob);
@@ -137,6 +140,7 @@ class FirebaseService {
       'bmi': bmi,
       'bmiCategory': bmiCategory,
       'bestpef': bestpef,
+      'smoker':smoker,
     };
 
     final FirebaseFirestore db = FirebaseFirestore.instance;
@@ -252,6 +256,41 @@ class FirebaseService {
       log(error);
     });
   }
+
+  Future<void> addMedicationName(String medication) async {
+    final Map<String, dynamic> medicationData = {
+      'medication_name': medication,
+    };
+
+    final FirebaseFirestore db = FirebaseFirestore.instance;
+    final DocumentReference userDocRef = db.collection('users').doc(_firebaseAuth.currentUser?.uid);
+    final CollectionReference dateRef = userDocRef.collection('medication_name');
+
+    await dateRef.add(medicationData).catchError((error) {
+      log(error);
+    });
+  }
+  // get medication names
+  Future<List<String>> getMedicationNames() async {
+    // Declare a variable to store the list of medication names
+    List<String> medicationNames = [];
+
+    // Get the reference to the user document
+    final FirebaseFirestore db = FirebaseFirestore.instance;
+    final DocumentReference userDocRef = db.collection('users').doc(_firebaseAuth.currentUser?.uid);
+
+    // Get the reference to the medication_name collection
+    final CollectionReference dateRef = userDocRef.collection('medication_name');
+
+    // Get the documents from the collection
+    QuerySnapshot querySnapshot = await dateRef.get();
+
+    // Map the documents to a list of medication names
+    medicationNames = querySnapshot.docs.map((doc) => doc['medication_name'] as String).toList();
+    // Return the list of medication names
+    return medicationNames;
+  }
+
 // add peak flow values
   Future<void> addPef(String pef) async {
     // Get the current date and time

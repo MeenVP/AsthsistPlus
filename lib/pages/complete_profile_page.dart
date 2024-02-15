@@ -59,37 +59,11 @@ class DOBInputField extends StatelessWidget {
   }
 }
 
-// void _showSaveConfirmationDialog(BuildContext context) {
-//   showDialog(
-//     context: context,
-//     builder: (BuildContext dialogContext) {
-//       return AlertDialog(
-//         title: Text('Confirm'),
-//         content: Text('Are you sure you want to save the changes?'),
-//         actions: <Widget>[
-//           TextButton(
-//             child: Text('Cancel'),
-//             onPressed: () {
-//               Navigator.of(dialogContext).pop(); // Dismiss the dialog
-//             },
-//           ),
-//           TextButton(
-//             child: Text('Save'),
-//             onPressed: () {
-//               //save logic
-//               Navigator.pushReplacement(context,
-//                   MaterialPageRoute(builder: (context) => NavigationBarApp()));
-//               // Implement your edit profile functionality here
-//             },
-//           ),
-//         ],
-//       );
-//     },
-//   );
-// }
+
 
 class _CompleteProfilePageState extends State<CompleteProfilePage> {
   String _gender = 'Male';
+  bool _isSmoker = false;
   String? errorMessage = '';
   bool error = false;
   final TextEditingController _firstNameController = TextEditingController();
@@ -98,6 +72,33 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
   final TextEditingController _weightController = TextEditingController();
   final TextEditingController _heightController = TextEditingController();
   final TextEditingController _peakFlowController = TextEditingController();
+
+  void _showSaveConfirmationDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: Text('Confirm'),
+          content: Text('Are you sure you want to save the changes?'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(dialogContext).pop(); // Dismiss the dialog
+              },
+            ),
+            TextButton(
+              child: Text('Save'),
+              onPressed: () async {
+                await completeUserProfile();
+                // Implement your edit profile functionality here
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   Future<void> completeUserProfile() async {
     try {
@@ -108,7 +109,8 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
           gender: _gender,
           weight: _weightController.text,
           height: _heightController.text,
-          bestpef: _peakFlowController.text);
+          bestpef: _peakFlowController.text,
+          smoker: _isSmoker);
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (context) => WidgetTree(),
@@ -205,6 +207,8 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
             SizedBox(height: 24.0),
             _genderRadio(),
             SizedBox(height: 24.0),
+            _smokerCheckbox(),
+            SizedBox(height: 24.0),
             _error(),
             SizedBox(height: 24.0),
             ElevatedButton(
@@ -217,7 +221,7 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
               onPressed: () async {
                   final navigator = Navigator.of(context);
                   final buildContext = context;
-                  await completeUserProfile();
+                  _showSaveConfirmationDialog(context);
                   errorMessage == '' ? error = false : error = true;
                 // Implement save logic
               },
@@ -296,6 +300,23 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
           },
         ),
         Text('Female'),
+      ],
+    );
+  }
+
+  Widget _smokerCheckbox(){
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Checkbox(
+          value: _isSmoker,
+          onChanged: (bool? newValue) {
+            setState(() {
+              _isSmoker = newValue ?? false;
+            });
+          },
+        ),
+        Text('Are you a smoker?'),
       ],
     );
   }
