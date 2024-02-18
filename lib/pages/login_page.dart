@@ -153,11 +153,39 @@ class _LoginState extends State<Login> {
   bool passwordVisible = true;
   String? errorMessage = '';
 
+  void showLoadingDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // User must not close the dialog manually
+      builder: (BuildContext context) {
+        return const Dialog(
+          child: Padding(
+            padding: EdgeInsets.all(20.0),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(width: 20),
+                Text("Signing in..."),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Future<void> signInWithEmailAndPassword() async {
     try {
+      // Show loading dialog
+      showLoadingDialog(context);
       await FirebaseService().signInWithEmailAndPassword(
           _emailController.text, _passwordController.text);
+      // If sign-in is successful, navigator.pop can be called to dismiss the dialog.
+      Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
+      // Dismiss the loading dialog if sign-in fails
+      Navigator.pop(context);
       setState(() {
         errorMessage = 'Wrong email or password';
       });
@@ -247,7 +275,9 @@ class _LoginState extends State<Login> {
                     minimumSize: const Size(double.infinity, 60),
                   ),
                   onPressed: () {
-                    signInWithEmailAndPassword();
+                    if (_formKey.currentState!.validate()) {
+                      signInWithEmailAndPassword(); // This already handles showing and hiding the dialog
+                    }
                   },
                   child: Text(
                     'Sign in',
@@ -332,16 +362,43 @@ class _RegisterState extends State<Register> {
   String? errorMessage = '';
   bool error = false;
 
+  void showRegisterLoadingDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // User must not close the dialog manually
+      builder: (BuildContext context) {
+        return const Dialog(
+          child: Padding(
+            padding: EdgeInsets.all(20.0),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(width: 20),
+                Text("Signing up..."),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Future<void> createUserWithEmailAndPassword() async {
     try {
+      showRegisterLoadingDialog(context);
       await FirebaseService().createUserWithEmailAndPassword(
           _emailController.text, _passwordController.text);
+      Navigator.pop(context); // Dismiss the loading dialog
+      // Navigate to CompleteProfilePage
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (context) => CompleteProfilePage(),
         ),
       );
     } on FirebaseAuthException catch (e) {
+      // Dismiss the loading dialog if registration fails
+      Navigator.pop(context);
       print(e.message);
       setState(() {
         errorMessage = e.message;
@@ -491,8 +548,6 @@ class _RegisterState extends State<Register> {
                 ),
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
-                    final navigator = Navigator.of(context);
-                    final buildContext = context;
                     await createUserWithEmailAndPassword();
                     errorMessage == '' ? error = false : error = true;
                   }
