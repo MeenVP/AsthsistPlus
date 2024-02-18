@@ -6,19 +6,19 @@ import 'backend/firebase.dart';
 import 'backend/health.dart';
 import 'firebase_options.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:workmanager/workmanager.dart';
+// import 'package:workmanager/workmanager.dart';
 
-void callbackDispatcher(){
-  Workmanager().executeTask((task, inputData) async {
-        print("Native called background task: $task");
-        await Firebase.initializeApp(
-          options: DefaultFirebaseOptions.currentPlatform,
-        );
-        await Health().fetchHeartRate();
-        await FirebaseService().addWeatherToFirebase();
-    return Future.value(true);
-  });
-}
+// void callbackDispatcher(){
+//   Workmanager().executeTask((task, inputData) async {
+//         print("Native called background task: $task");
+//         await Firebase.initializeApp(
+//           options: DefaultFirebaseOptions.currentPlatform,
+//         );
+//         await Health().fetchHeartRate();
+//         await FirebaseService().addWeatherToFirebase();
+//     return Future.value(true);
+//   });
+// }
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,15 +41,15 @@ void main() async {
     systemNavigationBarIconBrightness:Brightness.dark,
   ));
 
-  await Workmanager().initialize(
-      callbackDispatcher, // The top level function, aka callbackDispatcher
-      isInDebugMode: true // If enabled it will post a notification whenever the task is running. Handy for debugging tasks
-  );
-  await Workmanager().registerPeriodicTask(
-    '1',
-    'fetchData',
-    initialDelay: const Duration(minutes: 15),
-  );
+  // await Workmanager().initialize(
+  //     callbackDispatcher, // The top level function, aka callbackDispatcher
+  //     isInDebugMode: true // If enabled it will post a notification whenever the task is running. Handy for debugging tasks
+  // );
+  // await Workmanager().registerPeriodicTask(
+  //   '1',
+  //   'fetchData',
+  //   initialDelay: const Duration(minutes: 15),
+  // );
 
 
   runApp(const MyApp());
