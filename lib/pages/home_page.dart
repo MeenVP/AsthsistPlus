@@ -59,7 +59,7 @@ class _HomePageState extends State<HomePage> {
           builder: (BuildContext context, StateSetter setState) { // Modify this line
             return AlertDialog(
               title: Container(
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                     borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(20),
                         topRight: Radius.circular(20)),
@@ -205,7 +205,7 @@ class _HomePageState extends State<HomePage> {
                   controller: peakFlowController,
                   keyboardType: TextInputType.number,
                   decoration:
-                      InputDecoration(hintText: "Enter peak flow value"),
+                      const InputDecoration(hintText: "Enter peak flow value"),
                   inputFormatters: <TextInputFormatter>[
                     FilteringTextInputFormatter.digitsOnly // Only allow digits
                   ],
@@ -1018,7 +1018,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
+                  padding: const EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
                   child: Row(
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -1107,7 +1107,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
+                  padding: const EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
                   child: Material(
                     borderRadius: const BorderRadius.all(
                       Radius.circular(16),
@@ -1126,10 +1126,10 @@ class _HomePageState extends State<HomePage> {
                         );
                       },
                       child: ListTile(
-                        contentPadding: EdgeInsets.symmetric(
+                        contentPadding: const EdgeInsets.symmetric(
                             horizontal: 20.0,
                             vertical: 10.0), // Add padding if necessary
-                        leading: Icon(Icons.subtitles_outlined,
+                        leading: const Icon(Icons.subtitles_outlined,
                             size: 50, color: Style.primaryColorLight),
                         title: Text(
                           'Asthma Control Test',
