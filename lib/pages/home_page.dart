@@ -58,7 +58,27 @@ class _HomePageState extends State<HomePage> {
         return StatefulBuilder( // Add this line
           builder: (BuildContext context, StateSetter setState) { // Modify this line
             return AlertDialog(
-              title: Text('Add Attack'),
+              title: Container(
+                decoration: const BoxDecoration(
+                    borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(20),
+                        topRight: Radius.circular(20)),
+                    color: Style.primaryColor),
+                // color: Colors.red,
+                child: Padding(
+                  padding: EdgeInsetsDirectional.all(20), // Add horizontal padding
+                  child: Text(
+                    'Add Attack',
+                    style: GoogleFonts.outfit(
+                      textStyle: const TextStyle(
+                        fontWeight: FontWeight.normal,
+                        color: Style.tertiaryText,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              titlePadding: const EdgeInsets.all(0),
               content: SizedBox(
                 height: 200, // Increase height to accommodate radio buttons
                 child: Column(
@@ -80,13 +100,29 @@ class _HomePageState extends State<HomePage> {
               ),
               actions: <Widget>[
                 TextButton(
-                  child: Text('Cancel'),
+                  child: Text('Cancel',
+                    style: GoogleFonts.outfit(
+                      textStyle: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Style.primaryColor,
+                      ),
+                    ),
+                  ),
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
                 ),
                 TextButton(
-                  child: Text('Add'),
+                  child: Text('Add',
+                    style: GoogleFonts.outfit(
+                      textStyle: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Style.primaryColor,
+                      ),
+                    ),
+                  ),
                   onPressed: () async {
                     final navigator = Navigator.of(context);
                     final buildContext = context;
@@ -102,8 +138,6 @@ class _HomePageState extends State<HomePage> {
       },
     );
   }
-
-
 
   void _showAddPeakFlowDialog(BuildContext context) {
     TextEditingController peakFlowController = TextEditingController();
@@ -139,7 +173,28 @@ class _HomePageState extends State<HomePage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Add Peak Flow Data'),
+          title: Container(
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20)),
+                color: Style.primaryColor),
+            // color: Colors.red,
+            child: Padding(
+              padding: EdgeInsetsDirectional.all(20), // Add horizontal padding
+              child: Text(
+                'Add Peak Flow Data',
+                style: GoogleFonts.outfit(
+                  textStyle: const TextStyle(
+                    fontWeight: FontWeight.normal,
+                    color: Style.tertiaryText,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          titlePadding: const EdgeInsets.all(0),
+          // title: Text('Add Peak Flow Data'),
           content: SizedBox(
             height: 100,
             child: Column(
@@ -150,7 +205,7 @@ class _HomePageState extends State<HomePage> {
                   controller: peakFlowController,
                   keyboardType: TextInputType.number,
                   decoration:
-                      InputDecoration(hintText: "Enter peak flow value"),
+                      const InputDecoration(hintText: "Enter peak flow value"),
                   inputFormatters: <TextInputFormatter>[
                     FilteringTextInputFormatter.digitsOnly // Only allow digits
                   ],
@@ -160,13 +215,29 @@ class _HomePageState extends State<HomePage> {
           ),
           actions: <Widget>[
             TextButton(
-              child: Text('Cancel'),
+              child: Text('Cancel',
+                style: GoogleFonts.outfit(
+                  textStyle: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: Style.primaryColor,
+                  ),
+                ),
+              ),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: Text('Add'),
+              child: Text('Add',
+                style: GoogleFonts.outfit(
+                  textStyle: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: Style.primaryColor,
+                  ),
+                ),
+              ),
               onPressed: () async {
                 final navigator = Navigator.of(context);
                 final buildContext = context;
@@ -343,78 +414,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-
-  // void _showAddMedicationDialog(BuildContext context) {
-  //   TextEditingController medicationController = TextEditingController();
-  //
-  //   String? errorMessage = '';
-  //   bool error = false;
-  //
-  //   Future<void> addMedication() async {
-  //     try {
-  //       await FirebaseService().addMedication(medicationController.text);
-  //       Navigator.of(context).pop();
-  //     } on FirebaseAuthException catch (e) {
-  //       print(e.message);
-  //       setState(() {
-  //         errorMessage = e.message;
-  //       });
-  //     }
-  //   }
-  //   Widget showError() {
-  //     return Text(
-  //       errorMessage!,
-  //       style: GoogleFonts.outfit(
-  //         textStyle: const TextStyle(
-  //           fontWeight: FontWeight.normal,
-  //           fontSize: 18,
-  //           color: Colors.red,
-  //         ),
-  //       ),
-  //     );
-  //   }
-  //   showDialog(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         title: Text('Add Medication'),
-  //         content: SizedBox(
-  //           height: 100,
-  //           child: Column(
-  //             mainAxisAlignment: MainAxisAlignment.start,
-  //             children: [
-  //               showError(),
-  //               TextField(
-  //                 controller: medicationController,
-  //                 decoration:
-  //                     InputDecoration(hintText: "Enter medication details"),
-  //               ),
-  //             ],
-  //           ),
-  //         ),
-  //         actions: <Widget>[
-  //           TextButton(
-  //             child: Text('Cancel'),
-  //             onPressed: () {
-  //               Navigator.of(context).pop();
-  //             },
-  //           ),
-  //           TextButton(
-  //             child: Text('Add'),
-  //             onPressed: () async {
-  //               final navigator = Navigator.of(context);
-  //               final buildContext = context;
-  //               await addMedication();
-  //               errorMessage == '' ? error = false : error = true;
-  //               setState(() {});
-  //             },
-  //           ),
-  //         ],
-  //       );
-  //     },
-  //   );
-  // }
-
   void _showAddMedicationDialog(BuildContext context) async{
     // Declare a variable to store the selected medicine name
     String? selectedMedicine;
@@ -458,7 +457,28 @@ class _HomePageState extends State<HomePage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Add Medication'),
+          title: Container(
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20)),
+                color: Style.primaryColor),
+            // color: Colors.red,
+            child: Padding(
+              padding: EdgeInsetsDirectional.all(20), // Add horizontal padding
+              child: Text(
+                'Add Medication',
+                style: GoogleFonts.outfit(
+                  textStyle: const TextStyle(
+                    fontWeight: FontWeight.normal,
+                    color: Style.tertiaryText,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          titlePadding: const EdgeInsets.all(0),
+          // title: Text('Add Medication'),
           content: SizedBox(
             height: 150,
             child: Column(
@@ -472,17 +492,29 @@ class _HomePageState extends State<HomePage> {
                   ), // If the user types a medicine name that is not in the list, ask if they want to add it
                 ),
                 // Add a dropdown menu for the user to choose the medicine name from the list
-                DropdownButton<String>(
-                  value: selectedMedicine,
-                  hint: Text('Choose a medicine'),
-                  items: medicationNames.map((name) => DropdownMenuItem<String>(
-                    value: name,
-                    child: Text(name),
-                  )).toList(),
-                  onChanged: (value) {
-                    // Update the selected medicine name
-                    medicationController.text = value!;
-                  },
+                Padding(
+                  padding: const EdgeInsetsDirectional.fromSTEB(0, 8, 0, 0),
+                  child: Container(
+                    padding: EdgeInsets.only(left: 10, right: 10), // Add padding around the dropdown
+                    decoration: BoxDecoration(
+                      // color: Colors.white, // Background color of dropdown button
+                      borderRadius: BorderRadius.circular(8), // Rounded corners
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: selectedMedicine,
+                        hint: Text('Choose a medicine'),
+                        items: medicationNames.map((name) => DropdownMenuItem<String>(
+                          value: name,
+                          child: Text(name),
+                        )).toList(),
+                        onChanged: (value) {
+                          // Update the selected medicine name
+                          medicationController.text = value!;
+                        },
+                      ),
+                    ),
+                  ),
                 ),
                 // Show the error message if any
                 showError(),
@@ -491,13 +523,29 @@ class _HomePageState extends State<HomePage> {
           ),
           actions: <Widget>[
             TextButton(
-              child: Text('Cancel'),
+              child: Text('Cancel',
+                style: GoogleFonts.outfit(
+                  textStyle: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: Style.primaryColor,
+                  ),
+                ),
+              ),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: Text('Add'),
+              child: Text('Add',
+                style: GoogleFonts.outfit(
+                  textStyle: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: Style.primaryColor,
+                  ),
+                ),
+              ),
               onPressed: () async {
                 // Add the selected or typed medicine to the database
                   if (!medicationNames.contains(medicationController.text)) {
@@ -665,7 +713,6 @@ class _HomePageState extends State<HomePage> {
                     borderRadius: const BorderRadius.all(Radius.circular(16)),
                     elevation: 2,
                     child: Container(
-
                       child: Column(
                         mainAxisSize: MainAxisSize.max,
                         mainAxisAlignment: MainAxisAlignment.start,
@@ -971,7 +1018,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
+                  padding: const EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
                   child: Row(
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -986,7 +1033,7 @@ class _HomePageState extends State<HomePage> {
                             child: ElevatedButton.icon(
                               style: ElevatedButton.styleFrom(
                                 elevation: 0,
-                                backgroundColor: Colors.transparent,
+                                // backgroundColor: Colors.transparent,
                                 primary: Style.tertiaryText,
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 20.0),
@@ -1026,7 +1073,7 @@ class _HomePageState extends State<HomePage> {
                             child: ElevatedButton.icon(
                               style: ElevatedButton.styleFrom(
                                 elevation: 0,
-                                backgroundColor: Colors.transparent,
+                                // backgroundColor: Colors.transparent,
                                 primary: Style.tertiaryText,
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 20.0),
@@ -1060,7 +1107,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
+                  padding: const EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
                   child: Material(
                     borderRadius: const BorderRadius.all(
                       Radius.circular(16),
@@ -1069,7 +1116,7 @@ class _HomePageState extends State<HomePage> {
                     color: Style.tertiaryText,
                     clipBehavior: Clip.antiAliasWithSaveLayer,
                     child: InkWell(
-                      splashColor: Style.primaryColor,
+                      // splashColor: Style.primaryColor,
                       onTap: () {
                         Navigator.push(
                           context,
@@ -1078,23 +1125,33 @@ class _HomePageState extends State<HomePage> {
                                   const AsthmaControlTestPage()),
                         );
                       },
-                      child: const ListTile(
-                        contentPadding: EdgeInsets.symmetric(
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.symmetric(
                             horizontal: 20.0,
                             vertical: 10.0), // Add padding if necessary
-                        leading: Icon(Icons.subtitles_outlined,
+                        leading: const Icon(Icons.subtitles_outlined,
                             size: 50, color: Style.primaryColorLight),
                         title: Text(
                           'Asthma Control Test',
-                          style: TextStyle(
+                          style: GoogleFonts.outfit(
+                            textStyle: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              // fontSize: 16,
                               color: Style.primaryText,
-                              fontWeight: FontWeight.bold),
+                            ),
+                          ),
                         ),
                         subtitle: Text(
                           'Click here for testing',
-                          style: TextStyle(color: Style.primaryText),
+                          style: GoogleFonts.outfit(
+                            textStyle: const TextStyle(
+                              fontWeight: FontWeight.normal,
+                              // fontSize: 16,
+                              color: Style.primaryText,
+                            ),
+                          ),
                         ),
-                        trailing: Icon(Icons.arrow_forward_ios,
+                        trailing: const Icon(Icons.arrow_forward_ios,
                             color: Style.primaryText), // Right arrow icon
                       ),
                     ),
