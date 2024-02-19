@@ -1033,7 +1033,7 @@ class _HomePageState extends State<HomePage> {
                             child: ElevatedButton.icon(
                               style: ElevatedButton.styleFrom(
                                 elevation: 0,
-                                backgroundColor: Colors.transparent,
+                                // backgroundColor: Colors.transparent,
                                 primary: Style.tertiaryText,
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 20.0),
@@ -1073,7 +1073,7 @@ class _HomePageState extends State<HomePage> {
                             child: ElevatedButton.icon(
                               style: ElevatedButton.styleFrom(
                                 elevation: 0,
-                                backgroundColor: Colors.transparent,
+                                // backgroundColor: Colors.transparent,
                                 primary: Style.tertiaryText,
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 20.0),
@@ -1116,7 +1116,7 @@ class _HomePageState extends State<HomePage> {
                     color: Style.tertiaryText,
                     clipBehavior: Clip.antiAliasWithSaveLayer,
                     child: InkWell(
-                      splashColor: Style.primaryColor,
+                      // splashColor: Style.primaryColor,
                       onTap: () {
                         Navigator.push(
                           context,
