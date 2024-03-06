@@ -8,7 +8,7 @@ import 'package:intl/intl.dart';
 import '../backend/firebase.dart';
 import '../style.dart';
 
-enum DataFetchType { day, week, month }
+enum DataFetchType {day, week}
 class heartRateChart extends StatefulWidget {
   const heartRateChart({super.key});
 
@@ -33,7 +33,7 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 2, vsync: this);
     fetchDataForCurrentTab(); // Fetch initial data
     _tabController!.addListener(fetchDataForCurrentTab); // Fetch data on tab change
   }
@@ -76,22 +76,6 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
     });
   }
 
-  // void processWeekData(List<Map<String, dynamic>> hrData) {
-  //   if (!mounted) return;
-  //   // Update the state with new weekly data.
-  //   DateTime now = DateTime.now();
-  //   int todayIndex = now.weekday;
-  //   setState(() {
-  //     weeklyData = hrData;
-  //     selectedBarIndex = todayIndex;
-  //     if (hrData.isEmpty) {
-  //       // Show a message if no weekly data is available.
-  //       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-  //         content: Text("No heart rate data available."),
-  //       ));
-  //     }
-  //   });
-  // }
   void processWeekData(List<Map<String, dynamic>> hrData) {
     if (!mounted) return;
     // Assume hrData is pre-processed to minimize necessary transformations
@@ -123,10 +107,6 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
           processWeekData(hrData);
         }
         break;
-      case DataFetchType.month:
-
-      // Process monthly data if available
-        break;
     }
   }
 
@@ -141,29 +121,15 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
       case 'W':
         startTime = now.subtract(Duration(days: 7));
         break;
-      case 'M':
-        startTime = now.subtract(Duration(days: 30));
-        break;
       default:
         startTime = DateTime(now.year, now.month, now.day);
         break;
     }
 
-    // print('Time Span: $timeSpan');
-    // print('Start Time: $startTime');
-    // print('Current Time: $now');
-
     List<FlSpot> spots = heartRateData.where((spot) {
       DateTime spotTime = DateTime.fromMillisecondsSinceEpoch(spot.x.toInt());
       return spotTime.isAfter(startTime) && spotTime.isBefore(now);
     }).toList();
-
-    // print('Number of Spots for $timeSpan: ${spots.length}');
-
-    // for (var spot in spots) {
-    //   final timeX = DateTime.fromMillisecondsSinceEpoch(spot.x.toInt());
-    //   print('x: ${timeX}, y: ${spot.y}');
-    // }
 
     return spots;
   }
@@ -250,14 +216,12 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
               calculateOverallWeeklyMaximum(weeklyData).toInt(),
               calculateOverallWeeklyMinimum(weeklyData).toInt()
           );
-      case 2: // Month
-      // return summaryWidget("Monthly Summary", calculateMonthlyAverage(monthlyData).toInt(), calculateMonthlyMaximum(monthlyData).toInt(), calculateMonthlyMinimum(monthlyData).toInt());
       default:
         return const SizedBox.shrink();
     }
   }
 
-  // The summary widget for day, week, and month
+  // The summary widget for day and week
   Widget summaryWidget(String title, int average, int maximum, int minimum) {
     return Column(
       children: [
@@ -339,8 +303,6 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
     );
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     // Custom widget for displaying heart rate information based on the selected time span.
@@ -419,12 +381,11 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
           ],
         );
       }
-      // If it's the monthly view or no bar is selected in the weekly view, return an empty container
       return Container();
     }
     return SafeArea(
       child: DefaultTabController(
-        length: 3, // Added
+        length: 2, // Added
         initialIndex: 0, //Added
         child: Scaffold(
           appBar: AppBar(
@@ -475,7 +436,6 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
                               tabs: const <Widget>[
                                 Tab(text: 'D'),
                                 Tab(text: 'W'),
-                                Tab(text: 'M'),
                               ],
                             )
                         )
@@ -504,7 +464,6 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
                                     children: [
                                       chartView(0), //Day
                                       chartView(1), //Week
-                                      chartView(2), //Month
                                     ],
                                   ),
                                 ),
@@ -585,18 +544,6 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
             ),
           ],
         );
-      case 2: // Month
-        return Stack(
-          children: <Widget>[
-            AspectRatio(
-              aspectRatio: 2,
-              child: Center(
-                  // padding: EdgeInsetsDirectional.fromSTEB(0, 20, 0, 0),
-                  child:Text('No data')
-              ),
-            ),
-          ],
-        );
       default:
         return Container(); // Just in case something goes wrong
     }
@@ -623,8 +570,8 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
         horizontalInterval: 50,
         // verticalInterval: 1,
         getDrawingHorizontalLine: (value) {
-          return FlLine(
-            color: const Color(0xffe7e8ec),
+          return const FlLine(
+            color: Color(0xffe7e8ec),
             strokeWidth: 1,
           );
         },
@@ -729,7 +676,6 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
     }
 
     var dateTime = DateTime.fromMillisecondsSinceEpoch(value.toInt());
-    // var formattedDate = DateFormat('EEEE').format(dateTime); // Example: Jan 5
     var formattedTime = DateFormat('HH:mm').format(dateTime); // Example: 15:04
 
     var label = '';
@@ -795,7 +741,6 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
     List<BarChartGroupData> barGroups = List.generate(7, (index) {
       bool isSelected = index + 1 == selectedBarIndex;
       List<double> dailyValues = minMaxByDay[index + 1] ?? [];
-      // print('Test degub: ${dailyValues}');
       double minY = dailyValues.isNotEmpty ? dailyValues.reduce(math.min) : 0;
       double maxY = dailyValues.isNotEmpty ? dailyValues.reduce(math.max) : 0;
 
@@ -810,7 +755,6 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
             borderRadius: BorderRadius.circular(4),
           ),
         ],
-        // showingTooltipIndicators: minY != maxY ? [0] : [],
       );
     });
 
