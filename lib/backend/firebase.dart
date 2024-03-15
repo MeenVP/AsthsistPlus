@@ -372,7 +372,7 @@ class FirebaseService {
     });
   }
 // add predictions
-  Future<void> addPrediction(String prediction) async {
+  Future<void> addPrediction(int prediction, List<double> X) async {
     // Get the current date and time
     DateTime now = DateTime.now();
 
@@ -381,6 +381,7 @@ class FirebaseService {
 
     final Map<String, dynamic> medicationData = {
       'datetime': datetime,
+      'data': X,
       'result': prediction,
     };
 
@@ -393,6 +394,36 @@ class FirebaseService {
     final CollectionReference dateRef = userDocRef.collection('prediction').doc(formattedDate).collection('entries');
 
     await dateRef.add(medicationData).catchError((error) {
+      log(error);
+    });
+  }
+  //add notification
+  Future<void> addNotification(String title, String body,[String? error]) async {
+    print('addNotification');
+    // Get the current date and time
+    DateTime now = DateTime.now();
+
+    // Create a new DateTime object with only the year, month, day, hour, and minute
+    DateTime datetime = DateTime(now.year, now.month, now.day, now.hour, now.minute);
+
+      final Map<String, dynamic> notiData = {
+        'datetime': datetime,
+        'title': title,
+        'body': body,
+        'error': error,
+      };
+      print('notiData');
+
+
+    final FirebaseFirestore db = FirebaseFirestore.instance;
+    final DocumentReference userDocRef = db.collection('users').doc(_firebaseAuth.currentUser?.uid);
+
+    // Format the current date as 'yyyy-MM-dd'
+    final String formattedDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+    final CollectionReference dateRef = userDocRef.collection('notifications').doc(formattedDate).collection('entries');
+
+    await dateRef.add(notiData).catchError((error) {
       log(error);
     });
   }
@@ -488,6 +519,44 @@ class FirebaseService {
 
     return pefValues;
   }
+  Future<List<Map<String, dynamic>>> getPredictionForDay(DateTime date) async {
+    User? user = FirebaseAuth.instance.currentUser;
+    final FirebaseFirestore db = FirebaseFirestore.instance;
+
+    // Format the date as 'yyyy-MM-dd'
+    final String formattedDate = DateFormat('yyyy-MM-dd').format(date);
+    final DocumentReference dateDocRef = db.collection('users').doc(user?.uid).collection('prediction').doc(formattedDate);
+    final CollectionReference entriesRef = dateDocRef.collection('entries');
+
+    QuerySnapshot querySnapshot = await entriesRef.orderBy('datetime', descending: true).get();
+    List<Map<String, dynamic>> prediction = [];
+
+    for (var doc in querySnapshot.docs) {
+      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+      DateTime datetime = (data['datetime'] as Timestamp).toDate();
+      String value = data['result'].toString();
+      switch (data['result']) {
+        case 0:
+          value = 'Safe';
+          break;
+        case 1:
+          value = 'Caution';
+          break;
+        case 2:
+          value = 'Danger';
+
+          break;
+        default:
+          value = 'error';
+      }
+      prediction.add({
+        'data': value,
+        'time': datetime,
+      });
+    }
+
+    return prediction;
+  }
 
 // get daily medication
   Future<List<Map<String, dynamic>>> getMedicationForDay(DateTime date) async {
@@ -551,7 +620,7 @@ class FirebaseService {
       var value = data['value'].toString().split('.');
       String hr = value[0];
       hrValues.add({
-        'data': '$hr bpm',
+        'data': '$hr',
         'time': datetime,
       });
     }
@@ -779,12 +848,135 @@ class FirebaseService {
     return aqi.toString();
   }
 
+  Future<Map<String, dynamic>> getAverageStepsInPastHour() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    final FirebaseFirestore db = FirebaseFirestore.instance;
 
+    // Get the current time and time an hour ago
+    final DateTime now = DateTime.now();
+    final DateTime anHourAgo = now.subtract(Duration(hours: 1));
 
+    final DocumentReference dateDocRef = db.collection('users')
+        .doc(user?.uid)
+        .collection('steps')
+        .doc(DateFormat('yyyy-MM-dd').format(now));
+    final CollectionReference entriesRef = dateDocRef.collection('entries');
 
+    // Get all entries in the past hour
+    QuerySnapshot querySnapshot = await entriesRef.where('datetime', isGreaterThanOrEqualTo: anHourAgo).get();
 
+    // Calculate the average steps in the past hour
+    if (querySnapshot.docs.isNotEmpty) {
+      double totalSteps = 0;
+      for (var doc in querySnapshot.docs) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        totalSteps += double.parse(data['value']);
+      }
+      double averageSteps = totalSteps / querySnapshot.docs.length;
 
+      return {
+        'datetime': DateFormat('yyyy-MM-dd HH:mm:ss').format(now),
+        'value': averageSteps,
+      };
+    } else {
+      return {
+        'datetime': DateFormat('yyyy-MM-dd HH:mm:ss').format(now),
+        'value': 0,
+      };
+    }
+  }
+  Future<Map<String, dynamic>> getAverageHrInPastHour() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    final FirebaseFirestore db = FirebaseFirestore.instance;
 
+    // Get the current time and time an hour ago
+    final DateTime now = DateTime.now();
+    final DateTime anHourAgo = now.subtract(Duration(hours: 1));
+
+    final DocumentReference dateDocRef = db.collection('users')
+        .doc(user?.uid)
+        .collection('heartrate')
+        .doc(DateFormat('yyyy-MM-dd').format(now));
+    final CollectionReference entriesRef = dateDocRef.collection('entries');
+
+    // Get all entries in the past hour
+    QuerySnapshot querySnapshot = await entriesRef.where('datetime', isGreaterThanOrEqualTo: anHourAgo).get();
+
+    // Calculate the average heart rate in the past hour
+    if (querySnapshot.docs.isNotEmpty) {
+      double totalHr = 0.0;
+      for (var doc in querySnapshot.docs) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        totalHr += double.parse(data['value']);
+      }
+      double averageHr = totalHr / querySnapshot.docs.length;
+      print ('$averageHr BPM');
+      return {
+        'datetime': DateFormat('yyyy-MM-dd HH:mm:ss').format(now),
+        'value': averageHr,
+      };
+    } else {
+      print('error');
+      return {
+        'datetime': DateFormat('yyyy-MM-dd HH:mm:ss').format(now),
+        'value': 0.0,
+      };
+    }
+  }
+
+  Future<Map<String, dynamic>> getLatestPrediction() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    final FirebaseFirestore db = FirebaseFirestore.instance;
+
+    // Format the current date as 'yyyy-MM-dd'
+    final String formattedDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    final String updateDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
+
+    final DocumentReference dateDocRef = db.collection('users').doc(user?.uid).collection('prediction').doc(formattedDate);
+    final CollectionReference entriesRef = dateDocRef.collection('entries');
+
+    QuerySnapshot querySnapshot = await entriesRef.orderBy('datetime', descending: true).limit(1).get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      Map<String, dynamic> latestPrediction = querySnapshot.docs.first.data() as Map<String, dynamic>;
+      return {
+        'datetime': DateTime.parse(latestPrediction['datetime'].toDate().toString()),
+        'value': latestPrediction['result'],
+      };
+    } else {
+      return {
+        'datetime': DateTime.parse(updateDate.toString()),
+        'value': 4,
+      };
+    }
+  }
+  //get past notification
+  Future<List<Map<String, dynamic>>> getNotificationsForLast24Hours() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    final FirebaseFirestore db = FirebaseFirestore.instance;
+
+    // Get the current time and subtract 24 hours to get the start of the period
+    final DateTime now = DateTime.now();
+
+    final String formattedDate = DateFormat('yyyy-MM-dd').format(now);
+    final DocumentReference dateDocRef = db.collection('users').doc(user?.uid).collection('notifications').doc(formattedDate);
+    final CollectionReference entriesRef = dateDocRef.collection('entries');
+
+    QuerySnapshot querySnapshot = await entriesRef.orderBy('datetime', descending: true).get();
+
+    List<Map<String, dynamic>> notificationData = [];
+
+    for (var doc in querySnapshot.docs) {
+      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+      DateTime datetime = (data['datetime'] as Timestamp).toDate();
+      notificationData.add({
+        'title': data['title'],
+        'body': data['body'],
+        'time': datetime,
+      });
+    }
+    return notificationData;
+  }
 
 }
 

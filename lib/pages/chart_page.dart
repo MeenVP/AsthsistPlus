@@ -228,10 +228,13 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
         Text(
           title,
           textAlign: TextAlign.center,
-          style: const TextStyle(
-            fontSize: 18,
-            color: Colors.black,
-          ),
+          style: GoogleFonts.outfit(
+    textStyle: const TextStyle(
+    fontWeight: FontWeight.w500,
+      fontSize: 18,
+      color: Style.primaryText,
+    ),
+    ),
         ),
         Padding(
           padding: const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
@@ -246,7 +249,7 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
                 ),
               ),
               Text(
-                '$average BPM',
+                '$average bpm',
                 style: const TextStyle(
                   fontSize: 14,
                   color: Colors.black,
@@ -268,7 +271,7 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
                 ),
               ),
               Text(
-                '$maximum BPM',
+                '$maximum bpm',
                 style: const TextStyle(
                   fontSize: 14,
                   color: Colors.black,
@@ -290,7 +293,7 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
                 ),
               ),
               Text(
-                '$minimum BPM',
+                '$minimum bpm',
                 style: const TextStyle(
                   fontSize: 14,
                   color: Colors.black,
@@ -320,21 +323,23 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
                 ),
               ),
             ),
-            const Text(
+            Text(
               'bpm',
-              style: TextStyle(
-                fontWeight: FontWeight.w500,
-                fontSize: 18,
-                color: Colors.grey,
+              style: GoogleFonts.outfit(
+                textStyle: const TextStyle(
+                  fontWeight: FontWeight.normal,
+                  fontSize: 18,
+                  color: Style.secondaryText,
+                ),
               ),
             ),
             Text(
               DateFormat('MMM dd, yyyy  HH:mm').format(currentTimestamp), // Dynamic timestamp
               style: GoogleFonts.outfit(
                 textStyle: const TextStyle(
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.normal,
                   fontSize: 18,
-                  color: Colors.grey,
+                  color: Style.secondaryText,
                 ),
               ),
             ),
@@ -360,23 +365,33 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
           children: [
             Text(
                 heartRates.isNotEmpty ? '$minRate - $maxRate' : 'No Data',
-                style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold
-                )
+              style: GoogleFonts.outfit(
+                textStyle: const TextStyle(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 32,
+                  color: Style.primaryText,
+                ),
+              ),
             ),
-            const Text(
+            Text(
                 'bpm',
-                style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.grey
-                )
+              style: GoogleFonts.outfit(
+                textStyle: const TextStyle(
+                  fontWeight: FontWeight.normal,
+                  fontSize: 18,
+                  color: Style.secondaryText,
+                ),
+              ),
             ),
             Text(
               DateFormat('EEE, MMM dd').format(selectedDate),
-              style: const TextStyle(
+              style: GoogleFonts.outfit(
+                textStyle: const TextStyle(
+                  fontWeight: FontWeight.normal,
                   fontSize: 18,
-                  color: Colors.grey),
+                  color: Style.secondaryText,
+                ),
+              ),
             ),
           ],
         );

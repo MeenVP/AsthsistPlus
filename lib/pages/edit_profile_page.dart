@@ -182,9 +182,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 ),
               ),
               style: ElevatedButton.styleFrom(
-                shape: StadiumBorder(),
-                primary: Colors.deepPurple,
-                onPrimary: Colors.white,
+                foregroundColor: Colors.white, backgroundColor: Colors.deepPurple, shape: StadiumBorder(),
                 minimumSize: Size(double.infinity, 50), // Set a larger height
               ),
               onPressed: () {

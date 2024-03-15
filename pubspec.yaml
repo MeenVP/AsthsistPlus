@@ -56,6 +56,10 @@ dependencies:
   flutter_dotenv: ^5.1.0
   sklite: ^1.0.0
   flutter_spinkit: ^5.1.0
+  firebase_messaging: ^14.7.10
+  firebase_analytics: ^10.8.0
+  flutter_local_notifications: ^17.0.0
+  flutter_launcher_icons: ^0.13.1
 
 dev_dependencies:
   flutter_test:
@@ -71,6 +75,15 @@ dev_dependencies:
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon/icon.png"
+  min_sdk_android: 21
+  adaptive_icon_background: "#ffffff"
+  adaptive_icon_foreground: "assets/icon/icon.png"
+  remove_alpha_ios: true
+
 # The following section is specific to Flutter packages.
 flutter:
 
@@ -81,9 +94,8 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-     - assets/images/asthsist.jpg
      - assets/rf_model.json
-     #- assets/images/act.jpg
+     - assets/icon/icon.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
@@ -110,3 +122,5 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+
+

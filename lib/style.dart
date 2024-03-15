@@ -24,6 +24,7 @@ class Style {
   static const Color pef = Color(0xff1976D2);
   static const Color weather = Color(0xffe8a548);
   static const Color air = Color(0xff757575);
+  static const Color act = Color(0xFFA8D6E7);
 
 }
 

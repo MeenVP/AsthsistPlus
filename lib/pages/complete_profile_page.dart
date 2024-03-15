@@ -213,9 +213,7 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
             SizedBox(height: 24.0),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                shape: const StadiumBorder(),
-                primary: Colors.deepPurple,
-                onPrimary: Colors.white,
+                foregroundColor: Colors.white, backgroundColor: Colors.deepPurple, shape: const StadiumBorder(),
                 minimumSize: const Size(double.infinity, 50), // Set a larger height
               ),
               onPressed: () async {

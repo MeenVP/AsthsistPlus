@@ -168,7 +168,7 @@ class _AsthmaControlTestPageState extends State<AsthmaControlTestPage> {
               }).toList(), // Provide some spacing before the save button.
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
-                  primary: Style.primaryColor, // Use your style for buttons here.
+                  backgroundColor: Style.primaryColor, // Use your style for buttons here.
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),

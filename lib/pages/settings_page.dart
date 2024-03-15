@@ -47,6 +47,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<void> fetchData() async {
+    print('fetching data...');
     try{
       await Health().fetchHeartRate();
       await Health().fetchSteps();
@@ -54,11 +55,13 @@ class _SettingsPageState extends State<SettingsPage> {
       await getAirPollutionData();
       await FirebaseService().addWeatherToFirebase();
     }catch (e) {
+
       print(e);
       setState(() {
         errorMessage = e.toString();
       });
     }
+    print('data fetched');
   }
 
   Future<void> connect() async {

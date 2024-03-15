@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import '../backend/sklearn.dart';
 import 'notification_page.dart';
 
@@ -58,6 +59,8 @@ class _HomePageState extends State<HomePage> {
         return StatefulBuilder( // Add this line
           builder: (BuildContext context, StateSetter setState) { // Modify this line
             return AlertDialog(
+              backgroundColor: Style.primaryBackground,
+              surfaceTintColor: Colors.transparent,
               title: Container(
                 decoration: const BoxDecoration(
                     borderRadius: BorderRadius.only(
@@ -103,7 +106,7 @@ class _HomePageState extends State<HomePage> {
                   child: Text('Cancel',
                     style: GoogleFonts.outfit(
                       textStyle: const TextStyle(
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.normal,
                         fontSize: 16,
                         color: Style.primaryColor,
                       ),
@@ -117,7 +120,7 @@ class _HomePageState extends State<HomePage> {
                   child: Text('Add',
                     style: GoogleFonts.outfit(
                       textStyle: const TextStyle(
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.normal,
                         fontSize: 16,
                         color: Style.primaryColor,
                       ),
@@ -173,6 +176,8 @@ class _HomePageState extends State<HomePage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: Style.primaryBackground,
+          surfaceTintColor: Colors.transparent,
           title: Container(
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.only(
@@ -218,7 +223,7 @@ class _HomePageState extends State<HomePage> {
               child: Text('Cancel',
                 style: GoogleFonts.outfit(
                   textStyle: const TextStyle(
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.normal,
                     fontSize: 16,
                     color: Style.primaryColor,
                   ),
@@ -232,7 +237,7 @@ class _HomePageState extends State<HomePage> {
               child: Text('Add',
                 style: GoogleFonts.outfit(
                   textStyle: const TextStyle(
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.normal,
                     fontSize: 16,
                     color: Style.primaryColor,
                   ),
@@ -252,9 +257,9 @@ class _HomePageState extends State<HomePage> {
     );
   }
   Widget showPEFPrediction(){
-    return FutureBuilder<int>(
-      future: SKLearn().peakFlowPrediction(),
-      builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
+    return FutureBuilder<Map<String,dynamic>>(
+      future: FirebaseService().getLatestPrediction(),
+      builder: (BuildContext context, AsyncSnapshot<Map<String,dynamic>> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return CircularProgressIndicator();  // or your custom loader
         } else if (snapshot.hasError) {
@@ -321,7 +326,9 @@ class _HomePageState extends State<HomePage> {
             ),
           );
         } else {
-          int? prediction = snapshot.data;
+          Map<String, dynamic>? data = snapshot.data;
+          var prediction = data?['value'];
+          var updateTime = DateFormat('HH:mm, dd MMM yyyy').format(data?['datetime']);
           String riskLevel;
           String recommendation;
           Color riskColor;
@@ -343,8 +350,8 @@ class _HomePageState extends State<HomePage> {
               recommendation = 'Seek medical attention';
               break;
             default:
-              riskLevel = 'UNKNOWN';
-              riskColor = Style.tertiaryText;
+              riskLevel = 'Insufficient data';
+              riskColor = Style.primaryColor;
               recommendation = 'Error';
           }
 
@@ -394,7 +401,7 @@ class _HomePageState extends State<HomePage> {
                     padding: const EdgeInsetsDirectional.fromSTEB(
                         0, 0, 10, 10),
                     child: Text(
-                      recommendation,
+                      updateTime.toString(),
                       textAlign: TextAlign.end,
                       style: GoogleFonts.outfit(
                         textStyle: const TextStyle(
@@ -457,6 +464,8 @@ class _HomePageState extends State<HomePage> {
       context: context,
       builder: (context) {
         return AlertDialog(
+          backgroundColor: Style.primaryBackground,
+          surfaceTintColor: Colors.transparent,
           title: Container(
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.only(
@@ -526,7 +535,7 @@ class _HomePageState extends State<HomePage> {
               child: Text('Cancel',
                 style: GoogleFonts.outfit(
                   textStyle: const TextStyle(
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.normal,
                     fontSize: 16,
                     color: Style.primaryColor,
                   ),
@@ -540,7 +549,7 @@ class _HomePageState extends State<HomePage> {
               child: Text('Add',
                 style: GoogleFonts.outfit(
                   textStyle: const TextStyle(
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.normal,
                     fontSize: 16,
                     color: Style.primaryColor,
                   ),
@@ -1034,7 +1043,7 @@ class _HomePageState extends State<HomePage> {
                               style: ElevatedButton.styleFrom(
                                 elevation: 0,
                                 // backgroundColor: Colors.transparent,
-                                primary: Style.tertiaryText,
+                                foregroundColor: Style.tertiaryText,
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 20.0),
                                 shape: RoundedRectangleBorder(
@@ -1074,7 +1083,7 @@ class _HomePageState extends State<HomePage> {
                               style: ElevatedButton.styleFrom(
                                 elevation: 0,
                                 // backgroundColor: Colors.transparent,
-                                primary: Style.tertiaryText,
+                                foregroundColor: Style.tertiaryText,
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 20.0),
                                 shape: RoundedRectangleBorder(
@@ -1129,8 +1138,8 @@ class _HomePageState extends State<HomePage> {
                         contentPadding: const EdgeInsets.symmetric(
                             horizontal: 20.0,
                             vertical: 10.0), // Add padding if necessary
-                        leading: const Icon(Icons.subtitles_outlined,
-                            size: 50, color: Style.primaryColorLight),
+                        leading: const Icon(Icons.speaker_notes,
+                            size: 50, color: Style.act),
                         title: Text(
                           'Asthma Control Test',
                           style: GoogleFonts.outfit(
@@ -1147,12 +1156,12 @@ class _HomePageState extends State<HomePage> {
                             textStyle: const TextStyle(
                               fontWeight: FontWeight.normal,
                               // fontSize: 16,
-                              color: Style.primaryText,
+                              color: Style.secondaryText,
                             ),
                           ),
                         ),
                         trailing: const Icon(Icons.arrow_forward_ios,
-                            color: Style.primaryText), // Right arrow icon
+                            color: Style.secondaryText, size: 20), // Right arrow icon
                       ),
                     ),
                   ),
