@@ -26,6 +26,7 @@ class FirebaseService {
     required height,
     required bestpef,
     required bool smoker,
+    required String maxHR,
   }) async {
     User? user = _firebaseAuth.currentUser;
     DateTime dobTime = DateTime.parse(dob);
@@ -66,6 +67,7 @@ class FirebaseService {
       'bmiCategory': bmiCategory,
       'bestpef': bestpef,
       'smoker':smoker,
+      'maxHR': maxHR,
     };
     final FirebaseFirestore db = FirebaseFirestore.instance;
     final CollectionReference usersRef = db.collection('users');
@@ -102,6 +104,7 @@ class FirebaseService {
     required height,
     required bestpef,
     required bool smoker,
+    required String maxHR,
   }) async {
     User? user = _firebaseAuth.currentUser;
     DateTime dobTime = DateTime.parse(dob);
@@ -141,6 +144,7 @@ class FirebaseService {
       'bmiCategory': bmiCategory,
       'bestpef': bestpef,
       'smoker':smoker,
+      'maxHR': maxHR,
     };
 
     final FirebaseFirestore db = FirebaseFirestore.instance;
@@ -452,6 +456,60 @@ class FirebaseService {
       return 'No user data found';
     }
   }
+  //get user best pef
+  Future<int> getUserPEF() async {
+    User? user = _firebaseAuth.currentUser;
+    final FirebaseFirestore db = FirebaseFirestore.instance;
+    final CollectionReference usersRef = db.collection('users');
+    final DocumentReference userDocRef = usersRef.doc(user?.uid);
+
+    DocumentSnapshot docSnapshot = await userDocRef.get();
+
+    if (docSnapshot.exists) {
+      Map<String, dynamic> userData = docSnapshot.data() as Map<String, dynamic>;
+      int bestPEF = int.parse(userData['bestpef']);
+      return bestPEF;
+    } else {
+      log('No user pef found');
+      return 0;
+    }
+  }
+
+  Future<int> getUserMaxHR() async {
+    User? user = _firebaseAuth.currentUser;
+    final FirebaseFirestore db = FirebaseFirestore.instance;
+    final CollectionReference usersRef = db.collection('users');
+    final DocumentReference userDocRef = usersRef.doc(user?.uid);
+
+    DocumentSnapshot docSnapshot = await userDocRef.get();
+
+    if (docSnapshot.exists) {
+      Map<String, dynamic> userData = docSnapshot.data() as Map<String, dynamic>;
+      int maxHR = int.parse(userData['maxHR']);
+      return maxHR;
+    } else {
+      log('No max heart rate found');
+      return 0;
+    }
+  }
+  // get user age
+  Future<int> getUserAge() async {
+    User? user = _firebaseAuth.currentUser;
+    final FirebaseFirestore db = FirebaseFirestore.instance;
+    final CollectionReference usersRef = db.collection('users');
+    final DocumentReference userDocRef = usersRef.doc(user?.uid);
+
+    DocumentSnapshot docSnapshot = await userDocRef.get();
+
+    if (docSnapshot.exists) {
+      Map<String, dynamic> userData = docSnapshot.data() as Map<String, dynamic>;
+      int age = userData['age'];
+      return age;
+    } else {
+      log('No user age found');
+      return 0;
+    }
+  }
 // get today medication count
   Future<String> getTodayMedicationCount() async {
     User? user = FirebaseAuth.instance.currentUser;
@@ -472,28 +530,50 @@ class FirebaseService {
   }
 
   // get latest pef value
-  Future<String> getLatestPefValue() async {
+
+  Future<Map<String,dynamic>> getLatestPEF() async {
     User? user = FirebaseAuth.instance.currentUser;
     final FirebaseFirestore db = FirebaseFirestore.instance;
 
-    // Format the current date as 'yyyy-MM-dd'
-    final String formattedDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    // Define the date range
+    DateTime endDate = DateTime(2024, 1, 1); // Adjust as needed
+    DateTime startDate = DateTime.now();
+    int days = startDate.difference(endDate).inDays;
 
-    final DocumentReference dateDocRef = db.collection('users').doc(user?.uid).collection('pef').doc(formattedDate);
-    final CollectionReference entriesRef = dateDocRef.collection('entries');
+    // Initialize the latest ACT value and datetime
+    String latestActValue = '';
+    DateTime latestDatetime = DateTime.fromMillisecondsSinceEpoch(0);
 
-    QuerySnapshot querySnapshot = await entriesRef.orderBy('datetime', descending: true).limit(1).get();
+    for (int i = 0; i <= days; i++) {
+      // Format the date as 'yyyy-MM-dd'
+      String formattedDate = DateFormat('yyyy-MM-dd').format(startDate.subtract(Duration(days: i)));
 
-    if (querySnapshot.docs.isNotEmpty) {
-      Map<String, dynamic> latestPefData = querySnapshot.docs.first.data() as Map<String, dynamic>;
-      return latestPefData['value'] as String;
-    } else {
-      return 'NaN';
+      // Get the 'entries' subcollection for the 'act' document of the given date
+      CollectionReference entriesRef = db.collection('users').doc(user?.uid).collection('pef').doc(formattedDate).collection('entries');
+
+      // Get the latest entry in the 'entries' subcollection
+      QuerySnapshot entriesQuerySnapshot = await entriesRef.orderBy('datetime', descending: true).limit(1).get();
+      List<QueryDocumentSnapshot> entriesDocs = entriesQuerySnapshot.docs;
+
+      if (entriesDocs.isNotEmpty) {
+        Map<String, dynamic> latestEntry = entriesDocs.first.data() as Map<String, dynamic>;
+        DateTime entryDatetime = (latestEntry['datetime'] as Timestamp).toDate();
+        latestActValue = latestEntry['value'].toString();
+        latestDatetime = entryDatetime;
+        break;
+      }
     }
 
-
-
+    if (latestActValue == '') {
+      return {'error':'No ACT data found'};
+    } else {
+      return {
+        'data': latestActValue,
+        'time': latestDatetime,
+      };
+    }
   }
+
 // get daily pef values
   Future<List<Map<String, dynamic>>> getPefValuesForDay(DateTime date) async {
     User? user = FirebaseAuth.instance.currentUser;
@@ -584,6 +664,55 @@ class FirebaseService {
     return pefValues;
   }
 
+  //get weekly medication
+  Future<List<Map<String, dynamic>>> getMedicationForWeek(DateTime anyDate) async {
+    User? user = FirebaseAuth.instance.currentUser;
+    final FirebaseFirestore db = FirebaseFirestore.instance;
+
+    // Calculate the start and end dates of the week
+    int daysFromStart = anyDate.weekday - 1; // weekday returns 1 for Monday and 7 for Sunday
+    DateTime startDate = anyDate.subtract(Duration(days: daysFromStart));
+    DateTime endDate = startDate.add(Duration(days: 6));
+
+    List<Map<String, dynamic>> medicationValues = [];
+
+    for (DateTime date = startDate; date.isBefore(endDate) || date.isAtSameMomentAs(endDate); date = date.add(Duration(days: 1))) {
+      // Format the date as 'yyyy-MM-dd'
+      final String formattedDate = DateFormat('yyyy-MM-dd').format(date);
+      final DocumentReference dateDocRef = db.collection('users').doc(user?.uid).collection('medication').doc(formattedDate);
+      final CollectionReference entriesRef = dateDocRef.collection('entries');
+
+      QuerySnapshot querySnapshot = await entriesRef.orderBy('datetime', descending: true).get();
+
+      for (var doc in querySnapshot.docs) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        DateTime datetime = (data['datetime'] as Timestamp).toDate();
+        String value = data['medication_name'] as String;
+        medicationValues.add({
+          'data': value,
+          'time': datetime,
+        });
+      }
+    }
+
+    return medicationValues;
+  }
+
+  Future<List<int>> getWeeklyMedication() async {
+    List<int> weeklyMedications = List.filled(7, 0); // Initialize list with 7 zeros
+    DateTime now = DateTime.now();
+    DateTime startOfWeek = now.subtract(Duration(days: now.weekday - 1)); // Get the start of the week (Monday)
+
+    for (int i = 0; i < 7; i++) {
+      DateTime day = startOfWeek.add(Duration(days: i));
+      List<Map<String, dynamic>> dailyMedications = await getMedicationForDay(day);
+      int totalMedications = dailyMedications.length;
+      weeklyMedications[i] = totalMedications;
+    }
+    return weeklyMedications;
+  }
+
+
   //get latest heart rate
   Future<Map<String, dynamic>> getLatestHR() async {
     User? user = FirebaseAuth.instance.currentUser;
@@ -620,7 +749,7 @@ class FirebaseService {
       var value = data['value'].toString().split('.');
       String hr = value[0];
       hrValues.add({
-        'data': '$hr',
+        'data': hr,
         'time': datetime,
       });
     }
@@ -678,6 +807,16 @@ class FirebaseService {
     return latestSteps;
   }
 
+  Future<int> getTotalStepsForToday() async {
+    DateTime today = DateTime.now();
+    List<Map<String, dynamic>> dailySteps = await getStepsForDay(today);
+    int totalSteps = 0;
+    for (var step in dailySteps) {
+      totalSteps += int.parse(step['data']);
+    }
+    return totalSteps;
+  }
+
   // get daily steps
   Future<List<Map<String, dynamic>>> getStepsForDay(DateTime date) async {
     User? user = FirebaseAuth.instance.currentUser;
@@ -709,6 +848,31 @@ class FirebaseService {
     return hrValues;
   }
 
+  //get weekly steps
+  Future<List<int>> getWeeklySteps() async {
+    List<int> weeklySteps = List.filled(7, 0); // Initialize list with 7 zeros
+    DateTime now = DateTime.now();
+    DateTime startOfWeek = now.subtract(Duration(days: now.weekday - 1)); // Get the start of the week (Monday)
+
+    for (int i = 0; i < 7; i++) {
+      DateTime day = startOfWeek.add(Duration(days: i));
+      List<Map<String, dynamic>> dailySteps = await getStepsForDay(day);
+      int totalSteps = dailySteps.fold(0, (sum, item) => sum + int.parse(item['data']));
+      weeklySteps[i] = totalSteps;
+    }
+
+    return weeklySteps;
+  }
+
+  //get average steps for a week
+  Future<double> getAverageWeeklySteps() async {
+    List<int> weeklySteps = await getWeeklySteps();
+    int totalSteps = weeklySteps.fold(0, (sum, item) => sum + item);
+    double averageSteps = totalSteps / 7;
+    return averageSteps;
+  }
+
+
 
 
   // get daily attack
@@ -736,6 +900,102 @@ class FirebaseService {
 
     return attack;
   }
+
+// get weekly attack
+  Future<List<Map<String,dynamic>>> getWeeklyAttacks() async {
+    List<Map<String,dynamic>> weeklyAttack = []; // Initialize list with 7 zeros
+    DateTime now = DateTime.now();
+    DateTime startOfWeek = now.subtract(Duration(days: now.weekday - 1)); // Get the start of the week (Monday)
+
+    for (int i = 0; i < 7; i++) {
+      DateTime day = startOfWeek.add(Duration(days: i));
+      Map<String, int> dailyData = {'Mild': 0, 'Moderate': 0, 'Severe': 0, 'Total': 0};
+      List<Map<String, dynamic>> dailyAttack = await getAttackForDay(day);
+      for (var attack in dailyAttack) {
+        String severity = attack['data'];
+        if (severity == 'Moderate'){
+          dailyData['Moderate'] = (dailyData['Moderate'] ?? 0) + 1;
+        } else if (severity == 'Severe'){
+          dailyData['Severe'] = (dailyData['Severe'] ?? 0) + 1;
+        } else {
+          dailyData['Mild'] = (dailyData['Mild'] ?? 0) + 1;
+        }
+        dailyData['Total'] = (dailyData['Total'] ?? 0) + 1;
+      }
+      weeklyAttack.add(dailyData);
+    }
+    return weeklyAttack;
+  }
+
+  // get weekly total severity of attacks
+  Future<Map<String,int>> getTotalSeverityForWeek()async{
+    DateTime now = DateTime.now();
+    DateTime startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+    Map<String,int> weeklySeverity = {'Mild': 0, 'Moderate': 0, 'Severe': 0, 'Total': 0};
+    for (int i = 0; i < 7; i++) {
+      DateTime day = startOfWeek.add(Duration(days: i));
+      List<Map<String, dynamic>> dailyAttack = await getAttackForDay(day);
+      for (var attack in dailyAttack) {
+        String severity = attack['data'];
+        if (severity == 'Moderate'){
+          weeklySeverity['Moderate'] = (weeklySeverity['Moderate'] ?? 0) + 1;
+        } else if (severity == 'Severe'){
+          weeklySeverity['Severe'] = (weeklySeverity['Severe'] ?? 0) + 1;
+        } else {
+          weeklySeverity['Mild'] = (weeklySeverity['Mild'] ?? 0) + 1;
+        }
+        weeklySeverity['Total'] = (weeklySeverity['Total'] ?? 0) + 1;
+      }
+    }
+    return weeklySeverity;
+
+  }
+
+//get latest asthma control test
+  Future<Map<String,dynamic>> getLatestAct() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    final FirebaseFirestore db = FirebaseFirestore.instance;
+
+    // Define the date range
+    DateTime endDate = DateTime(2024, 1, 1); // Adjust as needed
+    DateTime startDate = DateTime.now();
+    int days = startDate.difference(endDate).inDays;
+
+    // Initialize the latest ACT value and datetime
+    String latestActValue = '';
+    DateTime latestDatetime = DateTime.fromMillisecondsSinceEpoch(0);
+
+    for (int i = 0; i <= days; i++) {
+      // Format the date as 'yyyy-MM-dd'
+      String formattedDate = DateFormat('yyyy-MM-dd').format(startDate.subtract(Duration(days: i)));
+
+      // Get the 'entries' subcollection for the 'act' document of the given date
+      CollectionReference entriesRef = db.collection('users').doc(user?.uid).collection('act').doc(formattedDate).collection('entries');
+
+      // Get the latest entry in the 'entries' subcollection
+      QuerySnapshot entriesQuerySnapshot = await entriesRef.orderBy('datetime', descending: true).limit(1).get();
+      List<QueryDocumentSnapshot> entriesDocs = entriesQuerySnapshot.docs;
+
+      if (entriesDocs.isNotEmpty) {
+        Map<String, dynamic> latestEntry = entriesDocs.first.data() as Map<String, dynamic>;
+        DateTime entryDatetime = (latestEntry['datetime'] as Timestamp).toDate();
+        latestActValue = latestEntry['sum'].toString();
+        latestDatetime = entryDatetime;
+        break;
+      }
+    }
+
+    if (latestActValue == '') {
+      return {'error':'No ACT data found'};
+    } else {
+      return {
+        'data': latestActValue,
+        'time': latestDatetime,
+      };
+    }
+  }
+
+
 // get daily asthma control test
   Future<List<Map<String, dynamic>>> getActForDay(DateTime date) async {
     User? user = FirebaseAuth.instance.currentUser;

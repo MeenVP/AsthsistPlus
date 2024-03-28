@@ -8,15 +8,16 @@ import 'package:intl/intl.dart';
 import '../backend/firebase.dart';
 import '../style.dart';
 
-enum DataFetchType {day, week}
-class heartRateChart extends StatefulWidget {
-  const heartRateChart({super.key});
+class HeartRateChart extends StatefulWidget {
+final String fetchType;
+
+  const HeartRateChart({super.key, required this.fetchType});
 
   @override
-  State<heartRateChart> createState() => _heartRateChartState();
+  State<HeartRateChart> createState() => _HeartRateChartState();
 }
 
-class _heartRateChartState extends State<heartRateChart> with TickerProviderStateMixin {
+class _HeartRateChartState extends State<HeartRateChart> with TickerProviderStateMixin {
 
   List<Color> gradientColors = [
     Style.secondaryText,
@@ -25,33 +26,29 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
 
   int currentHeartRate = 0;
   DateTime currentTimestamp = DateTime.now();
-  TabController? _tabController;
   List<FlSpot> heartRateData = [];
   List<Map<String, dynamic>> weeklyData = [];
   int? selectedBarIndex;
 
+  int maxHeartRate = 0;
+
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-    fetchDataForCurrentTab(); // Fetch initial data
-    _tabController!.addListener(fetchDataForCurrentTab); // Fetch data on tab change
+    fetchDataForCurrentTab(); // Fetch initial data// Fetch data on tab change
   }
 
   @override
   void dispose() {
-    _tabController?.dispose();
     super.dispose();
   }
 
   // Fetches heart rate data based on the currently selected tab.
   void fetchDataForCurrentTab() {
-    // Prevent data fetching during tab transition.
-    if (_tabController!.indexIsChanging) return; // Only fetch data when tab selection is finalized
+    // Prevent data fetching during tab transition.// Only fetch data when tab selection is finalized
     DateTime now = DateTime.now();
-    DataFetchType fetchType = DataFetchType.values[_tabController!.index];
     // Fetch heart rate data based on the selected time span.
-    getHeartRateDataForChart(now, fetchType);
+    getHeartRateDataForChart(now, widget.fetchType);
   }
 
   // Processes daily heart rate data and updates the state.
@@ -91,17 +88,18 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
   }
 
   // Fetches heart rate data from Firebase and processes it according to the fetch type.
-  void getHeartRateDataForChart(DateTime date, DataFetchType fetchType) async {
+  void getHeartRateDataForChart(DateTime date, String fetchType) async {
     var firebaseService = FirebaseService();
     List<Map<String, dynamic>> hrData = [];
     switch (fetchType) {
-      case DataFetchType.day:
+      case 'day':
         hrData = await firebaseService.getHRForDay(date);
+        maxHeartRate = await firebaseService.getUserMaxHR();
         if (mounted) {
           processDayData(hrData);
         }
         break;
-      case DataFetchType.week:
+      case 'week':
         hrData = await firebaseService.getHRForWeek(date);
         if (mounted) {
           processWeekData(hrData);
@@ -201,14 +199,14 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
   // Creates and returns a widget displaying a summary of heart rate data.
   Widget _buildSummaryWidget(BuildContext context) {
     // Switch between different summaries based on the selected tab.
-    switch (_tabController?.index) {
-      case 0: // Day
+    switch (widget.fetchType) {
+      case 'day': // Day
         return summaryWidget("Daily Summary",
             calculateAverage(heartRateData),
             calculateMaximum(heartRateData),
             calculateMinimum(heartRateData)
         );
-      case 1: // Week
+      case 'week': // Week
           // Calculate weekly stats based on the selectedBarIndex
           // Assuming you have a method to calculate these
           return summaryWidget("Weekly Summary",
@@ -281,7 +279,7 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
           ),
         ),
         Padding(
-          padding: const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
+          padding: const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 10),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -310,7 +308,7 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
   Widget build(BuildContext context) {
     // Custom widget for displaying heart rate information based on the selected time span.
     Widget heartRateInfoWidget() {
-      if (_tabController!.index == 0) { // Daily view
+      if (widget.fetchType=='day') { // Daily view
         // Always display the current heart rate for the daily view
         return Column(
           children: [
@@ -345,7 +343,7 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
             ),
           ],
         );
-      } else if (_tabController!.index == 1 && selectedBarIndex != null) { // Weekly view and a bar is selected
+      } else if (widget.fetchType == 'week' && selectedBarIndex != null) { // Weekly view and a bar is selected
         // Get the min and max heart rate for the selected day of the week
         List<double> heartRates = weeklyData
             .where((data) => (data['time'] as DateTime).weekday == selectedBarIndex!)
@@ -399,136 +397,54 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
       return Container();
     }
     return SafeArea(
-      child: DefaultTabController(
-        length: 2, // Added
-        initialIndex: 0, //Added
-        child: Scaffold(
-          appBar: AppBar(
-            surfaceTintColor: Colors.transparent,
-            title: Padding(
+      child: Padding(
+        padding: const EdgeInsetsDirectional.fromSTEB(10, 0, 10, 0),
+        child: Column(
+          children: [
+            chartView(widget.fetchType),
+            Padding(
               padding: const EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
-              child: Text(
-                  'Health Info',
-                  style: GoogleFonts.outfit(
-                    textStyle: const TextStyle(
-                      fontWeight: FontWeight.normal,
-                      fontSize: 32,
-                      color: Colors.black,
-                    ),
-                  )
-              ),
-            ),
-            backgroundColor: Style.primaryBackground,
-          ),
-          backgroundColor: Style.primaryBackground,
-          body: Padding(
-            padding: const EdgeInsetsDirectional.fromSTEB(16, 16, 16, 16),
-            child: Column(
-              children: [
-                Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
-                    child: Material(
-                        borderRadius:
-                        const BorderRadius.all(Radius.circular(10)),
-                        elevation: 1,
-                        child: Container(
-                            height: kToolbarHeight - 8.0,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFE1E3E9),
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                            child: TabBar(
-                              controller: _tabController,
-                              indicatorSize: TabBarIndicatorSize.tab,
-                              indicator: BoxDecoration(
-                                  borderRadius:
-                                  BorderRadius.circular(10.0),
-                                  color: Style.primaryColor
-                              ),
-                              dividerColor: Colors.transparent,
-                              labelColor: Style.accent4,
-                              unselectedLabelColor: Style.accent2,
-                              tabs: const <Widget>[
-                                Tab(text: 'D'),
-                                Tab(text: 'W'),
-                              ],
-                            )
-                        )
-                    )
+              child: Material(
+                color: Colors.transparent,
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                Padding(
-                  padding: EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        color: Style.secondaryBackground
-                    ),
+                child: Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      color: Style.secondaryBackground
+                  ),
+                  child: Padding(
+                    padding: EdgeInsetsDirectional.fromSTEB(20, 10, 20, 10),
                     child: Column(
-                      mainAxisSize: MainAxisSize.max,
                       children: [
-                        Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
-                          child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Container(
-                                  width: MediaQuery.sizeOf(context).width * 0.9,
-                                  height: 200,
-                                  child: TabBarView(
-                                    controller: _tabController,
-                                    children: [
-                                      chartView(0), //Day
-                                      chartView(1), //Week
-                                    ],
-                                  ),
-                                ),
-                              ]
-                          ),
+                        heartRateInfoWidget(),
+                        const Divider(
+                          height: 32,
+                          color: Style.accent4,
+                          thickness: 2,
+                          indent : 10,
+                          endIndent : 10,
                         ),
-                        Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 20.0),
-                              child: heartRateInfoWidget(),
-                            ),
-                          ],
-                        ),
+                        _buildSummaryWidget(context),
                       ],
                     ),
                   ),
                 ),
-                Padding(
-                  padding: EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
-                  child: Material(
-                    color: Colors.transparent,
-                    elevation: 2,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          color: Style.secondaryBackground
-                      ),
-                      child: Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(20, 10, 20, 10),
-                        child: _buildSummaryWidget(context),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
+          ]
         ),
       ),
     );
   }
 
-  Widget chartView(int index) {
+  Widget chartView(String index) {
+
     switch (index) {
-      case 0: // Day
+      case 'day': // Day
         List<FlSpot> daySpots = getSpotsFromData('D');
         if (daySpots.isEmpty) {
           // Handle the case where there's no data
@@ -537,7 +453,7 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
         return Stack(
           children: <Widget>[
             AspectRatio(
-              aspectRatio: 2.0,
+              aspectRatio: 1.6,
               child: Padding(
                 padding: EdgeInsetsDirectional.fromSTEB(0, 20, 0, 0),
                 child: LineChart(
@@ -547,11 +463,11 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
             ),
           ],
         );
-      case 1: // Week
+      case 'week': // Week
         return Stack(
           children: <Widget>[
             AspectRatio(
-              aspectRatio: 2,
+              aspectRatio: 1.6,
               child: Padding(
                   padding: EdgeInsetsDirectional.fromSTEB(0, 20, 0, 0),
                   child:BarChart(mainWeeklyBarData())
@@ -570,25 +486,70 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
     // Set a fixed range for minY and maxY
     double minY = 0;
     double maxY = 150;
+    DateTime now = DateTime.now();
+    DateTime minTime = DateTime(now.year, now.month, now.day);
+    DateTime maxTime = DateTime(now.year, now.month, now.day, 23, 59,59);
 
     // Calculate minX and maxX based on the spots data
-    double minX = reversedSpots.isNotEmpty ? reversedSpots.first.x : 0;
-    double maxX = reversedSpots.isNotEmpty ? reversedSpots.last.x : 0;
+    double minX = minTime.millisecondsSinceEpoch.toDouble();
+    double maxX = maxTime.millisecondsSinceEpoch.toDouble();
 
     FlSpot lasttSpot = reversedSpots.isNotEmpty ? reversedSpots.last : FlSpot(0, 0);
     // print('test list reversed: ${reversedSpots}');
 
+    HorizontalLine showExtraLines(){
+      if(maxHeartRate!=0){
+        return HorizontalLine(
+          y: maxHeartRate.toDouble(),
+          color: Style.heartrate,
+          strokeWidth: 1,
+          dashArray: [5,5],
+        );
+      }else{
+        return HorizontalLine(
+          y: 0,
+          color: Colors.transparent,
+          strokeWidth: 0,
+        );
+      }
+    }
+
     return LineChartData(
+      extraLinesData: ExtraLinesData(
+        horizontalLines: [
+          showExtraLines()
+        ]
+      ),
       gridData: FlGridData(
         show: true,
         drawVerticalLine: true,
         horizontalInterval: 50,
-        // verticalInterval: 1,
+        verticalInterval: 3600000,
         getDrawingHorizontalLine: (value) {
           return const FlLine(
             color: Color(0xffe7e8ec),
             strokeWidth: 1,
           );
+        },
+        getDrawingVerticalLine: (value) {
+          DateTime time = DateTime.fromMillisecondsSinceEpoch(value.toInt());
+          switch (time.hour){
+            case 0||6||12||18||23:
+              return const FlLine(
+                color: Color(0xffe7e8ec),
+                strokeWidth: 1,
+                dashArray: [5,5]
+              );
+              default:
+                return const FlLine(
+                  color: Color(0xffe7e8ec),
+                  strokeWidth: 0,
+                );
+          }
+          // return const FlLine(
+          //   color: Color(0xffe7e8ec),
+          //   strokeWidth: 1,
+          // );
         },
       ),
       titlesData: FlTitlesData(
@@ -601,7 +562,7 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
             showTitles: true,
             reservedSize: 30,
             getTitlesWidget: bottomTitleWidgets,
-            // interval: 0,
+            interval: 3600000,
           ),
         ),
         rightTitles: AxisTitles(
@@ -616,25 +577,12 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
             showTitles: true,
             getTitlesWidget: leftTitleWidgets,
             reservedSize: 50,
+            interval: 1,
           ),
         ),
       ),
       borderData: FlBorderData(
         show: false,
-      ),
-      extraLinesData: ExtraLinesData(
-        horizontalLines: [
-          HorizontalLine(
-            y: 0,
-            color: const Color(0xffe7e8ec),
-            strokeWidth: 1,
-          ),
-          HorizontalLine(
-            y: 150,
-            color: const Color(0xffe7e8ec),
-            strokeWidth: 1,
-          ),
-        ],
       ),
       minX: minX,
       maxX: maxX,
@@ -685,26 +633,46 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
       fontWeight: FontWeight.bold,
       fontSize: 13,
     );
-
-    if (heartRateData.isEmpty) {
-      return Text('');
-    }
-
-    var dateTime = DateTime.fromMillisecondsSinceEpoch(value.toInt());
-    var formattedTime = DateFormat('HH:mm').format(dateTime); // Example: 15:04
-
     var label = '';
-    if (_tabController?.index == 0) { // Day view
-      if (value == heartRateData.first.x) {
-        label = '$formattedTime';
-      }
-    } else{
-      label = '';
+
+    // var dateTime = DateTime.fromMillisecondsSinceEpoch(value.toInt());
+    // var formattedTime = DateFormat('HH:mm').format(dateTime); // Example: 15:04
+    //
+    // var label = '';
+    // if (_tabController?.index == 0) { // Day view
+    //   if (value == heartRateData.first.x) {
+    //     label = '$formattedTime';
+    //   }
+    // } else{
+    //   label = '';
+    // }
+    DateTime time = DateTime.fromMillisecondsSinceEpoch(value.toInt());
+    switch(time.hour) {
+      case 0:
+        if (time.minute == 0 && time.second == 0) {
+          label = '00:00';
+        }
+        break;
+      case 6:
+          label = '06:00';
+        break;
+      case 12:
+          label = '12:00';
+        break;
+      case 18:
+          label = '18:00';
+        break;
+      case 23:
+        if (time.minute == 59 && time.second == 59) {
+          label = '23:59';
+        }
+        break;
     }
+
 
     return Padding(
       padding: const EdgeInsets.all(5.0),
-      child: Text(label, style: style),
+      child: secondaryTileText(label),
     );
   }
 
@@ -714,12 +682,23 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
 
   // Handles custom formatting for left axis titles.
   Widget leftTitleWidgets(double value, TitleMeta meta) {
-    const textStyle = TextStyle(
-      color: Color(0xff68737d),
-      fontWeight: FontWeight.bold,
-      fontSize: 13,
-    );
+    Color color = Style.accent1;
     String text;
+    if (value.toInt()==maxHeartRate){
+      return Padding(
+        padding: const EdgeInsets.only(left: 15), // Add padding if needed
+        child: Text(
+          maxHeartRate.toString(),
+          style: GoogleFonts.outfit(
+            textStyle: TextStyle(
+              fontWeight: FontWeight.normal,
+              fontSize: 14,
+              color: Style.heartrate,
+            ),
+          ),
+        ),
+      );
+    }
     switch (value.toInt()) {
       case 0:
         text = '0';
@@ -738,8 +717,16 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
     }
     return Padding(
       padding: const EdgeInsets.only(left: 15), // Add padding if needed
-      child: Text(text, style: textStyle),
-    );
+      child: Text(
+        text,
+        style: GoogleFonts.outfit(
+          textStyle: TextStyle(
+            fontWeight: FontWeight.normal,
+            fontSize: 14,
+            color: color,
+          ),
+        ),
+    ));
   }
 
   // Custom bar chart configuration for weekly data visualization.
@@ -815,6 +802,7 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
             color: const Color(0xffe7e8ec),
             strokeWidth: 1,
           ),
+
         ],
       ),
       barTouchData: BarTouchData(
@@ -883,8 +871,7 @@ class _heartRateChartState extends State<heartRateChart> with TickerProviderStat
     }
     return Padding(
       padding: const EdgeInsets.all(5.0),
-      child: Text(weekday,
-          style: style),
+      child: secondaryTileText(weekday),
     );
   }
 }

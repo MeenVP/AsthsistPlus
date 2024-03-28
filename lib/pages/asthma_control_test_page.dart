@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../style.dart';
+import 'act_info.dart';
 
 class AsthmaControlTestPage extends StatefulWidget {
   const AsthmaControlTestPage({Key? key}) : super(key: key);
@@ -73,9 +74,13 @@ class _AsthmaControlTestPageState extends State<AsthmaControlTestPage> {
     },
   ];
 
-  void _saveTestResults() {
+  void _saveTestResults(){
     print(_selectedOptions);
-    FirebaseService().addACT(_selectedOptions);
+    FirebaseService().addACT(_selectedOptions).then((value) => Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const ControlTestInfoPage(showBackButton: true,)),
+    ));
+
   }
 
   @override
@@ -125,7 +130,7 @@ class _AsthmaControlTestPageState extends State<AsthmaControlTestPage> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsetsDirectional.fromSTEB(20, 20, 20, 30),
           child: Column(
             children: [
               // The '...' (spread operator) is used to insert all the elements of the list into the children array.
@@ -150,7 +155,7 @@ class _AsthmaControlTestPageState extends State<AsthmaControlTestPage> {
                       ),
                       // The '...' (spread operator) is used again to insert all option widgets into the children array.
                       ...question['options'].map<Widget>((option) {
-                        int optionIndex = question['options'].indexOf(option);
+                        int optionIndex = question['options'].indexOf(option)+1;
                         return RadioListTile<int>(
                           title: Text(option),
                           value: optionIndex,
@@ -165,14 +170,14 @@ class _AsthmaControlTestPageState extends State<AsthmaControlTestPage> {
                     ],
                   ),
                 )));
-              }).toList(), // Provide some spacing before the save button.
+              }), // Provide some spacing before the save button.
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Style.primaryColor, // Use your style for buttons here.
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  padding: EdgeInsets.symmetric(horizontal: 70, vertical: 15),
+                  padding: const EdgeInsets.symmetric(horizontal: 70, vertical: 15),
                 ),
                 onPressed: _saveTestResults,
                 icon: const Icon(Icons.save,
