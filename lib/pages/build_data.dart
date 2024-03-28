@@ -9,7 +9,7 @@ class CategoryList extends StatefulWidget {
   final String category;
   final DateTime date;
 
-  CategoryList({Key? key, required this.category, required this.date}) : super(key: key);
+  const CategoryList({Key? key, required this.category, required this.date}) : super(key: key);
 
   @override
   _CategoryListState createState() => _CategoryListState();
@@ -17,6 +17,7 @@ class CategoryList extends StatefulWidget {
 
 class _CategoryListState extends State<CategoryList> {
   late DateTime _selectedDay;
+  late int _age;
 
   late Map<String, List<Map<String, dynamic>>> data = {
     'HeartRate': [],
@@ -41,6 +42,13 @@ class _CategoryListState extends State<CategoryList> {
     }
   }
 
+  void updateAge() async {
+    int age = await FirebaseService().getUserAge();
+    setState(() {
+      _age = age;
+    });
+  }
+
 
 
   @override
@@ -48,7 +56,9 @@ class _CategoryListState extends State<CategoryList> {
     _selectedDay = widget.date;
     super.initState();
     updateData(_selectedDay);
+    updateAge();
   }
+
 
   Future<Map<String, List<Map<String, dynamic>>>> updateData(DateTime _selectedDay,) async {
     var heartRate = await FirebaseService().getHRForDay(_selectedDay);
@@ -69,6 +79,83 @@ class _CategoryListState extends State<CategoryList> {
         'Steps': steps,
         'Predictions': prediction,
       };
+  }
+
+  Widget buildTile(String category, dynamic item){
+    Color backgroundColor = Style.secondaryBackground;
+    switch(category){
+      case 'Heart rates':
+
+        int age = _age;
+          int maxHR = 220-age;
+          if (int.parse(item['data'])>maxHR){
+            backgroundColor = Style.dangerSecondary;
+          }else if (int.parse(item['data'])>maxHR*0.8){
+            backgroundColor = Style.warningSecondary;
+          }else{
+            backgroundColor = Style.safeSecondary;
+          }
+        break;
+      case 'Weathers':
+        List<String> parts = item['data'].split(', ');
+        String aqiPart = parts.firstWhere((part) => part.startsWith('AQI:'));
+        String aqiValueString = aqiPart.split(':')[1];
+        int aqiValue = int.parse(aqiValueString);
+        if (aqiValue >= 101){
+          backgroundColor = Style.dangerSecondary;
+        }else if (aqiValue > 50 && aqiValue <= 100){
+          backgroundColor = Style.warningSecondary;
+        }
+        break;
+      case 'Predictions':
+        switch (item['data']){
+          case 'Safe':
+            backgroundColor = Style.safeSecondary;
+            break;
+          case 'Caution':
+            backgroundColor = Style.warningSecondary;
+            break;
+          case 'Danger':
+            backgroundColor = Style.dangerSecondary;
+            break;
+        }
+        break;
+    }
+    return Padding(
+      padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 4),
+      child: Material(
+        borderRadius: const BorderRadius.all(Radius.circular(8)),
+        elevation: 0,
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            color: backgroundColor,
+          ),
+          child: ListTile(
+            title: Text(
+                item['data'],
+                style: GoogleFonts.outfit(
+                  textStyle: const TextStyle(
+                    fontWeight: FontWeight.normal,
+                    fontSize: 18,
+                    color: Style.primaryText,
+                  ),
+                )
+            ),
+            trailing: Text(DateFormat('HH:mm').format(item['time']),
+                style:
+                GoogleFonts.outfit(
+                  textStyle: const TextStyle(
+                    fontWeight: FontWeight.normal,
+                    fontSize: 16,
+                    color: Style.primaryText,
+                  ),
+                )
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
 
@@ -98,7 +185,7 @@ class _CategoryListState extends State<CategoryList> {
           return const Center(child: Text('Error in fetching data'));
         } else {
           if (snapshot.data[category] == null || snapshot.data[category]!.isEmpty) {
-            return const Center(child: Text('No data'));
+            return const Center(child: Text('No data available'));
           } else {
             return Padding(
               padding: const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
@@ -106,41 +193,7 @@ class _CategoryListState extends State<CategoryList> {
                 itemCount: snapshot.data[category]?.length ?? 0,
                 itemBuilder: (context, index) {
                   final item = snapshot.data[category]![index];
-                  return Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 4),
-                    child: Material(
-                        borderRadius: const BorderRadius.all(Radius.circular(8)),
-                        elevation: 0,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            color: Style.secondaryBackground,
-                          ),
-                          child: ListTile(
-                            title: Text(
-                                item['data'],
-                            style: GoogleFonts.outfit(
-                              textStyle: const TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 18,
-                                color: Style.accent2,
-                              ),
-                            )
-                            ),
-                            trailing: Text(DateFormat('HH:mm').format(item['time']),
-                              style:
-                              GoogleFonts.outfit(
-                              textStyle: const TextStyle(
-                              fontWeight: FontWeight.normal,
-                              fontSize: 16,
-                              color: Style.accent2,
-                            ),
-                          )
-                            ),
-                          ),
-                        ),
-                      ),
-                  );
+                  return buildTile(category, item);
                 },
               ),
             );

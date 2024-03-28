@@ -49,6 +49,7 @@ class _CalendarState extends State<CalendarPage> with TickerProviderStateMixin {
             initialIndex: 0, //Added
             child: Scaffold(
                 appBar: AppBar(
+                  automaticallyImplyLeading: false,
                   surfaceTintColor: Colors.transparent,
                   title: Padding(
                       padding:
@@ -154,7 +155,7 @@ class _CalendarState extends State<CalendarPage> with TickerProviderStateMixin {
                                       ),
                                       Tab(
                                         icon: Icon(Icons.inventory_outlined,
-                                            color: Style.primaryColorLight),
+                                            color: Style.act),
                                       ),
                                       Tab(
                                         icon: Icon(Icons.cloud_outlined,
