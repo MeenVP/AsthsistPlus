@@ -90,6 +90,7 @@ class SKLearn{
     avgSteps = steps['value'].toDouble();
     print([gender,age,bmi,smoker,pefBest,hours,temperature,humidity,aqi,no2,so2,pm25,inhaler,avgHeartRate,avgSteps]);
     if (avgHeartRate==0.0){
+      NotificationServices().showNotification(4);
       return null;
     }else{
       List<double> X=[gender,age,bmi,smoker,pefBest,hours,temperature,humidity,aqi,no2,so2,pm25,inhaler,avgHeartRate,avgSteps];

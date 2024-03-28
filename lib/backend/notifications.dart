@@ -62,6 +62,12 @@ class NotificationServices {
           title = 'Data Imported';
           body = 'Your data has been imported successfully $error';
           break;
+        case 4 :
+          title = 'Prediction Failed';
+          body = 'Insufficient Data';
+        case 5:
+          title = 'Unhealthy Air Condition';
+          body = 'Current AQI is $error';
     }
     await FirebaseService().addNotification(title, body,error);
     return flutterLocalNotificationsPlugin.show(

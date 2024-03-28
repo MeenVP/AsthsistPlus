@@ -47,7 +47,9 @@ void callbackDispatcher(){
           await Health().fetchSteps();
           await Health().fetchHeartRate();
           await FirebaseService().addWeatherToFirebase();
+          await NotificationServices().showNotification(3);
           await SKLearn().peakFlowPrediction();
+
         } catch (e) {
           print(e);
           NotificationServices().showNotification(3,e.toString());
