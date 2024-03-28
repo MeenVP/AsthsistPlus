@@ -1,5 +1,6 @@
 import 'package:asthsist_plus/pages/home_page.dart';
 import 'package:asthsist_plus/pages/navigation_bar.dart';
+import 'package:asthsist_plus/pages/settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -73,6 +74,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   final TextEditingController _weightController = TextEditingController();
   final TextEditingController _heightController = TextEditingController();
   final TextEditingController _peakFlowController = TextEditingController();
+  final TextEditingController _maxHRController = TextEditingController();
 
   Future<Map<String, dynamic>> getUserDetails() async {
     final userDetails = await FirebaseService().getUserDetails();
@@ -90,6 +92,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       _weightController.text = userData['weight'];
       _heightController.text = userData['height'];
       _peakFlowController.text = userData['bestpef'];
+      _maxHRController.text = userData['maxHR'];
       print(userData['dob']);
       setState(() {
         _gender = userData['gender'];
@@ -163,9 +166,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
             SizedBox(height: 15.0),
             TextFormField(
               controller: _peakFlowController,
-              decoration: _inputDecorationWithSuffix(
+              decoration: _inputDecoration(
                 'Personal best Peak Flow', 'Please enter a valid number',
-                Icons.fitness_center, Icons.help_outline
+                Icons.fitness_center
+              ),
+            ),
+            SizedBox(height: 15.0),
+            TextFormField(
+              controller: _maxHRController,
+              decoration: _inputDecoration(
+                  'Max heart rate(optional)', 'bpm',
+                  Icons.monitor_heart
               ),
             ),
             SizedBox(height: 24.0),
@@ -211,9 +222,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
                               height: _heightController.text,
                               bestpef: _peakFlowController.text,
                               smoker: _isSmoker,
+                              maxHR: _maxHRController.text,
+
                             );
-                            Navigator.pushReplacement(context,
-                                MaterialPageRoute(builder: (context) => NavigationBarApp()));
+                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                              content: Text("Profile updated successfully!"),
+                            ));
+                            Navigator.pop(context);
+                            Navigator.pop(context);
                             // Implement your edit profile functionality here
                           },
                         ),

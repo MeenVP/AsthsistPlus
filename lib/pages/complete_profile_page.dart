@@ -72,6 +72,7 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
   final TextEditingController _weightController = TextEditingController();
   final TextEditingController _heightController = TextEditingController();
   final TextEditingController _peakFlowController = TextEditingController();
+  final TextEditingController _maxHRController = TextEditingController();
 
   void _showSaveConfirmationDialog(BuildContext context) {
     showDialog(
@@ -110,7 +111,9 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
           weight: _weightController.text,
           height: _heightController.text,
           bestpef: _peakFlowController.text,
-          smoker: _isSmoker);
+          smoker: _isSmoker,
+          maxHR: _maxHRController.text,
+      );
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (context) => WidgetTree(),
@@ -202,6 +205,15 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
               decoration: _inputDecorationWithSuffix(
                 'Personal best Peak Flow', 'Please enter a valid number',
                 Icons.fitness_center, Icons.help_outline
+              ),
+            ),
+            SizedBox(height: 15.0),
+            TextFormField(
+
+              controller: _maxHRController,
+              decoration: _inputDecoration(
+                  'Max heart rate(optional)', 'bpm',
+                  Icons.monitor_heart
               ),
             ),
             SizedBox(height: 24.0),
