@@ -1,19 +1,22 @@
 import 'package:asthsist_plus/backend/firebase.dart';
 import 'package:asthsist_plus/backend/weather.dart';
 import 'package:asthsist_plus/pages/asthma_control_test_page.dart';
+import 'package:asthsist_plus/pages/pef_info.dart';
 import 'package:asthsist_plus/style.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../backend/sklearn.dart';
+import 'health_info.dart';
+import 'navigation_bar.dart';
 import 'notification_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
-  static const String routeName = '/home';
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -248,7 +251,9 @@ class _HomePageState extends State<HomePage> {
                 final buildContext = context;
                 await addPeakFlow();
                 errorMessage == '' ? error = false : error = true;
-                setState(() {});
+                navigator.push(
+                  MaterialPageRoute(builder: (context) => const PeakFlowInfoPage(showBackButton: true)),
+                );
               },
             ),
           ],
@@ -261,7 +266,9 @@ class _HomePageState extends State<HomePage> {
       future: FirebaseService().getLatestPrediction(),
       builder: (BuildContext context, AsyncSnapshot<Map<String,dynamic>> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator();  // or your custom loader
+          return const CircularProgressIndicator(
+            color: Style.primaryColor,
+          );  // or your custom loader
         } else if (snapshot.hasError) {
           // return
           return Container(
@@ -437,6 +444,11 @@ class _HomePageState extends State<HomePage> {
       try {
         await FirebaseService().addMedication(name);
         Navigator.of(context).pop();
+        setState(() {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text("Medicine added successfully!"),
+          ));
+        });
       } on FirebaseAuthException catch (e) {
         print(e.message);
         setState(() {
@@ -573,6 +585,11 @@ class _HomePageState extends State<HomePage> {
                                 addMedication(selectedMedicine ?? medicationController.text);
                                 // Close the dialog
                                 Navigator.of(context).pop();
+                                setState(() {
+                                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                                    content: Text("Medicine added successfully!"),
+                                  ));
+                                });
                               },
                               child: Text('Yes'),
                             ),
@@ -710,7 +727,9 @@ class _HomePageState extends State<HomePage> {
                           );
                         } else {
                           // If the Future is not complete, display a loading indicator
-                          return CircularProgressIndicator();
+                          return const CircularProgressIndicator(
+                            color: Style.primaryColor,
+                          );
                         }
                       },
                     )
@@ -740,54 +759,65 @@ class _HomePageState extends State<HomePage> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Padding(
-                                  padding: const EdgeInsetsDirectional.fromSTEB(
-                                      10, 10, 10, 10),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.max,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      const Icon(
-                                        Icons.favorite,
-                                        size: 24,
-                                        color: Style.heartrate,
-                                      ),
-                                      FutureBuilder<Map<String,dynamic>>(
-                                          future: FirebaseService()
-                                              .getLatestHR(),
-                                          builder: (context, snapshot) {
-                                            var heartRate = snapshot.data?['value'].toString().split('.');
-
-                                            if (snapshot.connectionState ==
-                                                ConnectionState.done) {
-                                              // If the Future is complete, display the data
-
-                                                return Text(
-                                                  '${heartRate?[0]}',
-                                                  style: GoogleFonts.outfit(
-                                                    textStyle: const TextStyle(
-                                                        fontWeight:
-                                                        FontWeight.normal,
-                                                        fontSize: 24,
-                                                        color: Style.primaryText),
-                                            )
+                                GestureDetector(
+                                  onTap: () {
+                                    print('Tapped');
+                                    Navigator. push(
+                                      context,
+                                      MaterialPageRoute(builder: (context) => const NavigationBarApp(initialPageIndex: 2),
+                                    ));
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsetsDirectional.fromSTEB(
+                                        10, 10, 10, 10),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.max,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        const Icon(
+                                          Icons.favorite,
+                                          size: 24,
+                                          color: Style.heartrate,
+                                        ),
+                                        FutureBuilder<Map<String,dynamic>>(
+                                            future: FirebaseService()
+                                                .getLatestHR(),
+                                            builder: (context, snapshot) {
+                                              var heartRate = snapshot.data?['value'].toString().split('.');
+                                  
+                                              if (snapshot.connectionState ==
+                                                  ConnectionState.done) {
+                                                // If the Future is complete, display the data
+                                  
+                                                  return Text(
+                                                    '${heartRate?[0]}',
+                                                    style: GoogleFonts.outfit(
+                                                      textStyle: const TextStyle(
+                                                          fontWeight:
+                                                          FontWeight.normal,
+                                                          fontSize: 24,
+                                                          color: Style.primaryText),
+                                              )
+                                                  );
+                                              }else{
+                                                return const CircularProgressIndicator(
+                                                  color: Style.primaryColor,
                                                 );
-                                            }else{
-                                              return const CircularProgressIndicator();
-                                            }
-                                          }),
-                                      Text(
-                                        'bpm',
-                                        style: GoogleFonts.outfit(
-                                          textStyle: const TextStyle(
-                                            fontWeight: FontWeight.w300,
-                                            fontSize: 16,
-                                            color: Style.accent2,
+                                              }
+                                            }),
+                                        Text(
+                                          'bpm',
+                                          style: GoogleFonts.outfit(
+                                            textStyle: const TextStyle(
+                                              fontWeight: FontWeight.w300,
+                                              fontSize: 16,
+                                              color: Style.accent2,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
                                 ),
                                 Padding(
@@ -866,7 +896,7 @@ class _HomePageState extends State<HomePage> {
                                               );
                                             } else {
                                               return const CircularProgressIndicator(
-                                                color: Style.accent2,
+                                                color: Style.primaryColor,
 
                                               );
                                             }
@@ -909,7 +939,7 @@ class _HomePageState extends State<HomePage> {
                                               );
                                             } else {
                                               return const CircularProgressIndicator(
-                                                color: Style.accent2,
+                                                color: Style.primaryColor,
                                               );
                                             }
                                           }),
@@ -935,14 +965,15 @@ class _HomePageState extends State<HomePage> {
                                           Icons.health_and_safety_outlined,
                                           size: 24,
                                           color: Style.pef),
-                                      FutureBuilder<String>(
+                                      FutureBuilder(
                                           future: FirebaseService()
-                                              .getLatestPefValue(),
+                                              .getLatestPEF(),
                                           builder: (context, snapshot) {
+                                            var value = snapshot.data?['data'];
                                             if (snapshot.connectionState ==
                                                 ConnectionState.done) {
                                               // If the Future is complete, display the data
-                                              if (snapshot.data == 'NaN') {
+                                              if (value == 'NaN') {
                                                 return Padding(
                                                   padding:
                                                       const EdgeInsets.only(
@@ -963,7 +994,7 @@ class _HomePageState extends State<HomePage> {
                                                 );
                                               } else {
                                                 return Text(
-                                                  '${snapshot.data}',
+                                                  '$value',
                                                   style: GoogleFonts.outfit(
                                                     textStyle: const TextStyle(
                                                         fontWeight:
@@ -975,7 +1006,9 @@ class _HomePageState extends State<HomePage> {
                                                 );
                                               }
                                             } else {
-                                              return const CircularProgressIndicator();
+                                              return const CircularProgressIndicator(
+                                                color: Style.primaryColor,
+                                              );
                                             }
                                           }),
                                       Text(
@@ -1138,13 +1171,13 @@ class _HomePageState extends State<HomePage> {
                         contentPadding: const EdgeInsets.symmetric(
                             horizontal: 20.0,
                             vertical: 10.0), // Add padding if necessary
-                        leading: const Icon(Icons.speaker_notes,
+                        leading: const Icon(Icons.inventory_outlined,
                             size: 50, color: Style.act),
                         title: Text(
                           'Asthma Control Test',
                           style: GoogleFonts.outfit(
                             textStyle: const TextStyle(
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.normal,
                               // fontSize: 16,
                               color: Style.primaryText,
                             ),

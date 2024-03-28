@@ -8,6 +8,7 @@ import '../backend/sklearn.dart';
 import '../backend/weather.dart';
 import '../style.dart';
 import '../widget_tree.dart';
+import 'act_info.dart';
 import 'edit_profile_page.dart'; // Import the flutter_health package
 
 class SettingsPage extends StatefulWidget {
@@ -301,7 +302,10 @@ class _SettingsPageState extends State<SettingsPage> {
                                   BorderRadius.all(Radius.circular(12))),
                         ),
                         onPressed: () {
-                          SKLearn().peakFlowPrediction();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const ControlTestInfoPage(showBackButton: true,)),
+                          );
                         },
                         child: Text(
                           'Connect',

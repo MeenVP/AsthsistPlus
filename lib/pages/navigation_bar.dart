@@ -5,20 +5,29 @@ import 'package:asthsist_plus/style.dart';
 
 import 'calendar_page.dart';
 import 'chart_page.dart';
+import 'health_info.dart';
 
 class NavigationBarApp extends StatefulWidget {
-  const NavigationBarApp({super.key});
+  final int initialPageIndex;
+
+  const NavigationBarApp({Key? key, this.initialPageIndex = 0}) : super(key: key);
 
   @override
   State<NavigationBarApp> createState() => _NavigationState();
 }
 
 class _NavigationState extends State<NavigationBarApp> {
-  int currentPageIndex = 0;
+  late int currentPageIndex;
+  @override
+  void initState() {
+    super.initState();
+    currentPageIndex = widget.initialPageIndex;
+  }
   static const List<Widget> _widgetOptions = <Widget>[
     HomePage(),
     CalendarPage(),
-    heartRateChart(),
+    HealthInfoPage(),
+    // HeartRateChart(),
     SettingsPage(),
   ];
 
