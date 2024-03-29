@@ -101,6 +101,7 @@ class _HeartRateChartState extends State<HeartRateChart> with TickerProviderStat
         break;
       case 'week':
         hrData = await firebaseService.getHRForWeek(date);
+        maxHeartRate = await firebaseService.getUserMaxHR();
         if (mounted) {
           processWeekData(hrData);
         }
@@ -480,6 +481,23 @@ class _HeartRateChartState extends State<HeartRateChart> with TickerProviderStat
     }
   }
 
+  HorizontalLine showExtraLines(){
+    if(maxHeartRate!=0){
+      return HorizontalLine(
+        y: maxHeartRate.toDouble(),
+        color: Style.heartrate,
+        strokeWidth: 1,
+        dashArray: [5,5],
+      );
+    }else{
+      return HorizontalLine(
+        y: 0,
+        color: Colors.transparent,
+        strokeWidth: 0,
+      );
+    }
+  }
+
   // Creates and configures a line chart with heart rate data.
   LineChartData mainData(List<FlSpot> reversedSpots) {
     reversedSpots = List.from(heartRateData.reversed);
@@ -497,26 +515,21 @@ class _HeartRateChartState extends State<HeartRateChart> with TickerProviderStat
     FlSpot lasttSpot = reversedSpots.isNotEmpty ? reversedSpots.last : FlSpot(0, 0);
     // print('test list reversed: ${reversedSpots}');
 
-    HorizontalLine showExtraLines(){
-      if(maxHeartRate!=0){
-        return HorizontalLine(
-          y: maxHeartRate.toDouble(),
-          color: Style.heartrate,
-          strokeWidth: 1,
-          dashArray: [5,5],
-        );
-      }else{
-        return HorizontalLine(
-          y: 0,
-          color: Colors.transparent,
-          strokeWidth: 0,
-        );
-      }
-    }
+
 
     return LineChartData(
       extraLinesData: ExtraLinesData(
         horizontalLines: [
+          HorizontalLine(
+            y: 0,
+            color: const Color(0xffe7e8ec),
+            strokeWidth: 1,
+          ),
+          HorizontalLine(
+            y: 150,
+            color: const Color(0xffe7e8ec),
+            strokeWidth: 1,
+          ),
           showExtraLines()
         ]
       ),
@@ -679,7 +692,6 @@ class _HeartRateChartState extends State<HeartRateChart> with TickerProviderStat
   Widget rightTitleWidgets(double value, TitleMeta meta) {
     return Container();
   }
-
   // Handles custom formatting for left axis titles.
   Widget leftTitleWidgets(double value, TitleMeta meta) {
     Color color = Style.accent1;
@@ -690,7 +702,7 @@ class _HeartRateChartState extends State<HeartRateChart> with TickerProviderStat
         child: Text(
           maxHeartRate.toString(),
           style: GoogleFonts.outfit(
-            textStyle: TextStyle(
+            textStyle: const TextStyle(
               fontWeight: FontWeight.normal,
               fontSize: 14,
               color: Style.heartrate,
@@ -777,6 +789,7 @@ class _HeartRateChartState extends State<HeartRateChart> with TickerProviderStat
             showTitles: true,
             getTitlesWidget: leftTitleWidgets, // Implement this function to show left titles
             reservedSize: 50,
+            interval: 1,
           ),
         ),
         rightTitles: AxisTitles(
@@ -802,7 +815,7 @@ class _HeartRateChartState extends State<HeartRateChart> with TickerProviderStat
             color: const Color(0xffe7e8ec),
             strokeWidth: 1,
           ),
-
+          showExtraLines()
         ],
       ),
       barTouchData: BarTouchData(

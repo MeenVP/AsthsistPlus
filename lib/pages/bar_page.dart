@@ -86,20 +86,20 @@ class _BarPageState extends State<BarPage> {
   }
 
   Widget getMedicationSideTitle(double value, TitleMeta meta) {
-    switch (value%2) {
-      case 0:
+    // switch (value%2) {
+    //   case 0:
         return SideTitleWidget(
           axisSide: AxisSide.left,
           space: 4,
           child: secondaryTileText(value.toInt().toString()),
         );
-      default:
-        return SideTitleWidget(
-          axisSide: AxisSide.left,
-          space: 4,
-          child: secondaryTileText(''),
-        );
-    }
+    //   default:
+    //     return SideTitleWidget(
+    //       axisSide: AxisSide.left,
+    //       space: 4,
+    //       child: secondaryTileText(''),
+    //     );
+    // }
   }
 
   Widget getStepsSideTitle(double value, TitleMeta meta) {
@@ -136,7 +136,7 @@ class _BarPageState extends State<BarPage> {
             sideTitles: SideTitles(
               showTitles: true,
               reservedSize: 30,
-              interval: 2,
+              interval: 1,
               getTitlesWidget: getMedicationSideTitle,
             ),
           ),
@@ -328,7 +328,7 @@ class _BarPageState extends State<BarPage> {
                               gridData: FlGridData(
                                 show: true,
                                 verticalInterval: 1,
-                                horizontalInterval: 2,
+                                horizontalInterval: 1,
                                 getDrawingVerticalLine: (value) {
                                   return const FlLine(
                                     color: Style.secondaryText,
@@ -336,9 +336,9 @@ class _BarPageState extends State<BarPage> {
                                   );
                                 },
                               ),
-                              maxY:(barData.length<8)
-                                ? 8
-                                : barData.length.toDouble()+2,
+                              maxY:(barData.reduce(max)<4)
+                                ? 4
+                                : barData.reduce(max)+1,
                             ),
                           ))),
             ]);
@@ -356,6 +356,11 @@ class _BarPageState extends State<BarPage> {
   }
 
   _buildAttackChart() {
+
+    int findMax(List<Map<String, dynamic>> weeklyAttack){
+      int maxValue = weeklyAttack.reduce((curr, next) => curr['Total'] > next['Total'] ? curr : next)['Total'];
+      return maxValue;
+    }
     return FutureBuilder(
         future: FirebaseService().getWeeklyAttacks(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
@@ -389,7 +394,7 @@ class _BarPageState extends State<BarPage> {
                             gridData: FlGridData(
                               show: true,
                               verticalInterval: 1,
-                              horizontalInterval: 2,
+                              horizontalInterval: 1,
                               getDrawingVerticalLine: (value) {
                                 return const FlLine(
                                   color: Style.secondaryText,
@@ -397,9 +402,9 @@ class _BarPageState extends State<BarPage> {
                                 );
                               },
                             ),
-                            maxY:(barData.length<8)
-                                ? 8
-                                : barData.length.toDouble()+2,
+                            maxY:(findMax(barData)<4)
+                                ? 4
+                                : findMax(barData).toDouble()+2,
                           ),
                         ))),
               ]);
