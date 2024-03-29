@@ -239,87 +239,87 @@ class _SettingsPageState extends State<SettingsPage> {
                       )
                     ]),
               ),
-              Padding(
-                padding: const EdgeInsetsDirectional.fromSTEB(0, 8, 0, 8),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Connect to Health Connect',
-                      style: GoogleFonts.outfit(
-                        textStyle: const TextStyle(
-                          fontWeight: FontWeight.normal,
-                          fontSize: 18,
-                          color: Style.primaryText,
-                        ),
-                      ),
-                    ),
-                    ElevatedButton(
-                      style: TextButton.styleFrom(
-                        backgroundColor: Style.secondaryBackground,
-                        shape: const RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(12))),
-                      ),
-                      onPressed: () {
-                        fetchData();
-                        // Implement your Google health connect connection functionality here
-                      },
-                      child: Text(
-                        'Connect',
-                        style: GoogleFonts.outfit(
-                          textStyle: const TextStyle(
-                            fontWeight: FontWeight.normal,
-                            fontSize: 18,
-                            color: Style.accent1,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsetsDirectional.fromSTEB(0, 8, 0, 8),
-                child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Connect to Apple Health Kit',
-                        style: GoogleFonts.outfit(
-                          textStyle: const TextStyle(
-                            fontWeight: FontWeight.normal,
-                            fontSize: 18,
-                            color: Style.primaryText,
-                          ),
-                        ),
-                      ),
-                      ElevatedButton(
-                        style: TextButton.styleFrom(
-                          backgroundColor: Style.secondaryBackground,
-                          shape: const RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(12))),
-                        ),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => const ControlTestInfoPage(showBackButton: true,)),
-                          );
-                        },
-                        child: Text(
-                          'Connect',
-                          style: GoogleFonts.outfit(
-                            textStyle: const TextStyle(
-                              fontWeight: FontWeight.normal,
-                              fontSize: 18,
-                              color: Style.accent1,
-                            ),
-                          ),
-                        ),
-                      )
-                    ]),
-              ),
+              // Padding(
+              //   padding: const EdgeInsetsDirectional.fromSTEB(0, 8, 0, 8),
+              //   child: Row(
+              //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //     children: [
+              //       Text(
+              //         'Connect to Health Connect',
+              //         style: GoogleFonts.outfit(
+              //           textStyle: const TextStyle(
+              //             fontWeight: FontWeight.normal,
+              //             fontSize: 18,
+              //             color: Style.primaryText,
+              //           ),
+              //         ),
+              //       ),
+              //       ElevatedButton(
+              //         style: TextButton.styleFrom(
+              //           backgroundColor: Style.secondaryBackground,
+              //           shape: const RoundedRectangleBorder(
+              //               borderRadius:
+              //                   BorderRadius.all(Radius.circular(12))),
+              //         ),
+              //         onPressed: () {
+              //           fetchData();
+              //           // Implement your Google health connect connection functionality here
+              //         },
+              //         child: Text(
+              //           'Connect',
+              //           style: GoogleFonts.outfit(
+              //             textStyle: const TextStyle(
+              //               fontWeight: FontWeight.normal,
+              //               fontSize: 18,
+              //               color: Style.accent1,
+              //             ),
+              //           ),
+              //         ),
+              //       ),
+              //     ],
+              //   ),
+              // ),
+              // Padding(
+              //   padding: const EdgeInsetsDirectional.fromSTEB(0, 8, 0, 8),
+              //   child: Row(
+              //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //       children: [
+              //         Text(
+              //           'Connect to Apple Health Kit',
+              //           style: GoogleFonts.outfit(
+              //             textStyle: const TextStyle(
+              //               fontWeight: FontWeight.normal,
+              //               fontSize: 18,
+              //               color: Style.primaryText,
+              //             ),
+              //           ),
+              //         ),
+              //         ElevatedButton(
+              //           style: TextButton.styleFrom(
+              //             backgroundColor: Style.secondaryBackground,
+              //             shape: const RoundedRectangleBorder(
+              //                 borderRadius:
+              //                     BorderRadius.all(Radius.circular(12))),
+              //           ),
+              //           onPressed: () {
+              //             Navigator.push(
+              //               context,
+              //               MaterialPageRoute(builder: (context) => const ControlTestInfoPage(showBackButton: true,)),
+              //             );
+              //           },
+              //           child: Text(
+              //             'Connect',
+              //             style: GoogleFonts.outfit(
+              //               textStyle: const TextStyle(
+              //                 fontWeight: FontWeight.normal,
+              //                 fontSize: 18,
+              //                 color: Style.accent1,
+              //               ),
+              //             ),
+              //           ),
+              //         )
+              //       ]),
+              // ),
               const Divider(),
             ],
           ),
