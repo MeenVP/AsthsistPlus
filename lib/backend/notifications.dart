@@ -68,6 +68,11 @@ class NotificationServices {
         case 5:
           title = 'Unhealthy Air Condition';
           body = 'Current AQI is $error';
+        case 6:
+          title = 'High Heart Rate Alert';
+          body = 'Your heart rate is above the maximum threshold';
+
+
     }
     await FirebaseService().addNotification(title, body,error);
     return flutterLocalNotificationsPlugin.show(

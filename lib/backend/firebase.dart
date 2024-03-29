@@ -5,6 +5,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:health/health.dart';
 import 'package:intl/intl.dart';
 
+import 'notifications.dart';
+
 
 class FirebaseService {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
@@ -171,8 +173,12 @@ class FirebaseService {
   Future addHRToFirebase(List<HealthDataPoint> healthDataList) async {
     CollectionReference users = FirebaseFirestore.instance.collection('users');
     CollectionReference heartrate = users.doc(_firebaseAuth.currentUser?.uid).collection('heartrate');
+    int maxHR = await getUserMaxHR();
 
     for (HealthDataPoint data in healthDataList) {
+      if (data.value as double >= maxHR){
+        await NotificationServices().showNotification(6);
+      }
       String date = DateFormat('yyyy-MM-dd').format(data.dateFrom);
       CollectionReference entries = heartrate.doc(date).collection('entries');
 
