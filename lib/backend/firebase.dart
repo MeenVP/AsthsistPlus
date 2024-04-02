@@ -176,7 +176,7 @@ class FirebaseService {
     int maxHR = await getUserMaxHR();
 
     for (HealthDataPoint data in healthDataList) {
-      if (data.value as double >= maxHR){
+      if (double.parse(data.value.toString()) >= maxHR){
         await NotificationServices().showNotification(6);
       }
       String date = DateFormat('yyyy-MM-dd').format(data.dateFrom);
