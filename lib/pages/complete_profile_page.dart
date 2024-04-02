@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 import '../backend/firebase.dart';
+import '../backend/health.dart';
 import '../style.dart';
 import '../widget_tree.dart';
 
@@ -14,6 +15,14 @@ class CompleteProfilePage extends StatefulWidget {
   _CompleteProfilePageState createState() => _CompleteProfilePageState();
   const CompleteProfilePage({Key? key}) : super(key: key);
   // static const String routeName = '/edit-profile';
+}
+
+Future<void> connect() async {
+  try {
+    await Health().authorize();
+  } catch (e) {
+    print(e);
+  }
 }
 
 class DOBInputField extends StatelessWidget {
@@ -114,6 +123,7 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
           smoker: _isSmoker,
           maxHR: _maxHRController.text,
       );
+      await connect();
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (context) => WidgetTree(),

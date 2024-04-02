@@ -373,7 +373,7 @@ class _PeakFlowInfoState extends State<PeakFlowInfoPage> {
               ),
             ),
           ),
-          body: SafeArea(
+          body: SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsetsDirectional.fromSTEB(20, 20, 20, 0),
               child: Column(

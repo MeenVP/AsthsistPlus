@@ -397,7 +397,7 @@ class _HeartRateChartState extends State<HeartRateChart> with TickerProviderStat
       }
       return Container();
     }
-    return SafeArea(
+    return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsetsDirectional.fromSTEB(10, 0, 10, 0),
         child: Column(

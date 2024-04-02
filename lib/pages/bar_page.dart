@@ -718,7 +718,7 @@ class _BarPageState extends State<BarPage> {
 
     switch (widget.category) {
       case 'Medications':
-        return SafeArea(
+        return SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsetsDirectional.fromSTEB(10, 0, 10, 0),
             child: Column(
@@ -774,7 +774,7 @@ class _BarPageState extends State<BarPage> {
       case 'PEFs':
         return _buildPefChart();
       case 'Attacks':
-        return SafeArea(
+        return SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsetsDirectional.fromSTEB(10, 0, 10, 0),
             child: Column(
@@ -832,7 +832,7 @@ class _BarPageState extends State<BarPage> {
       case 'Weathers':
         return _buildWeatherChart();
       case 'Steps':
-        return SafeArea(
+        return SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsetsDirectional.fromSTEB(10, 0, 10, 0),
             child: Column(
