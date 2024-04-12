@@ -361,6 +361,7 @@ class _PeakFlowInfoState extends State<PeakFlowInfoPage> {
                 ),
                 actions: [
                   IconButton(
+                    key: Key('closeButton'),
                     icon: const Icon(Icons.close),
                     onPressed: () {
                       Navigator.of(context).pop();

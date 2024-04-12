@@ -117,9 +117,11 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                           ),
                           tabs: const <Widget>[
                             Tab(
+                              key: Key('signInTab'),
                               text: 'Sign in',
                             ),
                             Tab(
+                              key: Key('registerTab'),
                               text: 'Register',
                             ),
                           ],
@@ -201,6 +203,7 @@ class _LoginState extends State<Login> {
           child: Column(
             children: <Widget>[
               TextFormField(
+                key: Key('emailAddress'),
                 controller: _emailController,
                 decoration: InputDecoration(
                     labelText: 'Email Address',
@@ -225,6 +228,7 @@ class _LoginState extends State<Login> {
               ),
               const SizedBox(height: 16.0),
               TextFormField(
+                key: Key('password'),
                 controller: _passwordController,
                 obscureText: passwordVisible,
                 decoration: InputDecoration(
@@ -266,6 +270,7 @@ class _LoginState extends State<Login> {
               Padding(
                 padding: const EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
                 child: ElevatedButton(
+                  key: Key("signIn"),
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Style.tertiaryText,
                     backgroundColor: Style.primaryColor,
@@ -431,6 +436,7 @@ class _RegisterState extends State<Register> {
         child: Column(
           children: <Widget>[
             TextFormField(
+              key: Key("regisEmail"),
               controller: _emailController,
               decoration: InputDecoration(
                   labelText: 'Email Address',
@@ -455,6 +461,7 @@ class _RegisterState extends State<Register> {
             ),
             const SizedBox(height: 16.0),
             TextFormField(
+              key: Key("regisPassword"),
               controller: _passwordController,
               obscureText: passwordVisible,
               decoration: InputDecoration(
@@ -497,6 +504,7 @@ class _RegisterState extends State<Register> {
             ),
             const SizedBox(height: 16.0),
             TextFormField(
+              key: Key('confirmPassword'),
               controller: _confirmPasswordController,
               obscureText: passwordVisible,
               decoration: InputDecoration(
@@ -538,6 +546,7 @@ class _RegisterState extends State<Register> {
             Padding(
               padding: const EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
               child: ElevatedButton(
+                key: Key('registerButton'),
                 style: ElevatedButton.styleFrom(
                   foregroundColor: Style.tertiaryText,
                   backgroundColor: Style.primaryColor,

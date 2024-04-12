@@ -210,6 +210,7 @@ class _HomePageState extends State<HomePage> {
               children: [
                 showError(),
                 TextField(
+                  key: Key('enterPeakFlow'),
                   controller: peakFlowController,
                   keyboardType: TextInputType.number,
                   decoration:
@@ -507,6 +508,7 @@ class _HomePageState extends State<HomePage> {
               children: [
                 // Add a text field for the user to type the medicine name
                 TextField(
+                  key: Key('enterMedicine'),
                   controller: medicationController,
                   decoration: InputDecoration(
                     labelText: 'Medicine name',
@@ -523,6 +525,8 @@ class _HomePageState extends State<HomePage> {
                     ),
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton<String>(
+                        //Added DropdownButton key
+                        key: Key('medicineDropdown'),
                         value: selectedMedicine,
                         hint: Text('Choose a medicine'),
                         items: medicationNames.map((name) => DropdownMenuItem<String>(
@@ -785,11 +789,11 @@ class _HomePageState extends State<HomePage> {
                                                 .getLatestHR(),
                                             builder: (context, snapshot) {
                                               var heartRate = snapshot.data?['value'].toString().split('.');
-                                  
+
                                               if (snapshot.connectionState ==
                                                   ConnectionState.done) {
                                                 // If the Future is complete, display the data
-                                  
+
                                                   return Text(
                                                     '${heartRate?[0]}',
                                                     style: GoogleFonts.outfit(

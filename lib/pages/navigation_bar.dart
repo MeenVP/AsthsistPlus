@@ -74,6 +74,7 @@ class _NavigationState extends State<NavigationBarApp> {
             label: '•',
           ),
           BottomNavigationBarItem(
+            key: Key('settingPageButton'),
             activeIcon: Icon(Icons.manage_accounts),
             icon: Icon(Icons.manage_accounts_outlined),
             label: '•',

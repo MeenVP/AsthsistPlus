@@ -138,6 +138,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         },
                       ),
                       IconButton(
+                        key: Key('logoutButton'),
                         icon: const Icon(Icons.logout),
                         onPressed: () {
                           Navigator.push(
