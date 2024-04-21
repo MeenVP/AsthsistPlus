@@ -122,7 +122,7 @@ class MyApp extends StatelessWidget {
       ),
       // home: NavigationBarApp()
       //home: HomePage(),
-      home: WidgetTree(),
+      home: const WidgetTree(),
     );
   }
 }

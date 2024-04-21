@@ -8,6 +8,7 @@ import '../backend/sklearn.dart';
 import '../backend/weather.dart';
 import '../style.dart';
 import '../widget_tree.dart';
+import 'Tutorials/home_page.dart';
 import 'act_info.dart';
 import 'edit_profile_page.dart'; // Import the flutter_health package
 
@@ -295,6 +296,47 @@ class _SettingsPageState extends State<SettingsPage> {
                               fontWeight: FontWeight.normal,
                               fontSize: 18,
                               color: Style.accent1,
+                            ),
+                          ),
+                        ),
+                      )
+                    ]),
+              ),
+              Padding(
+                padding: const EdgeInsetsDirectional.fromSTEB(0, 8, 0, 8),
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'How to use this App?',
+                        style: GoogleFonts.outfit(
+                          textStyle: const TextStyle(
+                            fontWeight: FontWeight.normal,
+                            fontSize: 18,
+                            color: Style.primaryText,
+                          ),
+                        ),
+                      ),
+                      ElevatedButton(
+                        style: TextButton.styleFrom(
+                          backgroundColor: Style.primaryColor,
+                          shape: const RoundedRectangleBorder(
+                              borderRadius:
+                              BorderRadius.all(Radius.circular(12))),
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const HomePageTutorial()),
+                          );
+                        },
+                        child: Text(
+                          'Go!',
+                          style: GoogleFonts.outfit(
+                            textStyle: const TextStyle(
+                              fontWeight: FontWeight.normal,
+                              fontSize: 18,
+                              color: Style.tertiaryText,
                             ),
                           ),
                         ),

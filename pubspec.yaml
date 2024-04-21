@@ -96,6 +96,9 @@ flutter:
   assets:
      - assets/rf_model.json
      - assets/icon/icon.png
+     - assets/images/Homepage.png
+     - assets/images/Calendarpage.png
+     - assets/images/Infopage.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

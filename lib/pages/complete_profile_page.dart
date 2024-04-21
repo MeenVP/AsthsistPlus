@@ -1,5 +1,4 @@
-import 'package:asthsist_plus/pages/home_page.dart';
-import 'package:asthsist_plus/pages/navigation_bar.dart';
+import 'package:asthsist_plus/pages/Tutorials/home_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -8,7 +7,6 @@ import 'package:intl/intl.dart';
 import '../backend/firebase.dart';
 import '../backend/health.dart';
 import '../style.dart';
-import '../widget_tree.dart';
 
 class CompleteProfilePage extends StatefulWidget {
   @override
@@ -132,7 +130,7 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
       // await connect();
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-          builder: (context) => WidgetTree(),
+          builder: (context) => const HomePageTutorial(),
         ),
       );
     } on FirebaseAuthException catch (e) {
