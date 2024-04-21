@@ -7,7 +7,7 @@ class NotificationServices {
 
   Future<void> initNotifications() async {
     const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
+        AndroidInitializationSettings('launcher_notification');
 
     var InitializationSettingsIOS = DarwinInitializationSettings(
       requestAlertPermission: true,
@@ -60,7 +60,7 @@ class NotificationServices {
         break;
         case 3 :
           title = 'Data Imported';
-          body = 'Your data has been imported successfully $error';
+          body = 'Your data has been imported successfully';
           break;
         case 4 :
           title = 'Prediction Failed';

@@ -176,7 +176,8 @@ class FirebaseService {
     int maxHR = await getUserMaxHR();
 
     for (HealthDataPoint data in healthDataList) {
-      if (double.parse(data.value.toString()) >= maxHR){
+      var hr = data.value.toJson();
+      if (double.parse(hr["numeric_value"].toString()) >= maxHR){
         await NotificationServices().showNotification(6);
       }
       String date = DateFormat('yyyy-MM-dd').format(data.dateFrom);
@@ -188,7 +189,7 @@ class FirebaseService {
         // No duplicate found, add the new data
         await entries.add({
           'datetime': data.dateTo,
-          'value': data.value.toString()
+          'value': hr["numeric_value"].toString()
         });
       }
     }
@@ -199,6 +200,7 @@ class FirebaseService {
     CollectionReference steps = users.doc(_firebaseAuth.currentUser?.uid).collection('steps');
 
     for (HealthDataPoint data in healthDataList) {
+      var step = data.value.toJson();
       String date = DateFormat('yyyy-MM-dd').format(data.dateFrom);
       CollectionReference entries = steps.doc(date).collection('entries');
 
@@ -208,7 +210,7 @@ class FirebaseService {
         // No duplicate found, add the new data
         await entries.add({
           'datetime': data.dateTo,
-          'value': data.value.toString()
+          'value': step["numeric_value"].toString()
         });
       }
     }
@@ -910,7 +912,7 @@ class FirebaseService {
 // get weekly attack
   Future<List<Map<String,dynamic>>> getWeeklyAttacks() async {
     List<Map<String,dynamic>> weeklyAttack = []; // Initialize list with 7 zeros
-    DateTime now = DateTime.now();
+    DateTime now = DateTime.now().subtract(Duration(days:21));
     DateTime startOfWeek = now.subtract(Duration(days: now.weekday - 1)); // Get the start of the week (Monday)
 
     for (int i = 0; i < 7; i++) {
@@ -1114,7 +1116,7 @@ class FirebaseService {
     return aqi.toString();
   }
 
-  Future<Map<String, dynamic>> getAverageStepsInPastHour() async {
+  Future<Map<String, dynamic>> getTotalStepsInPastHour() async {
     User? user = FirebaseAuth.instance.currentUser;
     final FirebaseFirestore db = FirebaseFirestore.instance;
 
@@ -1138,11 +1140,10 @@ class FirebaseService {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
         totalSteps += double.parse(data['value']);
       }
-      double averageSteps = totalSteps / querySnapshot.docs.length;
 
       return {
         'datetime': DateFormat('yyyy-MM-dd HH:mm:ss').format(now),
-        'value': averageSteps,
+        'value': totalSteps,
       };
     } else {
       return {
@@ -1176,7 +1177,7 @@ class FirebaseService {
         totalHr += double.parse(data['value']);
       }
       double averageHr = totalHr / querySnapshot.docs.length;
-      print ('$averageHr BPM');
+      // print ('$averageHr BPM');
       return {
         'datetime': DateFormat('yyyy-MM-dd HH:mm:ss').format(now),
         'value': averageHr,

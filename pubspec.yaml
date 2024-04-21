@@ -37,21 +37,21 @@ dependencies:
   cupertino_icons: ^1.0.2
   firebase_core: ^2.24.2
   google_fonts: ^6.1.0
-  health: ^8.1.0
+  health: ^10.2.0
   permission_handler: ^11.2.0
 #  cloud_firestore: ^4.14.0
 #  firebase_auth: ^4.16.0
-  syncfusion_flutter_calendar: ^24.1.45
+  syncfusion_flutter_calendar: ^25.1.40
   table_calendar: ^3.0.9
-  intl: ^0.18.1
-  flutter_slidable: ^0.6.0
-  dob_input_field: ^1.0.0
+  intl: ^0.19.0
+  flutter_slidable: ^3.1.0
+  dob_input_field: ^2.0.0
   cloud_firestore: ^4.14.0
   firebase_auth: ^4.16.0
   workmanager: ^0.5.2
-  fl_chart: ^0.66.1
+  fl_chart: ^0.67.0
   weather: ^3.1.1
-  geolocator: ^10.1.0
+  geolocator: ^11.0.0
   air_quality: ^4.0.0
   flutter_dotenv: ^5.1.0
   sklite: ^1.0.0

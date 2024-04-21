@@ -19,22 +19,7 @@ class SettingsPage extends StatefulWidget {
   State<SettingsPage> createState() => _SettingsPageState();
 }
 
-enum AppState {
-  DATA_NOT_FETCHED,
-  FETCHING_DATA,
-  DATA_READY,
-  NO_DATA,
-  AUTHORIZED,
-  AUTH_NOT_GRANTED,
-  DATA_ADDED,
-  DATA_DELETED,
-  DATA_NOT_ADDED,
-  DATA_NOT_DELETED,
-  STEPS_READY,
-}
-
 class _SettingsPageState extends State<SettingsPage> {
-  AppState _state = AppState.DATA_NOT_FETCHED;
   static const String username = 'Username';
   final String age = 'Age';
   final String email = 'email@email.com';
@@ -50,10 +35,8 @@ class _SettingsPageState extends State<SettingsPage> {
   Future<void> fetchData() async {
     print('fetching data...');
     try{
-      await Health().fetchHeartRate();
-      await Health().fetchSteps();
-      await getHumidity();
-      await getAirPollutionData();
+      // await HealthService().fetchHeartRate();
+      // await HealthService().fetchSteps();
       await FirebaseService().addWeatherToFirebase();
     }catch (e) {
 
@@ -67,7 +50,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Future<void> connect() async {
     try {
-      await Health().authorize();
+      await HealthService().authorize();
     } catch (e) {
       print(e);
       setState(() {
@@ -172,34 +155,34 @@ class _SettingsPageState extends State<SettingsPage> {
                     }
                   }),
               const Divider(),
-              Padding(
-                padding: const EdgeInsetsDirectional.fromSTEB(0, 8, 0, 8),
-                child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      Text(
-                        'Toggle Light/Dark mode',
-                        style: GoogleFonts.outfit(
-                          textStyle: const TextStyle(
-                            fontWeight: FontWeight.normal,
-                            fontSize: 18,
-                            color: Style.primaryText,
-                          ),
-                        ),
-                      ),
-                      Switch(
-                        value: isDarkModeEnabled,
-                        onChanged: (value) {
-                          // Implement your dark mode toggle functionality here
-                        },
-                        activeTrackColor: Style.primaryColor,
-                        activeColor: Style.secondaryBackground,
-                        inactiveTrackColor: Style.accent3,
-                      ),
-                    ]),
-              ),
-              const Divider(),
+              // Padding(
+              //   padding: const EdgeInsetsDirectional.fromSTEB(0, 8, 0, 8),
+              //   child: Row(
+              //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //       mainAxisSize: MainAxisSize.max,
+              //       children: [
+              //         Text(
+              //           'Toggle Light/Dark mode',
+              //           style: GoogleFonts.outfit(
+              //             textStyle: const TextStyle(
+              //               fontWeight: FontWeight.normal,
+              //               fontSize: 18,
+              //               color: Style.primaryText,
+              //             ),
+              //           ),
+              //         ),
+              //         Switch(
+              //           value: isDarkModeEnabled,
+              //           onChanged: (value) {
+              //             // Implement your dark mode toggle functionality here
+              //           },
+              //           activeTrackColor: Style.primaryColor,
+              //           activeColor: Style.secondaryBackground,
+              //           inactiveTrackColor: Style.accent3,
+              //         ),
+              //       ]),
+              // ),
+              // const Divider(),
               Padding(
                 padding: const EdgeInsetsDirectional.fromSTEB(0, 8, 0, 8),
                 child: Row(
@@ -239,87 +222,85 @@ class _SettingsPageState extends State<SettingsPage> {
                       )
                     ]),
               ),
-              // Padding(
-              //   padding: const EdgeInsetsDirectional.fromSTEB(0, 8, 0, 8),
-              //   child: Row(
-              //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //     children: [
-              //       Text(
-              //         'Connect to Health Connect',
-              //         style: GoogleFonts.outfit(
-              //           textStyle: const TextStyle(
-              //             fontWeight: FontWeight.normal,
-              //             fontSize: 18,
-              //             color: Style.primaryText,
-              //           ),
-              //         ),
-              //       ),
-              //       ElevatedButton(
-              //         style: TextButton.styleFrom(
-              //           backgroundColor: Style.secondaryBackground,
-              //           shape: const RoundedRectangleBorder(
-              //               borderRadius:
-              //                   BorderRadius.all(Radius.circular(12))),
-              //         ),
-              //         onPressed: () {
-              //           fetchData();
-              //           // Implement your Google health connect connection functionality here
-              //         },
-              //         child: Text(
-              //           'Connect',
-              //           style: GoogleFonts.outfit(
-              //             textStyle: const TextStyle(
-              //               fontWeight: FontWeight.normal,
-              //               fontSize: 18,
-              //               color: Style.accent1,
-              //             ),
-              //           ),
-              //         ),
-              //       ),
-              //     ],
-              //   ),
-              // ),
-              // Padding(
-              //   padding: const EdgeInsetsDirectional.fromSTEB(0, 8, 0, 8),
-              //   child: Row(
-              //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //       children: [
-              //         Text(
-              //           'Connect to Apple Health Kit',
-              //           style: GoogleFonts.outfit(
-              //             textStyle: const TextStyle(
-              //               fontWeight: FontWeight.normal,
-              //               fontSize: 18,
-              //               color: Style.primaryText,
-              //             ),
-              //           ),
-              //         ),
-              //         ElevatedButton(
-              //           style: TextButton.styleFrom(
-              //             backgroundColor: Style.secondaryBackground,
-              //             shape: const RoundedRectangleBorder(
-              //                 borderRadius:
-              //                     BorderRadius.all(Radius.circular(12))),
-              //           ),
-              //           onPressed: () {
-              //             Navigator.push(
-              //               context,
-              //               MaterialPageRoute(builder: (context) => const ControlTestInfoPage(showBackButton: true,)),
-              //             );
-              //           },
-              //           child: Text(
-              //             'Connect',
-              //             style: GoogleFonts.outfit(
-              //               textStyle: const TextStyle(
-              //                 fontWeight: FontWeight.normal,
-              //                 fontSize: 18,
-              //                 color: Style.accent1,
-              //               ),
-              //             ),
-              //           ),
-              //         )
-              //       ]),
-              // ),
+              Padding(
+                padding: const EdgeInsetsDirectional.fromSTEB(0, 8, 0, 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Fetch Data',
+                      style: GoogleFonts.outfit(
+                        textStyle: const TextStyle(
+                          fontWeight: FontWeight.normal,
+                          fontSize: 18,
+                          color: Style.primaryText,
+                        ),
+                      ),
+                    ),
+                    ElevatedButton(
+                      style: TextButton.styleFrom(
+                        backgroundColor: Style.secondaryBackground,
+                        shape: const RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(12))),
+                      ),
+                      onPressed: () async {
+                        await fetchData();
+                        // await SKLearn().peakFlowPrediction();
+                        // Implement your Google health connect connection functionality here
+                      },
+                      child: Text(
+                        'Fetch',
+                        style: GoogleFonts.outfit(
+                          textStyle: const TextStyle(
+                            fontWeight: FontWeight.normal,
+                            fontSize: 18,
+                            color: Style.accent1,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsetsDirectional.fromSTEB(0, 8, 0, 8),
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Predict Peak Flow',
+                        style: GoogleFonts.outfit(
+                          textStyle: const TextStyle(
+                            fontWeight: FontWeight.normal,
+                            fontSize: 18,
+                            color: Style.primaryText,
+                          ),
+                        ),
+                      ),
+                      ElevatedButton(
+                        style: TextButton.styleFrom(
+                          backgroundColor: Style.secondaryBackground,
+                          shape: const RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(12))),
+                        ),
+                        onPressed: () {
+                          SKLearn().peakFlowPrediction();
+                        },
+                        child: Text(
+                          'Predict',
+                          style: GoogleFonts.outfit(
+                            textStyle: const TextStyle(
+                              fontWeight: FontWeight.normal,
+                              fontSize: 18,
+                              color: Style.accent1,
+                            ),
+                          ),
+                        ),
+                      )
+                    ]),
+              ),
               const Divider(),
             ],
           ),
