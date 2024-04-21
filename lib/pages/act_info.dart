@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../backend/firebase.dart';
 import '../style.dart';
 import 'asthma_control_test_page.dart';
+import 'navigation_bar.dart';
 
 class ControlTestInfoPage extends StatefulWidget {
   final bool showBackButton;
@@ -223,7 +224,7 @@ class _ControlTestInfoState extends State<ControlTestInfoPage> {
                   style: GoogleFonts.outfit(
                     textStyle: const TextStyle(
                       fontWeight: FontWeight.w400,
-                      fontSize: 32,
+                      fontSize: 24,
                       color: Colors.black,
                     ),
                   ),
@@ -232,7 +233,11 @@ class _ControlTestInfoState extends State<ControlTestInfoPage> {
                   IconButton(
                     icon: const Icon(Icons.close),
                     onPressed: () {
-                      Navigator.of(context).pop();
+                      // Navigator.of(context).pop();
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const NavigationBarApp()),
+                      );
                     },
                   ),
                 ],
@@ -242,7 +247,7 @@ class _ControlTestInfoState extends State<ControlTestInfoPage> {
               ),
             ),
           ),
-          body: SafeArea(
+          body: SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsetsDirectional.fromSTEB(20, 20, 20, 0),
               child: Column(
@@ -276,9 +281,9 @@ class _ControlTestInfoState extends State<ControlTestInfoPage> {
           )
       );
     }else{
-      return SafeArea(
+      return SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsetsDirectional.fromSTEB(10, 10, 10, 0),
+          padding: const EdgeInsetsDirectional.fromSTEB(10, 10, 10, 10),
           child: Column(
               children: [
                 Padding(
