@@ -19,7 +19,7 @@ class CompleteProfilePage extends StatefulWidget {
 
 Future<void> connect() async {
   try {
-    await Health().authorize();
+    await HealthService().authorize();
   } catch (e) {
     print(e);
   }
@@ -44,12 +44,18 @@ class DOBInputField extends StatelessWidget {
       decoration: InputDecoration(
         labelText: label,
         prefixIcon: Icon(icon),
+        labelStyle: GoogleFonts.outfit(
+          textStyle: const TextStyle(
+            fontWeight: FontWeight.normal,
+            color: Style.accent2,
+          ),
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15.0),
           borderSide: BorderSide.none,
         ),
         filled: true,
-        fillColor: Colors.grey[200],
+        fillColor: Style.accent4,
       ),
       readOnly: true, // Prevent manual editing
       onTap: () async {
@@ -123,7 +129,7 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
           smoker: _isSmoker,
           maxHR: _maxHRController.text,
       );
-      await connect();
+      // await connect();
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (context) => WidgetTree(),
@@ -260,37 +266,73 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
   }
 
   InputDecoration _inputDecoration(String label, String hint, IconData? icon) {
+    // return InputDecoration(
+    //   border: OutlineInputBorder(
+    //     borderRadius: BorderRadius.circular(15.0),
+    //     borderSide: BorderSide.none,
+    //   ),
+    //   labelText: label,
+    //   hintText: hint,
+    //   floatingLabelStyle: const TextStyle(
+    //     height: 4,
+    //     color: Colors.grey,
+    //   ),
+    //   filled: true,
+    //   fillColor: Colors.grey[200],
+    //   prefixIcon: icon != null ? Icon(icon) : null,
+    // );
     return InputDecoration(
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(15.0),
-        borderSide: BorderSide.none,
-      ),
-      labelText: label,
-      hintText: hint,
-      floatingLabelStyle: const TextStyle(
-        height: 4,
-        color: Colors.grey,
-      ),
-      filled: true,
-      fillColor: Colors.grey[200],
-      prefixIcon: icon != null ? Icon(icon) : null,
+        labelText: label,
+        hintText: hint,
+        labelStyle: GoogleFonts.outfit(
+          textStyle: const TextStyle(
+            fontWeight: FontWeight.normal,
+            color: Style.accent2,
+          ),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10.0),
+          borderSide: const BorderSide(color: Colors.transparent),
+        ),
+        filled: true,
+        fillColor: Style.accent4,
+        prefixIcon: icon != null ? Icon(icon) : null,
     );
+
   }
 
   InputDecoration _inputDecorationWithSuffix(String label, String hint, IconData? prefixIcon, IconData suffixIcon) {
+    // return InputDecoration(
+    //   border: OutlineInputBorder(
+    //     borderRadius: BorderRadius.circular(15.0),
+    //     borderSide: BorderSide.none,
+    //   ),
+    //   labelText: label,
+    //   hintText: hint,
+    //   floatingLabelStyle: const TextStyle(
+    //     height: 4,
+    //     color: Style.accent2,
+    //   ),
+    //   filled: true,
+    //   fillColor: Style.accent4,
+    //   prefixIcon: prefixIcon != null ? Icon(prefixIcon) : null,
+    //   suffixIcon: Icon(suffixIcon),
+    // );
     return InputDecoration(
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(15.0),
-        borderSide: BorderSide.none,
-      ),
       labelText: label,
       hintText: hint,
-      floatingLabelStyle: const TextStyle(
-        height: 4,
-        color: Colors.grey,
+      labelStyle: GoogleFonts.outfit(
+        textStyle: const TextStyle(
+          fontWeight: FontWeight.normal,
+          color: Style.accent2,
+        ),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10.0),
+        borderSide: const BorderSide(color: Colors.transparent),
       ),
       filled: true,
-      fillColor: Colors.grey[200],
+      fillColor: Style.accent4,
       prefixIcon: prefixIcon != null ? Icon(prefixIcon) : null,
       suffixIcon: Icon(suffixIcon),
     );

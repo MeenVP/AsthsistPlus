@@ -27,7 +27,7 @@ class _BarPageState extends State<BarPage> {
   BarTouchData get barTouchData => BarTouchData(
         enabled: true,
         touchTooltipData: BarTouchTooltipData(
-          tooltipBgColor: Colors.transparent,
+          getTooltipColor: (group) => Colors.transparent,
           tooltipPadding: EdgeInsets.zero,
           tooltipMargin: 8,
           getTooltipItem: (
@@ -230,7 +230,7 @@ class _BarPageState extends State<BarPage> {
                 topLeft: Radius.circular(0),
                 topRight: Radius.circular(0),
               ),
-            )
+            ),
           ],
           showingTooltipIndicators: [0],
         ),
@@ -541,6 +541,8 @@ class _BarPageState extends State<BarPage> {
             child: Text('No data for this category'),
           );
         });
+
+
       case 'Steps':
         return FutureBuilder(future: FirebaseService().getTotalStepsForToday(), builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -720,7 +722,7 @@ class _BarPageState extends State<BarPage> {
       case 'Medications':
         return SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsetsDirectional.fromSTEB(10, 0, 10, 0),
+            padding: const EdgeInsetsDirectional.fromSTEB(10, 0, 10, 10),
             child: Column(
                 children: [
                   Padding(
@@ -776,7 +778,7 @@ class _BarPageState extends State<BarPage> {
       case 'Attacks':
         return SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsetsDirectional.fromSTEB(10, 0, 10, 0),
+            padding: const EdgeInsetsDirectional.fromSTEB(10, 0, 10, 10),
             child: Column(
                 children: [
                   Padding(
@@ -834,7 +836,7 @@ class _BarPageState extends State<BarPage> {
       case 'Steps':
         return SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsetsDirectional.fromSTEB(10, 0, 10, 0),
+            padding: const EdgeInsetsDirectional.fromSTEB(10, 0, 10, 10),
             child: Column(
                 children: [
                   Padding(

@@ -18,7 +18,8 @@ class AsthmaControlTestPage extends StatefulWidget {
 
 class _AsthmaControlTestPageState extends State<AsthmaControlTestPage> {
   // This will hold the selected option index for each question
-  List<int?> _selectedOptions = List.filled(5, null);
+  final List<int?> _selectedOptions = List.filled(5, null);
+  String? errorMessage = '';
 
   // This will hold the actual questions and options
   final List<Map<String, dynamic>> _questions = [
@@ -85,6 +86,22 @@ class _AsthmaControlTestPageState extends State<AsthmaControlTestPage> {
 
   @override
   Widget build(BuildContext context) {
+
+    Widget _error() {
+      return Padding(
+          padding: const EdgeInsetsDirectional.fromSTEB(0, 8, 0, 8),
+          child: Text(
+            errorMessage!,
+            style: GoogleFonts.outfit(
+              textStyle: const TextStyle(
+                fontWeight: FontWeight.normal,
+                fontSize: 18,
+                color: Colors.red,
+              ),
+            ),
+          ));
+    }
+
     return Scaffold(
       backgroundColor: Style.primaryBackground,
       appBar: AppBar(
@@ -170,7 +187,9 @@ class _AsthmaControlTestPageState extends State<AsthmaControlTestPage> {
                     ],
                   ),
                 )));
-              }), // Provide some spacing before the save button.
+              }),
+              _error(),
+              // Provide some spacing before the save button.
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Style.primaryColor, // Use your style for buttons here.
@@ -179,7 +198,16 @@ class _AsthmaControlTestPageState extends State<AsthmaControlTestPage> {
                   ),
                   padding: const EdgeInsets.symmetric(horizontal: 70, vertical: 15),
                 ),
-                onPressed: _saveTestResults,
+                onPressed: () {
+                  print(_selectedOptions);
+                  if (_selectedOptions.contains(null)==true) {
+                    setState(() {
+                      errorMessage = 'Please answer all questions';
+                    });
+                  } else {
+                    _saveTestResults();
+                  }
+                },
                 icon: const Icon(Icons.save,
                   color: Colors.white,
                 ),

@@ -42,7 +42,7 @@ class DOBInputField extends StatelessWidget {
           borderSide: BorderSide.none,
         ),
         filled: true,
-        fillColor: Colors.grey[200],
+        fillColor: Style.accent4,
       ),
       readOnly: true, // Prevent manual editing
       onTap: () async {
@@ -247,36 +247,40 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   InputDecoration _inputDecoration(String label, String hint, IconData? icon) {
     return InputDecoration(
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(15.0),
-        borderSide: BorderSide.none,
-      ),
       labelText: label,
       hintText: hint,
-      floatingLabelStyle: const TextStyle(
-        height: 4,
-        color: Colors.grey,
+      labelStyle: GoogleFonts.outfit(
+        textStyle: const TextStyle(
+          fontWeight: FontWeight.normal,
+          color: Style.accent2,
+        ),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10.0),
+        borderSide: const BorderSide(color: Colors.transparent),
       ),
       filled: true,
-      fillColor: Colors.grey[200],
+      fillColor: Style.accent4,
       prefixIcon: icon != null ? Icon(icon) : null,
     );
   }
 
   InputDecoration _inputDecorationWithSuffix(String label, String hint, IconData? prefixIcon, IconData suffixIcon) {
     return InputDecoration(
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(15.0),
-        borderSide: BorderSide.none,
-      ),
       labelText: label,
       hintText: hint,
-      floatingLabelStyle: const TextStyle(
-        height: 4,
-        color: Colors.grey,
+      labelStyle: GoogleFonts.outfit(
+        textStyle: const TextStyle(
+          fontWeight: FontWeight.normal,
+          color: Style.accent2,
+        ),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10.0),
+        borderSide: const BorderSide(color: Colors.transparent),
       ),
       filled: true,
-      fillColor: Colors.grey[200],
+      fillColor: Style.accent4,
       prefixIcon: prefixIcon != null ? Icon(prefixIcon) : null,
       suffixIcon: Icon(suffixIcon),
     );

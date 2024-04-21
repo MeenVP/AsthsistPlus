@@ -35,6 +35,11 @@ class _HomePageState extends State<HomePage> {
       try {
         await FirebaseService().addAttack(selectedSeverity);
         Navigator.of(context).pop();
+        setState(() {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text("Asthma attack added successfully!"),
+          ));
+        });
       } on FirebaseAuthException catch (e) {
         print(e.message);
         setState(() {
@@ -338,6 +343,7 @@ class _HomePageState extends State<HomePage> {
           var updateTime = DateFormat('HH:mm, dd MMM yyyy').format(data?['datetime']);
           String riskLevel;
           String recommendation;
+          double fontSize = 48;
           Color riskColor;
 
           switch (prediction) {
@@ -360,6 +366,7 @@ class _HomePageState extends State<HomePage> {
               riskLevel = 'Insufficient data';
               riskColor = Style.primaryColor;
               recommendation = 'Error';
+              fontSize = 24;
           }
 
           return Container(
@@ -393,9 +400,9 @@ class _HomePageState extends State<HomePage> {
                     child: Text(
                       riskLevel,
                       style: GoogleFonts.outfit(
-                        textStyle: const TextStyle(
+                        textStyle: TextStyle(
                           fontWeight: FontWeight.normal,
-                          fontSize: 48,
+                          fontSize: fontSize,
                           color: Style.tertiaryText,
                         ),
                       ),
@@ -509,7 +516,7 @@ class _HomePageState extends State<HomePage> {
                 TextField(
                   controller: medicationController,
                   decoration: InputDecoration(
-                    labelText: 'Medicine name',
+                    labelText: 'Enter medicine name',
                   ), // If the user types a medicine name that is not in the list, ask if they want to add it
                 ),
                 // Add a dropdown menu for the user to choose the medicine name from the list
@@ -524,7 +531,7 @@ class _HomePageState extends State<HomePage> {
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton<String>(
                         value: selectedMedicine,
-                        hint: Text('Choose a medicine'),
+                        hint: Text('Or choose a medicine'),
                         items: medicationNames.map((name) => DropdownMenuItem<String>(
                           value: name,
                           child: Text(name),
@@ -682,7 +689,7 @@ class _HomePageState extends State<HomePage> {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsetsDirectional.fromSTEB(10, 0, 10, 0),
+            padding: const EdgeInsetsDirectional.fromSTEB(10, 0, 10, 10),
             child: Column(
               mainAxisSize: MainAxisSize.max,
               children: [
@@ -788,18 +795,40 @@ class _HomePageState extends State<HomePage> {
                                   
                                               if (snapshot.connectionState ==
                                                   ConnectionState.done) {
-                                                // If the Future is complete, display the data
-                                  
-                                                  return Text(
-                                                    '${heartRate?[0]}',
+                                                if (snapshot.data == null) {
+                                                return Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          top: 6, bottom: 6),
+                                                  child: Text(
+                                                    'No Data',
                                                     style: GoogleFonts.outfit(
-                                                      textStyle: const TextStyle(
-                                                          fontWeight:
-                                                          FontWeight.normal,
-                                                          fontSize: 24,
-                                                          color: Style.primaryText),
-                                              )
+                                                      textStyle:
+                                                          const TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .normal,
+                                                              fontSize: 9,
+                                                              color: Style
+                                                                  .primaryText),
+                                                    ),
+                                                  ),
+                                                );
+                                              } else {
+                                                  // If the Future is complete, display the data
+
+                                                  return Text(
+                                                      '${heartRate?[0]}',
+                                                      style: GoogleFonts.outfit(
+                                                        textStyle: const TextStyle(
+                                                            fontWeight:
+                                                            FontWeight.normal,
+                                                            fontSize: 21,
+                                                            color: Style
+                                                                .primaryText),
+                                                      )
                                                   );
+                                                }
                                               }else{
                                                 return const CircularProgressIndicator(
                                                   color: Style.primaryColor,
@@ -852,7 +881,7 @@ class _HomePageState extends State<HomePage> {
                                                   textStyle: const TextStyle(
                                                       fontWeight:
                                                           FontWeight.normal,
-                                                      fontSize: 24,
+                                                      fontSize: 21,
                                                       color: Style.primaryText),
                                                 ),
                                               );
@@ -883,17 +912,39 @@ class _HomePageState extends State<HomePage> {
                                           builder: (context, snapshot) {
                                             if (snapshot.connectionState ==
                                                 ConnectionState.done) {
-                                              // If the Future is complete, display the data
-                                              return Text(
-                                                '${snapshot.data}°C',
-                                                style: GoogleFonts.outfit(
-                                                  textStyle: const TextStyle(
-                                                      fontWeight:
-                                                      FontWeight.normal,
-                                                      fontSize: 21,
-                                                      color: Style.primaryText),
-                                                ),
-                                              );
+                                              if (snapshot.data == null) {
+                                                return Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          top: 6, bottom: 6),
+                                                  child: Text(
+                                                    'No Data',
+                                                    style: GoogleFonts.outfit(
+                                                      textStyle:
+                                                          const TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .normal,
+                                                              fontSize: 9,
+                                                              color: Style
+                                                                  .primaryText),
+                                                    ),
+                                                  ),
+                                                );
+                                              } else {
+                                                // If the Future is complete, display the data
+                                                return Text(
+                                                  '${snapshot.data}°C',
+                                                  style: GoogleFonts.outfit(
+                                                    textStyle: const TextStyle(
+                                                        fontWeight:
+                                                        FontWeight.normal,
+                                                        fontSize: 21,
+                                                        color: Style
+                                                            .primaryText),
+                                                  ),
+                                                );
+                                              }
                                             } else {
                                               return const CircularProgressIndicator(
                                                 color: Style.primaryColor,
@@ -927,16 +978,39 @@ class _HomePageState extends State<HomePage> {
                                             if (snapshot.connectionState ==
                                                 ConnectionState.done) {
                                               // If the Future is complete, display the data
-                                              return Text(
-                                                '${snapshot.data}',
-                                                style: GoogleFonts.outfit(
-                                                  textStyle: const TextStyle(
-                                                      fontWeight:
-                                                      FontWeight.normal,
-                                                      fontSize: 21,
-                                                      color: Style.primaryText),
-                                                ),
-                                              );
+                                              var value = snapshot.data;
+                                              if (value == null) {
+                                                return Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          top: 6, bottom: 6),
+                                                  child: Text(
+                                                    'No Data',
+                                                    style: GoogleFonts.outfit(
+                                                      textStyle:
+                                                          const TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .normal,
+                                                              fontSize: 9,
+                                                              color: Style
+                                                                  .primaryText),
+                                                    ),
+                                                  ),
+                                                );
+                                              } else {
+                                                return Text(
+                                                  '${snapshot.data}',
+                                                  style: GoogleFonts.outfit(
+                                                    textStyle: const TextStyle(
+                                                        fontWeight:
+                                                        FontWeight.normal,
+                                                        fontSize: 21,
+                                                        color: Style
+                                                            .primaryText),
+                                                  ),
+                                                );
+                                              }
                                             } else {
                                               return const CircularProgressIndicator(
                                                 color: Style.primaryColor,
@@ -973,7 +1047,7 @@ class _HomePageState extends State<HomePage> {
                                             if (snapshot.connectionState ==
                                                 ConnectionState.done) {
                                               // If the Future is complete, display the data
-                                              if (value == 'NaN') {
+                                              if (value == null) {
                                                 return Padding(
                                                   padding:
                                                       const EdgeInsets.only(
@@ -986,7 +1060,7 @@ class _HomePageState extends State<HomePage> {
                                                               fontWeight:
                                                                   FontWeight
                                                                       .normal,
-                                                              fontSize: 14,
+                                                              fontSize: 9,
                                                               color: Style
                                                                   .primaryText),
                                                     ),
@@ -999,7 +1073,7 @@ class _HomePageState extends State<HomePage> {
                                                     textStyle: const TextStyle(
                                                         fontWeight:
                                                             FontWeight.normal,
-                                                        fontSize: 24,
+                                                        fontSize: 21,
                                                         color:
                                                             Style.primaryText),
                                                   ),

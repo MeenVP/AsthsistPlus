@@ -1,3 +1,4 @@
+import 'package:asthsist_plus/style.dart';
 import 'package:asthsist_plus/widget_tree.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -44,8 +45,8 @@ void callbackDispatcher(){
         _checkLocationPermission();
         await NotificationServices().initNotifications();
         try{
-          await Health().fetchSteps();
-          await Health().fetchHeartRate();
+          await HealthService().fetchSteps();
+          await HealthService().fetchHeartRate();
           await FirebaseService().addWeatherToFirebase();
           await NotificationServices().showNotification(3);
           await SKLearn().peakFlowPrediction();
@@ -103,9 +104,22 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    return const MaterialApp(
+    return MaterialApp(
       title:'Asthsist+',
       debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Style.primaryColor),
+        primarySwatch: Colors.blue,
+        inputDecorationTheme: const InputDecorationTheme(
+          focusedBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: Style.primaryColor),
+          ),
+        ),
+        textSelectionTheme: const TextSelectionThemeData(
+            cursorColor: Style.primaryColor,
+        ),
+
+      ),
       // home: NavigationBarApp()
       //home: HomePage(),
       home: WidgetTree(),

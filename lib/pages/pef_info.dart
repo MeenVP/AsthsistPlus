@@ -258,7 +258,7 @@ class _PeakFlowInfoState extends State<PeakFlowInfoPage> {
                   ));
                 }
                 if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
+                  return Center(child: Text('No PEF data available'));
                 }
                 if (snapshot.hasData) {
                   String resultText = snapshot.data[0].toString();
@@ -410,7 +410,7 @@ class _PeakFlowInfoState extends State<PeakFlowInfoPage> {
       return SingleChildScrollView(
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsetsDirectional.fromSTEB(10, 10, 10, 0),
+            padding: const EdgeInsetsDirectional.fromSTEB(10, 10, 10, 10),
             child: Column(
                 children: [
                   Padding(

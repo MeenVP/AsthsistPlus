@@ -30,12 +30,26 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+
+    EdgeInsetsDirectional detectKeyboard(){
+      if(MediaQuery.of(context).viewInsets.bottom != 0.0)
+      {
+        // Keyboard is visible.
+        return const EdgeInsetsDirectional.fromSTEB(0, 40, 0, 0);
+      }
+      else
+      {
+        // Keyboard is not visible.
+      return const EdgeInsetsDirectional.fromSTEB(0, 160, 0, 0);
+      }
+    }
+
     return Scaffold(
         resizeToAvoidBottomInset: true,
         backgroundColor: Style.primaryBackground,
         body: SafeArea(
             child: Padding(
-                padding: const EdgeInsetsDirectional.fromSTEB(0, 160, 0, 0),
+                padding: detectKeyboard(),
                 child: Column(mainAxisSize: MainAxisSize.max, children: [
                   Row(
                     mainAxisSize: MainAxisSize.max,
@@ -264,7 +278,7 @@ class _LoginState extends State<Login> {
               ),
               _error(),
               Padding(
-                padding: const EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
+                padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Style.tertiaryText,
@@ -293,38 +307,38 @@ class _LoginState extends State<Login> {
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Style.tertiaryText,
-                    backgroundColor: Style.secondaryBackground,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                    minimumSize: const Size(double.infinity, 60),
-                  ),
-                  onPressed: () {},
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.g_mobiledata, color: Style.primaryText),
-                      Text(
-                        'Sign in with Google',
-                        style: GoogleFonts.outfit(
-                          textStyle: GoogleFonts.outfit(
-                            textStyle: const TextStyle(
-                              fontWeight: FontWeight.normal,
-                              fontSize: 18,
-                              color: Style.primaryText,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              )
+              // Padding(
+              //   padding: const EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
+              //   child: ElevatedButton(
+              //     style: ElevatedButton.styleFrom(
+              //       foregroundColor: Style.tertiaryText,
+              //       backgroundColor: Style.secondaryBackground,
+              //       shape: RoundedRectangleBorder(
+              //         borderRadius: BorderRadius.circular(10.0),
+              //       ),
+              //       minimumSize: const Size(double.infinity, 60),
+              //     ),
+              //     onPressed: () {},
+              //     child: Row(
+              //       mainAxisAlignment: MainAxisAlignment.center,
+              //       children: [
+              //         const Icon(Icons.g_mobiledata, color: Style.primaryText),
+              //         Text(
+              //           'Sign in with Google',
+              //           style: GoogleFonts.outfit(
+              //             textStyle: GoogleFonts.outfit(
+              //               textStyle: const TextStyle(
+              //                 fontWeight: FontWeight.normal,
+              //                 fontSize: 18,
+              //                 color: Style.primaryText,
+              //               ),
+              //             ),
+              //           ),
+              //         ),
+              //       ],
+              //     ),
+              //   ),
+              // )
             ],
           ),
         ));
@@ -332,7 +346,7 @@ class _LoginState extends State<Login> {
 
   Widget _error() {
     return Padding(
-        padding: const EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
+        padding: const EdgeInsetsDirectional.fromSTEB(0, 8, 0, 8),
         child: Text(
           errorMessage!,
           style: GoogleFonts.outfit(

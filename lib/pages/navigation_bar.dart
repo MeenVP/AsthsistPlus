@@ -2,6 +2,7 @@ import 'package:asthsist_plus/pages/settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:asthsist_plus/pages/home_page.dart';
 import 'package:asthsist_plus/style.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'calendar_page.dart';
 import 'chart_page.dart';
@@ -41,8 +42,8 @@ class _NavigationState extends State<NavigationBarApp> {
       bottomNavigationBar:
       BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
-        showUnselectedLabels: false,
-        showSelectedLabels: false,
+        showUnselectedLabels: true,
+        showSelectedLabels: true,
         elevation: 20,
         backgroundColor: Style.secondaryBackground,
         selectedItemColor: Style.primaryColor,
@@ -53,30 +54,40 @@ class _NavigationState extends State<NavigationBarApp> {
             currentPageIndex = index;
           });
         },
-        selectedLabelStyle: const TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.w700,
+        selectedLabelStyle: GoogleFonts.outfit(
+          textStyle: const TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 14,
+            color: Style.primaryColor,
+          ),
+        ),
+        unselectedLabelStyle: GoogleFonts.outfit(
+          textStyle: const TextStyle(
+            fontWeight: FontWeight.w300,
+            fontSize: 12,
+            color: Style.accent1,
+          ),
         ),
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             activeIcon: Icon(Icons.home),
             icon: Icon(Icons.home_outlined),
-            label: '•',
+            label: 'Home',
           ),
           BottomNavigationBarItem(
             activeIcon: Icon(Icons.date_range),
             icon: Icon(Icons.date_range_outlined),
-            label: '•',
+            label: 'Calendar',
           ),
           BottomNavigationBarItem(
             activeIcon: Icon(Icons.monitor_heart),
             icon: Icon(Icons.monitor_heart_outlined),
-            label: '•',
+            label: 'Health',
           ),
           BottomNavigationBarItem(
             activeIcon: Icon(Icons.manage_accounts),
             icon: Icon(Icons.manage_accounts_outlined),
-            label: '•',
+            label: 'Profiles',
           ),
         ],
       ),

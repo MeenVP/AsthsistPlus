@@ -102,7 +102,7 @@ class _CalendarState extends State<HealthInfoPage> with TickerProviderStateMixin
                                         Tab(
                                           icon:
                                           Icon(
-                                            Icons.favorite_outline,
+                                            Icons.favorite_border_outlined,
                                             color: Style.heartrate,
                                           ),
                                         ),
