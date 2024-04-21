@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter/services.dart';
 import 'package:sklite/utils/io.dart';
 import 'package:sklite/ensemble/forest.dart';
 import 'firebase.dart';
@@ -19,14 +18,14 @@ class SKLearn{
   double so2 =0;
   double pm25 =0;
   double avgHeartRate =0;
-  double avgSteps =0;
+  double totalSteps =0;
 
 
   Future<List<double>?> prepareData() async {
     final userDetails = await FirebaseService().getUserDetails();
     final weather = await FirebaseService().getLatestWeather();
     final hr = await FirebaseService().getAverageHrInPastHour();
-    final steps = await FirebaseService().getAverageStepsInPastHour();
+    final steps = await FirebaseService().getTotalStepsInPastHour();
     //gender
     if (userDetails['gender']== 'Male') {
       gender = 1;
@@ -87,14 +86,14 @@ class SKLearn{
     avgHeartRate = hr['value'].toDouble();
 
     //avgSteps
-    avgSteps = steps['value'].toDouble();
-    print([gender,age,bmi,smoker,pefBest,hours,temperature,humidity,aqi,no2,so2,pm25,inhaler,avgHeartRate,avgSteps]);
+    totalSteps = steps['value'].toDouble();
+    // print([gender,age,bmi,smoker,pefBest,hours,temperature,humidity,aqi,no2,so2,pm25,inhaler,avgHeartRate,totalSteps]);
     if (avgHeartRate==0.0){
       NotificationServices().showNotification(4);
       return null;
     }else{
-      List<double> X=[gender,age,bmi,smoker,pefBest,hours,temperature,humidity,aqi,no2,so2,pm25,inhaler,avgHeartRate,avgSteps];
-      print(X);
+      List<double> X=[gender,age,bmi,smoker,pefBest,hours,temperature,humidity,aqi,no2,so2,pm25,inhaler,avgHeartRate,totalSteps];
+      // print(X);
       return X;
     }
   }
@@ -109,8 +108,8 @@ class SKLearn{
       String model = await loadModel("assets/rf_model.json");
       r = RandomForestClassifier.fromMap(json.decode(model));
       print(X);
-      print('Prediction result: ${r.predict(X)}');
       result = r.predict(X);
+      print('Prediction result: $result');
       switch (result) {
         case 0:
           print('Your vitals are normal.');
