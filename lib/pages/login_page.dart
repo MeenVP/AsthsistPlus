@@ -1,15 +1,16 @@
-import 'package:asthsist_plus/pages/navigation_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../backend/firebase.dart';
+import '../backend/health.dart';
 import '../style.dart';
+import 'Tutorials/home_page.dart';
 import 'complete_profile_page.dart';
 
 class LoginPage extends StatefulWidget {
   @override
   _LoginPageState createState() => _LoginPageState();
-  const LoginPage({Key? key}) : super(key: key);
+  const LoginPage({super.key});
   // static const String routeName = '/login';
 }
 
@@ -30,17 +31,13 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-
-    EdgeInsetsDirectional detectKeyboard(){
-      if(MediaQuery.of(context).viewInsets.bottom != 0.0)
-      {
+    EdgeInsetsDirectional detectKeyboard() {
+      if (MediaQuery.of(context).viewInsets.bottom != 0.0) {
         // Keyboard is visible.
         return const EdgeInsetsDirectional.fromSTEB(0, 40, 0, 0);
-      }
-      else
-      {
+      } else {
         // Keyboard is not visible.
-      return const EdgeInsetsDirectional.fromSTEB(0, 160, 0, 0);
+        return const EdgeInsetsDirectional.fromSTEB(0, 160, 0, 0);
       }
     }
 
@@ -154,7 +151,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
 }
 
 class Login extends StatefulWidget {
-  const Login({Key? key}) : super(key: key);
+  const Login({super.key});
 
   @override
   _LoginState createState() => _LoginState();
@@ -167,6 +164,7 @@ class _LoginState extends State<Login> {
   bool passwordVisible = true;
   String? errorMessage = '';
 
+  // Function to show a loading dialog
   void showLoadingDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -189,6 +187,7 @@ class _LoginState extends State<Login> {
     );
   }
 
+  // Function to sign in with email and password
   Future<void> signInWithEmailAndPassword() async {
     try {
       // Show loading dialog
@@ -197,7 +196,12 @@ class _LoginState extends State<Login> {
           _emailController.text, _passwordController.text);
       // If sign-in is successful, navigator.pop can be called to dismiss the dialog.
       Navigator.pop(context);
-    } on FirebaseAuthException catch (e) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => const HomePageTutorial(),
+        ),
+      );
+    } on FirebaseAuthException {
       // Dismiss the loading dialog if sign-in fails
       Navigator.pop(context);
       setState(() {
@@ -229,7 +233,7 @@ class _LoginState extends State<Login> {
                       borderSide: const BorderSide(color: Colors.transparent),
                     ),
                     filled: true,
-                    fillColor: Color(0xFFE1E3E9)),
+                    fillColor: const Color(0xFFE1E3E9)),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your email';
@@ -254,7 +258,7 @@ class _LoginState extends State<Login> {
                     borderSide: const BorderSide(color: Colors.transparent),
                   ),
                   filled: true,
-                  fillColor: Color(0xFFE1E3E9),
+                  fillColor: const Color(0xFFE1E3E9),
                   suffixIcon: IconButton(
                     icon: Icon(passwordVisible
                         ? Icons.visibility
@@ -307,43 +311,12 @@ class _LoginState extends State<Login> {
                   ),
                 ),
               ),
-              // Padding(
-              //   padding: const EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
-              //   child: ElevatedButton(
-              //     style: ElevatedButton.styleFrom(
-              //       foregroundColor: Style.tertiaryText,
-              //       backgroundColor: Style.secondaryBackground,
-              //       shape: RoundedRectangleBorder(
-              //         borderRadius: BorderRadius.circular(10.0),
-              //       ),
-              //       minimumSize: const Size(double.infinity, 60),
-              //     ),
-              //     onPressed: () {},
-              //     child: Row(
-              //       mainAxisAlignment: MainAxisAlignment.center,
-              //       children: [
-              //         const Icon(Icons.g_mobiledata, color: Style.primaryText),
-              //         Text(
-              //           'Sign in with Google',
-              //           style: GoogleFonts.outfit(
-              //             textStyle: GoogleFonts.outfit(
-              //               textStyle: const TextStyle(
-              //                 fontWeight: FontWeight.normal,
-              //                 fontSize: 18,
-              //                 color: Style.primaryText,
-              //               ),
-              //             ),
-              //           ),
-              //         ),
-              //       ],
-              //     ),
-              //   ),
-              // )
             ],
           ),
         ));
   }
 
+  // Function to display error message
   Widget _error() {
     return Padding(
         padding: const EdgeInsetsDirectional.fromSTEB(0, 8, 0, 8),
@@ -361,7 +334,7 @@ class _LoginState extends State<Login> {
 }
 
 class Register extends StatefulWidget {
-  const Register({Key? key}) : super(key: key);
+  const Register({super.key});
 
   @override
   _RegisterState createState() => _RegisterState();
@@ -376,6 +349,7 @@ class _RegisterState extends State<Register> {
   String? errorMessage = '';
   bool error = false;
 
+  // Function to show a loading dialog
   void showRegisterLoadingDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -398,6 +372,7 @@ class _RegisterState extends State<Register> {
     );
   }
 
+  // Function to create a user with email and password
   Future<void> createUserWithEmailAndPassword() async {
     try {
       showRegisterLoadingDialog(context);
@@ -407,7 +382,7 @@ class _RegisterState extends State<Register> {
       // Navigate to CompleteProfilePage
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-          builder: (context) => CompleteProfilePage(),
+          builder: (context) => const CompleteProfilePage(),
         ),
       );
     } on FirebaseAuthException catch (e) {
@@ -420,7 +395,7 @@ class _RegisterState extends State<Register> {
     }
   }
 
-
+// Function to display error message
   Widget _error() {
     return Padding(
         padding: const EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
@@ -459,7 +434,7 @@ class _RegisterState extends State<Register> {
                     borderSide: const BorderSide(color: Colors.transparent),
                   ),
                   filled: true,
-                  fillColor: Color(0xFFE1E3E9)),
+                  fillColor: const Color(0xFFE1E3E9)),
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Please enter your email';
@@ -526,7 +501,7 @@ class _RegisterState extends State<Register> {
                   borderSide: const BorderSide(color: Colors.transparent),
                 ),
                 filled: true,
-                fillColor: Color(0xFFE1E3E9),
+                fillColor: const Color(0xFFE1E3E9),
                 suffixIcon: IconButton(
                   icon: Icon(passwordVisible
                       ? Icons.visibility

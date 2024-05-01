@@ -5,7 +5,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../backend/firebase.dart';
 import '../style.dart';
-import 'asthma_control_test_page.dart';
 
 class PeakFlowInfoPage extends StatefulWidget {
   final bool showBackButton;
@@ -14,15 +13,22 @@ class PeakFlowInfoPage extends StatefulWidget {
   @override
   _PeakFlowInfoState createState() => _PeakFlowInfoState();
 }
+
 class _PeakFlowInfoState extends State<PeakFlowInfoPage> {
   @override
-  Widget build(BuildContext context) {
+  void dispose() {
+    super.dispose();
+  }
 
-    void _showAddPeakFlowDialog(BuildContext context) {
+  @override
+  Widget build(BuildContext context) {
+    // Show dialog to add peak flow data
+    void showAddPeakFlowDialog(BuildContext context) {
       TextEditingController peakFlowController = TextEditingController();
       String? errorMessage = '';
       bool error = false;
 
+      // Add peak flow data to firebase
       Future<void> addPeakFlow() async {
         try {
           await FirebaseService().addPef(peakFlowController.text);
@@ -35,6 +41,7 @@ class _PeakFlowInfoState extends State<PeakFlowInfoPage> {
         }
       }
 
+      // Show error message
       Widget showError() {
         return Text(
           errorMessage!,
@@ -62,7 +69,8 @@ class _PeakFlowInfoState extends State<PeakFlowInfoPage> {
                   color: Style.primaryColor),
               // color: Colors.red,
               child: Padding(
-                padding: EdgeInsetsDirectional.all(20), // Add horizontal padding
+                padding: const EdgeInsetsDirectional.all(
+                    20), // Add horizontal padding
                 child: Text(
                   'Add Peak Flow Data',
                   style: GoogleFonts.outfit(
@@ -85,10 +93,11 @@ class _PeakFlowInfoState extends State<PeakFlowInfoPage> {
                   TextField(
                     controller: peakFlowController,
                     keyboardType: TextInputType.number,
-                    decoration:
-                    const InputDecoration(hintText: "Enter peak flow value"),
+                    decoration: const InputDecoration(
+                        hintText: "Enter peak flow value"),
                     inputFormatters: <TextInputFormatter>[
-                      FilteringTextInputFormatter.digitsOnly // Only allow digits
+                      FilteringTextInputFormatter
+                          .digitsOnly // Only allow digits
                     ],
                   ),
                 ],
@@ -96,7 +105,8 @@ class _PeakFlowInfoState extends State<PeakFlowInfoPage> {
             ),
             actions: <Widget>[
               TextButton(
-                child: Text('Cancel',
+                child: Text(
+                  'Cancel',
                   style: GoogleFonts.outfit(
                     textStyle: const TextStyle(
                       fontWeight: FontWeight.normal,
@@ -110,7 +120,8 @@ class _PeakFlowInfoState extends State<PeakFlowInfoPage> {
                 },
               ),
               TextButton(
-                child: Text('Add',
+                child: Text(
+                  'Add',
                   style: GoogleFonts.outfit(
                     textStyle: const TextStyle(
                       fontWeight: FontWeight.normal,
@@ -133,15 +144,16 @@ class _PeakFlowInfoState extends State<PeakFlowInfoPage> {
       );
     }
 
-    Widget testResult(List<dynamic> data) {
-      int pef=data[0];
-      int bestPef=data[1];
+    // Display the result of the PEF
+    Widget showResult(List<dynamic> data) {
+      int pef = data[0];
+      int bestPef = data[1];
       String text = '';
-      if(pef>bestPef*0.8){
+      if (pef > bestPef * 0.8) {
         text = 'Green Zone';
-      }else if (pef>=bestPef*0.5) {
+      } else if (pef >= bestPef * 0.5) {
         text = 'Yellow Zone';
-      }else{
+      } else {
         text = 'Red Zone';
       }
       return Column(
@@ -226,20 +238,23 @@ class _PeakFlowInfoState extends State<PeakFlowInfoPage> {
         ],
       );
     }
-    Color setColor(List<dynamic> data){
-      int pef=data[0];
-      int bestPef=data[1];
-      if(pef>(bestPef*0.8)){
+
+    // Set color of the PEF value
+    Color setColor(List<dynamic> data) {
+      int pef = data[0];
+      int bestPef = data[1];
+      if (pef > (bestPef * 0.8)) {
         return Style.safeSecondary;
-      }else if (pef>=(bestPef*0.5)) {
+      } else if (pef >= (bestPef * 0.5)) {
         return Style.warningSecondary;
-      }else{
+      } else {
         return Style.dangerSecondary;
       }
     }
 
-    Future<List<dynamic>> getPEFData() async{
-      List<dynamic> data =[];
+    // Get PEF data from firebase
+    Future<List<dynamic>> getPEFData() async {
+      List<dynamic> data = [];
       var pef = await FirebaseService().getLatestPEF();
       var bestPef = await FirebaseService().getUserPEF();
       data.add(int.parse(pef['data']));
@@ -248,98 +263,100 @@ class _PeakFlowInfoState extends State<PeakFlowInfoPage> {
       return data;
     }
 
-    Widget infoWidget(){
-          return FutureBuilder(
-              future: getPEFData(),
-              builder: (BuildContext context, AsyncSnapshot snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator(
-                    color: Style.primaryColor,
-                  ));
-                }
-                if (snapshot.hasError) {
-                  return Center(child: Text('No PEF data available'));
-                }
-                if (snapshot.hasData) {
-                  String resultText = snapshot.data[0].toString();
-                  int result = snapshot.data[0];
-                  return Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsetsDirectional.fromSTEB(0, 20, 0, 10),
-                        child: Text(
-                          'Your latest PEF is',
+    // Display PEF data
+    Widget infoWidget() {
+      return FutureBuilder(
+          future: getPEFData(),
+          builder: (BuildContext context, AsyncSnapshot snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                  child: CircularProgressIndicator(
+                color: Style.primaryColor,
+              ));
+            }
+            if (snapshot.hasError) {
+              return const Center(child: Text('No PEF data available'));
+            }
+            if (snapshot.hasData) {
+              String resultText = snapshot.data[0].toString();
+              int result = snapshot.data[0];
+              return Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsetsDirectional.fromSTEB(0, 20, 0, 10),
+                    child: Text(
+                      'Your latest PEF is',
+                      style: GoogleFonts.outfit(
+                        textStyle: const TextStyle(
+                          fontWeight: FontWeight.normal,
+                          fontSize: 24,
+                          color: Style.primaryText,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsetsDirectional.fromSTEB(0, 20, 0, 10),
+                    child: Column(
+                      children: [
+                        Text(
+                          resultText,
                           style: GoogleFonts.outfit(
-                            textStyle: const TextStyle(
-                              fontWeight: FontWeight.normal,
-                              fontSize: 24,
-                              color: Style.primaryText,
+                            textStyle: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 72,
+                              color: setColor(snapshot.data),
                             ),
                           ),
                         ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsetsDirectional.fromSTEB(0, 20, 0, 10),
-                        child: Column(
-                          children: [
-                            Text(
-                              resultText,
-                              style: GoogleFonts.outfit(
-                                textStyle: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 72,
-                                  color: setColor(snapshot.data),
-                                ),
-                              ),
+                        Text(
+                          'L/min',
+                          style: GoogleFonts.outfit(
+                            textStyle: const TextStyle(
+                              fontWeight: FontWeight.normal,
+                              fontSize: 18,
+                              color: Style.secondaryText,
                             ),
-                            Text(
-                              'L/min',
-                              style: GoogleFonts.outfit(
-                                textStyle: const TextStyle(
-                                  fontWeight: FontWeight.normal,
-                                  fontSize: 18,
-                                  color: Style.secondaryText,
-                                ),
-                              ),
-                            ),
-                            Text(
-                              DateFormat('MMM dd, yyyy').format(
-                                  snapshot.data[2] as DateTime),
-                              // Dynamic timestamp
-                              style: GoogleFonts.outfit(
-                                textStyle: const TextStyle(
-                                  fontWeight: FontWeight.normal,
-                                  fontSize: 18,
-                                  color: Style.secondaryText,
-                                ),
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
-                      ),
-                      const Divider(
-                        height: 32,
-                        color: Style.accent4,
-                        thickness: 2,
-                        indent : 10,
-                        endIndent : 10,
-                      ),
-                      Padding(
-                        padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 10),
-                        child: testResult(snapshot.data),
-                      )
-                    ],
-                  );
-                }
-                return const Text('No data for this category');
-              });
-      }
+                        Text(
+                          DateFormat('MMM dd, yyyy')
+                              .format(snapshot.data[2] as DateTime),
+                          // Dynamic timestamp
+                          style: GoogleFonts.outfit(
+                            textStyle: const TextStyle(
+                              fontWeight: FontWeight.normal,
+                              fontSize: 18,
+                              color: Style.secondaryText,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Divider(
+                    height: 32,
+                    color: Style.accent4,
+                    thickness: 2,
+                    indent: 10,
+                    endIndent: 10,
+                  ),
+                  Padding(
+                    padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 10),
+                    child: showResult(snapshot.data),
+                  )
+                ],
+              );
+            }
+            return const Text('No data for this category');
+          });
+    }
 
-    if (widget.showBackButton==true) {
+    if (widget.showBackButton == true) {
+      // show the page after adding the peak flow data
       return Scaffold(
           backgroundColor: Style.primaryBackground,
-          appBar:
-          PreferredSize(
+          appBar: PreferredSize(
             preferredSize: const Size.fromHeight(kToolbarHeight),
             // This is the height of AppBar.
             child: Padding(
@@ -376,116 +393,111 @@ class _PeakFlowInfoState extends State<PeakFlowInfoPage> {
           body: SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsetsDirectional.fromSTEB(20, 20, 20, 0),
-              child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
-                      child: Material(
-                        color: Colors.transparent,
-                        elevation: 2,
-                        shape: RoundedRectangleBorder(
+              child: Column(children: [
+                Padding(
+                  padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
+                  child: Material(
+                    color: Colors.transparent,
+                    elevation: 2,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Container(
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12),
-                              color: Style.secondaryBackground
-                          ),
-                          child:
-                          Padding(
-                            padding: const EdgeInsetsDirectional.fromSTEB(
-                                20, 0, 20, 0),
-                            child: infoWidget(),
-                          ),
-                        ),
+                          color: Style.secondaryBackground),
+                      child: Padding(
+                        padding:
+                            const EdgeInsetsDirectional.fromSTEB(20, 0, 20, 0),
+                        child: infoWidget(),
                       ),
                     ),
-                  ]
-              ),
+                  ),
+                ),
+              ]),
             ),
-          )
-      );
-    }else{
+          ));
+    } else {
+      // show the page in the health info page
       return SingleChildScrollView(
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsetsDirectional.fromSTEB(10, 10, 10, 10),
-            child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 10),
-                    child:Text('Peak Flow', style: GoogleFonts.outfit(
-                      textStyle: const TextStyle(
-                        fontWeight: FontWeight.normal,
-                        fontSize: 24,
-                        color: Style.primaryText,
-                      ),
-                    ),),
+            child: Column(children: [
+              Padding(
+                padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 10),
+                child: Text(
+                  'Peak Flow',
+                  style: GoogleFonts.outfit(
+                    textStyle: const TextStyle(
+                      fontWeight: FontWeight.normal,
+                      fontSize: 24,
+                      color: Style.primaryText,
+                    ),
                   ),
-                  Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
-                    child: Material(
-                      color: Colors.transparent,
-                      elevation: 2,
-                      shape: RoundedRectangleBorder(
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
+                child: Material(
+                  color: Colors.transparent,
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Container(
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                            color: Style.secondaryBackground
-                        ),
-                        child:
-                        Padding(
-                          padding: const EdgeInsetsDirectional.fromSTEB(
-                              20, 0, 20, 0),
-                          child:
-                              infoWidget(),
-                        ),
-                      ),
+                        color: Style.secondaryBackground),
+                    child: Padding(
+                      padding:
+                          const EdgeInsetsDirectional.fromSTEB(20, 0, 20, 0),
+                      child: infoWidget(),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
-                    child: Material(
-                      borderRadius: const BorderRadius.all(
-                        Radius.circular(16),
-                      ),
-                      elevation: 2,
-                      surfaceTintColor: Colors.transparent,
-                      color: Style.secondaryBackground,
-                      clipBehavior: Clip.antiAliasWithSaveLayer,
-                      child: InkWell(
-                        // splashColor: Style.primaryColor,
-                        onTap: () {
-                          _showAddPeakFlowDialog(context);
-                        },
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 20.0,
-                              vertical: 10.0), // Add padding if necessary
-                          leading: const Icon(Icons.health_and_safety_outlined,
-                              size: 50, color: Style.pef),
-                          title: Text(
-                            'Add Peak Flow',
-                            style: GoogleFonts.outfit(
-                              textStyle: const TextStyle(
-                                fontWeight: FontWeight.normal,
-                                // fontSize: 16,
-                                color: Style.primaryText,
-                              ),
-                            ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
+                child: Material(
+                  borderRadius: const BorderRadius.all(
+                    Radius.circular(16),
+                  ),
+                  elevation: 2,
+                  surfaceTintColor: Colors.transparent,
+                  color: Style.secondaryBackground,
+                  clipBehavior: Clip.antiAliasWithSaveLayer,
+                  child: InkWell(
+                    // splashColor: Style.primaryColor,
+                    onTap: () {
+                      showAddPeakFlowDialog(context);
+                    },
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 20.0,
+                          vertical: 10.0), // Add padding if necessary
+                      leading: const Icon(Icons.health_and_safety_outlined,
+                          size: 50, color: Style.pef),
+                      title: Text(
+                        'Add Peak Flow',
+                        style: GoogleFonts.outfit(
+                          textStyle: const TextStyle(
+                            fontWeight: FontWeight.normal,
+                            // fontSize: 16,
+                            color: Style.primaryText,
                           ),
-                          trailing: const Icon(Icons.arrow_forward_ios,
-                              color: Style.secondaryText, size: 20), // Right arrow icon
                         ),
                       ),
+                      trailing: const Icon(Icons.arrow_forward_ios,
+                          color: Style.secondaryText,
+                          size: 20), // Right arrow icon
                     ),
                   ),
-                ]
-            ),
+                ),
+              ),
+            ]),
           ),
         ),
       );

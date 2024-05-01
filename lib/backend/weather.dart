@@ -7,56 +7,61 @@ import 'package:http/http.dart' as http;
 import 'notifications.dart';
 
 // get API keys from api_key.dart
-WeatherFactory wf = WeatherFactory(openWeatherApiKey );
+WeatherFactory wf = WeatherFactory(openWeatherApiKey);
 AirQuality airQuality = AirQuality(airQualityApiKey);
 
 // check if GPS service is enabled
-void enableGPSService()async {
+void enableGPSService() async {
   bool serviceStatus = await Geolocator.isLocationServiceEnabled();
-  if(serviceStatus){
+  if (serviceStatus) {
     print("GPS service is enabled");
-  }else{
+  } else {
     print("GPS service is disabled.");
   }
 }
+
 // check if GPS permission is granted
-void checkPermission()async{
+void checkPermission() async {
   LocationPermission permission = await Geolocator.checkPermission();
   if (permission == LocationPermission.denied) {
     permission = await Geolocator.requestPermission();
     if (permission == LocationPermission.denied) {
       print('Location permissions are denied');
-    }else if(permission == LocationPermission.deniedForever){
+    } else if (permission == LocationPermission.deniedForever) {
       print('Location permissions are permanently denied');
-    }else{
+    } else {
       print('GPS Location service is granted');
     }
-  }else{
+  } else {
     print('GPS Location permission granted.');
   }
-
 }
-
 
 // get weather data
 Future<Weather> getWeatherData() async {
-  Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-  Weather w = await wf.currentWeatherByLocation(position.latitude, position.longitude);
+  Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high);
+  Weather w =
+      await wf.currentWeatherByLocation(position.latitude, position.longitude);
   return w;
 }
 
 // get air quality data
-Future<AirQualityData> getAirQualityData() async{
-  Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-  AirQualityData airQualityData = await airQuality.feedFromGeoLocation(position.latitude, position.longitude);
+Future<AirQualityData> getAirQualityData() async {
+  Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high);
+  AirQualityData airQualityData = await airQuality.feedFromGeoLocation(
+      position.latitude, position.longitude);
   return airQualityData;
 }
 
 // get air pollution data
 Future<Map<String, dynamic>> getAirPollutionData() async {
-  Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+  Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high);
   final response = await http.get(
-    Uri.parse('http://api.openweathermap.org/data/2.5/air_pollution?lat=${position.latitude}&lon=${position.longitude}&appid=$openWeatherApiKey'),
+    Uri.parse(
+        'http://api.openweathermap.org/data/2.5/air_pollution?lat=${position.latitude}&lon=${position.longitude}&appid=$openWeatherApiKey'),
   );
 
   if (response.statusCode == 200) {
@@ -75,30 +80,26 @@ Future<Map<String, dynamic>> getAirPollutionData() async {
 }
 
 // get AQI
-Future<String> getAirQualityIndex()async {
+Future<String> getAirQualityIndex() async {
   AirQualityData airQuality = await getAirQualityData();
-  if (airQuality.airQualityIndex>100){
+  if (airQuality.airQualityIndex > 100) {
     print('Unhealthy Air quality index');
-    NotificationServices().showNotification(5,airQuality.airQualityIndex.toString());
+    NotificationServices()
+        .showNotification(5, airQuality.airQualityIndex.toString());
   }
   return airQuality.airQualityIndex.toString();
 }
 
 // get temperature
-Future<String> getTemperature()async {
+Future<String> getTemperature() async {
   Weather weather = await getWeatherData();
   String temperature = weather.temperature.toString().split(' ')[0];
   return temperature;
 }
 
 // get humidity
-Future<String> getHumidity()async {
+Future<String> getHumidity() async {
   Weather weather = await getWeatherData();
   String humidity = weather.humidity.toString().split(' ')[0];
   return humidity;
 }
-
-
-
-
-

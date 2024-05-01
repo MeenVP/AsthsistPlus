@@ -5,13 +5,11 @@ import 'package:asthsist_plus/style.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'calendar_page.dart';
-import 'chart_page.dart';
 import 'health_info.dart';
 
 class NavigationBarApp extends StatefulWidget {
   final int initialPageIndex;
-
-  const NavigationBarApp({Key? key, this.initialPageIndex = 0}) : super(key: key);
+  const NavigationBarApp({super.key, this.initialPageIndex = 0});
 
   @override
   State<NavigationBarApp> createState() => _NavigationState();
@@ -24,6 +22,13 @@ class _NavigationState extends State<NavigationBarApp> {
     super.initState();
     currentPageIndex = widget.initialPageIndex;
   }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  // This list will hold the widgets for each page
   static const List<Widget> _widgetOptions = <Widget>[
     HomePage(),
     CalendarPage(),
@@ -39,8 +44,7 @@ class _NavigationState extends State<NavigationBarApp> {
       body: Center(
         child: _widgetOptions.elementAt(currentPageIndex),
       ),
-      bottomNavigationBar:
-      BottomNavigationBar(
+      bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         showUnselectedLabels: true,
         showSelectedLabels: true,
@@ -69,21 +73,28 @@ class _NavigationState extends State<NavigationBarApp> {
           ),
         ),
         items: const <BottomNavigationBarItem>[
+          // Home Page
           BottomNavigationBarItem(
             activeIcon: Icon(Icons.home),
             icon: Icon(Icons.home_outlined),
             label: 'Home',
           ),
+
+          // Calendar Page
           BottomNavigationBarItem(
             activeIcon: Icon(Icons.date_range),
             icon: Icon(Icons.date_range_outlined),
             label: 'Calendar',
           ),
+
+          // Health Info Page
           BottomNavigationBarItem(
             activeIcon: Icon(Icons.monitor_heart),
             icon: Icon(Icons.monitor_heart_outlined),
             label: 'Health',
           ),
+
+          // Settings Page
           BottomNavigationBarItem(
             activeIcon: Icon(Icons.manage_accounts),
             icon: Icon(Icons.manage_accounts_outlined),

@@ -1,6 +1,3 @@
-import 'package:asthsist_plus/pages/home_page.dart';
-import 'package:asthsist_plus/pages/navigation_bar.dart';
-import 'package:asthsist_plus/pages/settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -11,10 +8,11 @@ import '../style.dart';
 class EditProfilePage extends StatefulWidget {
   @override
   _EditProfilePageState createState() => _EditProfilePageState();
-  const EditProfilePage({Key? key}) : super(key: key);
+  const EditProfilePage({super.key});
   // static const String routeName = '/edit-profile';
 }
 
+// This widget will display a date picker when tapped
 class DOBInputField extends StatelessWidget {
   final TextEditingController dobController;
   final String label;
@@ -22,13 +20,13 @@ class DOBInputField extends StatelessWidget {
 
   final String showDate;
 
-  DOBInputField({
-    Key? key,
+  const DOBInputField({
+    super.key,
     required this.dobController,
     required this.label,
     required this.showDate,
     this.icon = Icons.calendar_today, // Default icon if one is not provided
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -61,11 +59,8 @@ class DOBInputField extends StatelessWidget {
   }
 }
 
-
-
 class _EditProfilePageState extends State<EditProfilePage> {
-
-
+  // Initialize the text controllers for the input fields
   String _gender = 'Male';
   bool _isSmoker = false;
   final TextEditingController _firstNameController = TextEditingController();
@@ -81,9 +76,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
     return userDetails;
   }
 
-
-@override
+  @override
   void initState() {
+    // Fetch the user's details and update the text controllers
     super.initState();
     getUserDetails().then((userData) {
       _firstNameController.text = userData['firstname'];
@@ -96,136 +91,124 @@ class _EditProfilePageState extends State<EditProfilePage> {
       print(userData['dob']);
       setState(() {
         _gender = userData['gender'];
-        _isSmoker = userData['smoker'];// Set _gender to the user's current gender
+        _isSmoker =
+            userData['smoker']; // Set _gender to the user's current gender
       });
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         surfaceTintColor: Colors.transparent,
-        title: Text('Edit Profile'),
+        title: const Text('Edit Profile'),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+            icon: const Icon(Icons.arrow_back),
             onPressed: () {
               Navigator.pop(context);
-            }
-        ),
+            }),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: <Widget>[
-            SizedBox(height: 40),
+            const SizedBox(height: 40),
             TextFormField(
               controller: _firstNameController,
               decoration: _inputDecoration(
-                'Firstname', 'Please enter a valid name',
-                Icons.person
-              ),
+                  'Firstname', 'Please enter a valid name', Icons.person),
             ),
-            SizedBox(height: 15.0),
+            const SizedBox(height: 15.0),
             TextFormField(
               controller: _lastNameController,
-              decoration: _inputDecoration(
-                'Lastname', 'Please enter a valid name',
-                Icons.person_outline
-              ),
+              decoration: _inputDecoration('Lastname',
+                  'Please enter a valid name', Icons.person_outline),
             ),
-            SizedBox(height: 15.0),
+            const SizedBox(height: 15.0),
             DOBInputField(
               dobController: _dobController,
               label: 'Date of Birth',
               showDate: _dobController.text,
             ),
-            SizedBox(height: 15.0),
+            const SizedBox(height: 15.0),
             Row(
               children: <Widget>[
                 Expanded(
                   child: TextFormField(
                     controller: _weightController,
-                    decoration: _inputDecoration(
-                      'Weight', 'Weight in kg',
-                      null
-                    ),
+                    decoration:
+                        _inputDecoration('Weight', 'Weight in kg', null),
                   ),
                 ),
-                SizedBox(width: 15.0),
+                const SizedBox(width: 15.0),
                 Expanded(
                   child: TextFormField(
                     controller: _heightController,
-                    decoration: _inputDecoration(
-                      'Height', 'Height in cm',
-                      null
-                    ),
+                    decoration:
+                        _inputDecoration('Height', 'Height in cm', null),
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 15.0),
+            const SizedBox(height: 15.0),
             TextFormField(
               controller: _peakFlowController,
-              decoration: _inputDecoration(
-                'Personal best Peak Flow', 'Please enter a valid number',
-                Icons.fitness_center
-              ),
+              decoration: _inputDecoration('Personal best Peak Flow',
+                  'Please enter a valid number', Icons.fitness_center),
             ),
-            SizedBox(height: 15.0),
+            const SizedBox(height: 15.0),
             TextFormField(
               controller: _maxHRController,
               decoration: _inputDecoration(
-                  'Max heart rate(optional)', 'bpm',
-                  Icons.monitor_heart
-              ),
+                  'Max heart rate(optional)', 'bpm', Icons.monitor_heart),
             ),
-            SizedBox(height: 24.0),
+            const SizedBox(height: 24.0),
             _genderRadio(),
-            SizedBox(height: 24.0),
+            const SizedBox(height: 24.0),
             _smokerCheckbox(),
-            SizedBox(height: 24.0),
+            const SizedBox(height: 24.0),
             ElevatedButton(
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 10.0),
-                child: Text(
-                  'Save Change',
-                  style: TextStyle(fontSize: 20),
-                ),
-              ),
               style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.white, backgroundColor: Colors.deepPurple, shape: StadiumBorder(),
-                minimumSize: Size(double.infinity, 50), // Set a larger height
+                foregroundColor: Colors.white,
+                backgroundColor: Colors.deepPurple,
+                shape: const StadiumBorder(),
+                minimumSize:
+                    const Size(double.infinity, 50), // Set a larger height
               ),
               onPressed: () {
                 showDialog(
                   context: context,
                   builder: (BuildContext dialogContext) {
                     return AlertDialog(
-                      title: Text('Confirm'),
-                      content: Text('Are you sure you want to save the changes?'),
+                      title: const Text('Confirm'),
+                      content: const Text(
+                          'Are you sure you want to save the changes?'),
                       actions: <Widget>[
                         TextButton(
-                          child: Text('Cancel'),
+                          child: const Text('Cancel'),
                           onPressed: () {
-                            Navigator.of(dialogContext).pop(); // Dismiss the dialog
+                            Navigator.of(dialogContext)
+                                .pop(); // Dismiss the dialog
                           },
                         ),
                         TextButton(
-                          child: Text('Save'),
+                          child: const Text('Save'),
                           onPressed: () {
                             FirebaseService().updateUserDetails(
                               firstname: _firstNameController.text,
                               lastname: _lastNameController.text,
                               dob: _dobController.text,
-                              gender: _gender,  // Assuming the gender is not changed
+                              gender:
+                                  _gender, // Assuming the gender is not changed
                               weight: _weightController.text,
                               height: _heightController.text,
                               bestpef: _peakFlowController.text,
                               smoker: _isSmoker,
                               maxHR: _maxHRController.text,
-
                             );
-                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                            ScaffoldMessenger.of(context)
+                                .showSnackBar(const SnackBar(
                               content: Text("Profile updated successfully!"),
                             ));
                             Navigator.pop(context);
@@ -238,6 +221,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   },
                 );
               },
+              child: const Padding(
+                padding: EdgeInsets.symmetric(vertical: 10.0),
+                child: Text(
+                  'Save Change',
+                  style: TextStyle(fontSize: 20),
+                ),
+              ),
             ),
           ],
         ),
@@ -245,6 +235,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 
+  // Helper function to create input decoration for text fields
   InputDecoration _inputDecoration(String label, String hint, IconData? icon) {
     return InputDecoration(
       labelText: label,
@@ -265,7 +256,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 
-  InputDecoration _inputDecorationWithSuffix(String label, String hint, IconData? prefixIcon, IconData suffixIcon) {
+  // Helper function to create input decoration for text fields with a suffix icon
+  InputDecoration _inputDecorationWithSuffix(
+      String label, String hint, IconData? prefixIcon, IconData suffixIcon) {
     return InputDecoration(
       labelText: label,
       hintText: hint,
@@ -286,6 +279,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 
+  // Helper function to create radio buttons
   Widget _genderRadio() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -299,7 +293,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             });
           },
         ),
-        Text('Male'),
+        const Text('Male'),
         Radio(
           value: 'Female',
           groupValue: _gender,
@@ -309,12 +303,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
             });
           },
         ),
-        Text('Female'),
+        const Text('Female'),
       ],
     );
   }
 
-  Widget _smokerCheckbox(){
+  // Helper function to create a checkbox
+  Widget _smokerCheckbox() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -326,11 +321,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
             });
           },
         ),
-        Text('Are you a smoker?'),
+        const Text('Are you a smoker?'),
       ],
     );
   }
-
 
   @override
   void dispose() {
@@ -340,6 +334,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     _weightController.dispose();
     _heightController.dispose();
     _peakFlowController.dispose();
+    _maxHRController.dispose();
     super.dispose();
   }
 }

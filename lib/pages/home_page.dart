@@ -1,29 +1,29 @@
 import 'package:asthsist_plus/backend/firebase.dart';
-import 'package:asthsist_plus/backend/weather.dart';
 import 'package:asthsist_plus/pages/asthma_control_test_page.dart';
 import 'package:asthsist_plus/pages/pef_info.dart';
 import 'package:asthsist_plus/style.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import '../backend/sklearn.dart';
-import 'health_info.dart';
 import 'navigation_bar.dart';
 import 'notification_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
-
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
+  //show a dialog to add an asthma attack
   void _showAddAttackDialog(BuildContext context) {
     String? errorMessage = '';
     bool error = false;
@@ -48,6 +48,7 @@ class _HomePageState extends State<HomePage> {
       }
     }
 
+    // Declare a widget to show the error message
     Widget showError() {
       return Text(
         errorMessage!,
@@ -64,8 +65,10 @@ class _HomePageState extends State<HomePage> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return StatefulBuilder( // Add this line
-          builder: (BuildContext context, StateSetter setState) { // Modify this line
+        return StatefulBuilder(
+          // Add this line
+          builder: (BuildContext context, StateSetter setState) {
+            // Modify this line
             return AlertDialog(
               backgroundColor: Style.primaryBackground,
               surfaceTintColor: Colors.transparent,
@@ -77,7 +80,8 @@ class _HomePageState extends State<HomePage> {
                     color: Style.primaryColor),
                 // color: Colors.red,
                 child: Padding(
-                  padding: EdgeInsetsDirectional.all(20), // Add horizontal padding
+                  padding: const EdgeInsetsDirectional.all(
+                      20), // Add horizontal padding
                   child: Text(
                     'Add Attack',
                     style: GoogleFonts.outfit(
@@ -97,21 +101,22 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     showError(),
                     ...severities.map((severity) => RadioListTile<String>(
-                      title: Text(severity),
-                      value: severity,
-                      groupValue: selectedSeverity,
-                      onChanged: (String? value) {
-                        setState(() {
-                          selectedSeverity = value!;
-                        });
-                      },
-                    )).toList(),
+                          title: Text(severity),
+                          value: severity,
+                          groupValue: selectedSeverity,
+                          onChanged: (String? value) {
+                            setState(() {
+                              selectedSeverity = value!;
+                            });
+                          },
+                        )),
                   ],
                 ),
               ),
               actions: <Widget>[
                 TextButton(
-                  child: Text('Cancel',
+                  child: Text(
+                    'Cancel',
                     style: GoogleFonts.outfit(
                       textStyle: const TextStyle(
                         fontWeight: FontWeight.normal,
@@ -125,7 +130,8 @@ class _HomePageState extends State<HomePage> {
                   },
                 ),
                 TextButton(
-                  child: Text('Add',
+                  child: Text(
+                    'Add',
                     style: GoogleFonts.outfit(
                       textStyle: const TextStyle(
                         fontWeight: FontWeight.normal,
@@ -150,6 +156,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  // Show a dialog to add a peak flow value
   void _showAddPeakFlowDialog(BuildContext context) {
     TextEditingController peakFlowController = TextEditingController();
     String? errorMessage = '';
@@ -167,6 +174,7 @@ class _HomePageState extends State<HomePage> {
       }
     }
 
+    // Declare a widget to show the error message
     Widget showError() {
       return Text(
         errorMessage!,
@@ -187,14 +195,15 @@ class _HomePageState extends State<HomePage> {
           backgroundColor: Style.primaryBackground,
           surfaceTintColor: Colors.transparent,
           title: Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
                 borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(20),
                     topRight: Radius.circular(20)),
                 color: Style.primaryColor),
             // color: Colors.red,
             child: Padding(
-              padding: EdgeInsetsDirectional.all(20), // Add horizontal padding
+              padding:
+                  const EdgeInsetsDirectional.all(20), // Add horizontal padding
               child: Text(
                 'Add Peak Flow Data',
                 style: GoogleFonts.outfit(
@@ -228,7 +237,8 @@ class _HomePageState extends State<HomePage> {
           ),
           actions: <Widget>[
             TextButton(
-              child: Text('Cancel',
+              child: Text(
+                'Cancel',
                 style: GoogleFonts.outfit(
                   textStyle: const TextStyle(
                     fontWeight: FontWeight.normal,
@@ -242,7 +252,8 @@ class _HomePageState extends State<HomePage> {
               },
             ),
             TextButton(
-              child: Text('Add',
+              child: Text(
+                'Add',
                 style: GoogleFonts.outfit(
                   textStyle: const TextStyle(
                     fontWeight: FontWeight.normal,
@@ -257,7 +268,9 @@ class _HomePageState extends State<HomePage> {
                 await addPeakFlow();
                 errorMessage == '' ? error = false : error = true;
                 navigator.push(
-                  MaterialPageRoute(builder: (context) => const PeakFlowInfoPage(showBackButton: true)),
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          const PeakFlowInfoPage(showBackButton: true)),
                 );
               },
             ),
@@ -266,27 +279,31 @@ class _HomePageState extends State<HomePage> {
       },
     );
   }
-  Widget showPEFPrediction(){
-    return FutureBuilder<Map<String,dynamic>>(
+
+  // Show a peak flow prediction
+  Widget showPEFPrediction() {
+    return FutureBuilder<Map<String, dynamic>>(
       future: FirebaseService().getLatestPrediction(),
-      builder: (BuildContext context, AsyncSnapshot<Map<String,dynamic>> snapshot) {
+      builder:
+          (BuildContext context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const CircularProgressIndicator(
             color: Style.primaryColor,
-          );  // or your custom loader
+          ); // or your custom loader
         } else if (snapshot.hasError) {
           // return
           return Container(
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(topLeft: Radius.circular(16), topRight: Radius.circular(16)),
+            decoration: const BoxDecoration(
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(16),
+                    topRight: Radius.circular(16)),
                 color: Style.primaryColor),
             child: Column(
               children: [
                 Align(
                   alignment: const AlignmentDirectional(-1, -1),
                   child: Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(
-                        16, 10, 0, 0),
+                    padding: const EdgeInsetsDirectional.fromSTEB(16, 10, 0, 0),
                     child: Text(
                       'Your current risk',
                       style: GoogleFonts.outfit(
@@ -302,8 +319,7 @@ class _HomePageState extends State<HomePage> {
                 Align(
                   alignment: const AlignmentDirectional(0, 0),
                   child: Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(
-                        0, 32, 0, 32),
+                    padding: const EdgeInsetsDirectional.fromSTEB(0, 32, 0, 32),
                     child: Text(
                       'Error: ${snapshot.error}',
                       style: GoogleFonts.outfit(
@@ -319,8 +335,7 @@ class _HomePageState extends State<HomePage> {
                 Align(
                   alignment: const AlignmentDirectional(1, 1),
                   child: Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(
-                        0, 0, 10, 10),
+                    padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 10, 10),
                     child: Text(
                       '-_-\'',
                       textAlign: TextAlign.end,
@@ -340,7 +355,8 @@ class _HomePageState extends State<HomePage> {
         } else {
           Map<String, dynamic>? data = snapshot.data;
           var prediction = data?['value'];
-          var updateTime = DateFormat('HH:mm, dd MMM yyyy').format(data?['datetime']);
+          var updateTime =
+              DateFormat('HH:mm, dd MMM yyyy').format(data?['datetime']);
           String riskLevel;
           String recommendation;
           double fontSize = 48;
@@ -371,15 +387,16 @@ class _HomePageState extends State<HomePage> {
 
           return Container(
             decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(topLeft: Radius.circular(16), topRight: Radius.circular(16)),
+                borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(16),
+                    topRight: Radius.circular(16)),
                 color: riskColor),
             child: Column(
               children: [
                 Align(
                   alignment: const AlignmentDirectional(-1, -1),
                   child: Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(
-                        16, 10, 0, 0),
+                    padding: const EdgeInsetsDirectional.fromSTEB(16, 10, 0, 0),
                     child: Text(
                       'Your current risk',
                       style: GoogleFonts.outfit(
@@ -395,8 +412,7 @@ class _HomePageState extends State<HomePage> {
                 Align(
                   alignment: const AlignmentDirectional(0, 0),
                   child: Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(
-                        0, 32, 0, 32),
+                    padding: const EdgeInsetsDirectional.fromSTEB(0, 32, 0, 32),
                     child: Text(
                       riskLevel,
                       style: GoogleFonts.outfit(
@@ -412,8 +428,7 @@ class _HomePageState extends State<HomePage> {
                 Align(
                   alignment: const AlignmentDirectional(1, 1),
                   child: Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(
-                        0, 0, 10, 10),
+                    padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 10, 10),
                     child: Text(
                       updateTime.toString(),
                       textAlign: TextAlign.end,
@@ -435,7 +450,8 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void _showAddMedicationDialog(BuildContext context) async{
+  // Show a dialog to add a medication
+  void _showAddMedicationDialog(BuildContext context) async {
     // Declare a variable to store the selected medicine name
     String? selectedMedicine;
     List<String> medicationNames = await FirebaseService().getMedicationNames();
@@ -486,14 +502,15 @@ class _HomePageState extends State<HomePage> {
           backgroundColor: Style.primaryBackground,
           surfaceTintColor: Colors.transparent,
           title: Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
                 borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(20),
                     topRight: Radius.circular(20)),
                 color: Style.primaryColor),
             // color: Colors.red,
             child: Padding(
-              padding: EdgeInsetsDirectional.all(20), // Add horizontal padding
+              padding:
+                  const EdgeInsetsDirectional.all(20), // Add horizontal padding
               child: Text(
                 'Add Medication',
                 style: GoogleFonts.outfit(
@@ -515,7 +532,7 @@ class _HomePageState extends State<HomePage> {
                 // Add a text field for the user to type the medicine name
                 TextField(
                   controller: medicationController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Enter medicine name',
                   ), // If the user types a medicine name that is not in the list, ask if they want to add it
                 ),
@@ -523,7 +540,8 @@ class _HomePageState extends State<HomePage> {
                 Padding(
                   padding: const EdgeInsetsDirectional.fromSTEB(0, 8, 0, 0),
                   child: Container(
-                    padding: EdgeInsets.only(left: 10, right: 10), // Add padding around the dropdown
+                    padding: const EdgeInsets.only(
+                        left: 10, right: 10), // Add padding around the dropdown
                     decoration: BoxDecoration(
                       // color: Colors.white, // Background color of dropdown button
                       borderRadius: BorderRadius.circular(8), // Rounded corners
@@ -531,11 +549,13 @@ class _HomePageState extends State<HomePage> {
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton<String>(
                         value: selectedMedicine,
-                        hint: Text('Or choose a medicine'),
-                        items: medicationNames.map((name) => DropdownMenuItem<String>(
-                          value: name,
-                          child: Text(name),
-                        )).toList(),
+                        hint: const Text('Or choose a medicine'),
+                        items: medicationNames
+                            .map((name) => DropdownMenuItem<String>(
+                                  value: name,
+                                  child: Text(name),
+                                ))
+                            .toList(),
                         onChanged: (value) {
                           // Update the selected medicine name
                           medicationController.text = value!;
@@ -551,7 +571,8 @@ class _HomePageState extends State<HomePage> {
           ),
           actions: <Widget>[
             TextButton(
-              child: Text('Cancel',
+              child: Text(
+                'Cancel',
                 style: GoogleFonts.outfit(
                   textStyle: const TextStyle(
                     fontWeight: FontWeight.normal,
@@ -565,7 +586,8 @@ class _HomePageState extends State<HomePage> {
               },
             ),
             TextButton(
-              child: Text('Add',
+              child: Text(
+                'Add',
                 style: GoogleFonts.outfit(
                   textStyle: const TextStyle(
                     fontWeight: FontWeight.normal,
@@ -576,45 +598,49 @@ class _HomePageState extends State<HomePage> {
               ),
               onPressed: () async {
                 // Add the selected or typed medicine to the database
-                  if (!medicationNames.contains(medicationController.text)) {
-                    await showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          title: Text('Add new medicine'),
-                          content: Text(
-                              'The medicine ${medicationController.text} is not in the list. Do you want to add it?'),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                // Add the new medicine to the database
-                                FirebaseService().addMedicationName(medicationController.text);
-                                addMedication(selectedMedicine ?? medicationController.text);
-                                // Close the dialog
-                                Navigator.of(context).pop();
-                                setState(() {
-                                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                                    content: Text("Medicine added successfully!"),
-                                  ));
-                                });
-                              },
-                              child: Text('Yes'),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                // Close the dialog
-                                addMedication(selectedMedicine ?? medicationController.text);
-                                Navigator.of(context).pop();
-                              },
-                              child: Text('No'),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  }else{
-                    addMedication(selectedMedicine ?? medicationController.text);
-                  }
+                if (!medicationNames.contains(medicationController.text)) {
+                  await showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: const Text('Add new medicine'),
+                        content: Text(
+                            'The medicine ${medicationController.text} is not in the list. Do you want to add it?'),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              // Add the new medicine to the database
+                              FirebaseService()
+                                  .addMedicationName(medicationController.text);
+                              addMedication(selectedMedicine ??
+                                  medicationController.text);
+                              // Close the dialog
+                              Navigator.of(context).pop();
+                              setState(() {
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(const SnackBar(
+                                  content: Text("Medicine added successfully!"),
+                                ));
+                              });
+                            },
+                            child: const Text('Yes'),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              // Close the dialog
+                              addMedication(selectedMedicine ??
+                                  medicationController.text);
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text('No'),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                } else {
+                  addMedication(selectedMedicine ?? medicationController.text);
+                }
                 // Close the dialog
               },
             ),
@@ -623,8 +649,6 @@ class _HomePageState extends State<HomePage> {
       },
     );
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -679,7 +703,8 @@ class _HomePageState extends State<HomePage> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => NotificationsPage()),
+                  MaterialPageRoute(
+                      builder: (context) => const NotificationsPage()),
                 );
               },
             ),
@@ -769,14 +794,18 @@ class _HomePageState extends State<HomePage> {
                                 GestureDetector(
                                   onTap: () {
                                     print('Tapped');
-                                    Navigator. push(
-                                      context,
-                                      MaterialPageRoute(builder: (context) => const NavigationBarApp(initialPageIndex: 2),
-                                    ));
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const NavigationBarApp(
+                                                  initialPageIndex: 2),
+                                        ));
                                   },
                                   child: Padding(
-                                    padding: const EdgeInsetsDirectional.fromSTEB(
-                                        10, 10, 10, 10),
+                                    padding:
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            10, 10, 10, 10),
                                     child: Column(
                                       mainAxisSize: MainAxisSize.max,
                                       crossAxisAlignment:
@@ -787,49 +816,53 @@ class _HomePageState extends State<HomePage> {
                                           size: 24,
                                           color: Style.heartrate,
                                         ),
-                                        FutureBuilder<Map<String,dynamic>>(
-                                            future: FirebaseService()
-                                                .getLatestHR(),
+                                        FutureBuilder<Map<String, dynamic>>(
+                                            future:
+                                                FirebaseService().getLatestHR(),
                                             builder: (context, snapshot) {
-                                              var heartRate = snapshot.data?['value'].toString().split('.');
-                                  
+                                              var heartRate = snapshot
+                                                  .data?['value']
+                                                  .toString()
+                                                  .split('.');
+
                                               if (snapshot.connectionState ==
                                                   ConnectionState.done) {
                                                 if (snapshot.data == null) {
-                                                return Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          top: 6, bottom: 6),
-                                                  child: Text(
-                                                    'No Data',
-                                                    style: GoogleFonts.outfit(
-                                                      textStyle:
-                                                          const TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .normal,
-                                                              fontSize: 9,
-                                                              color: Style
-                                                                  .primaryText),
+                                                  return Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            top: 6, bottom: 6),
+                                                    child: Text(
+                                                      'No Data',
+                                                      style: GoogleFonts.outfit(
+                                                        textStyle:
+                                                            const TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .normal,
+                                                                fontSize: 9,
+                                                                color: Style
+                                                                    .primaryText),
+                                                      ),
                                                     ),
-                                                  ),
-                                                );
-                                              } else {
+                                                  );
+                                                } else {
                                                   // If the Future is complete, display the data
 
                                                   return Text(
                                                       '${heartRate?[0]}',
                                                       style: GoogleFonts.outfit(
-                                                        textStyle: const TextStyle(
-                                                            fontWeight:
-                                                            FontWeight.normal,
-                                                            fontSize: 21,
-                                                            color: Style
-                                                                .primaryText),
-                                                      )
-                                                  );
+                                                        textStyle:
+                                                            const TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .normal,
+                                                                fontSize: 21,
+                                                                color: Style
+                                                                    .primaryText),
+                                                      ));
                                                 }
-                                              }else{
+                                              } else {
                                                 return const CircularProgressIndicator(
                                                   color: Style.primaryColor,
                                                 );
@@ -908,7 +941,8 @@ class _HomePageState extends State<HomePage> {
                                       const Icon(Icons.thermostat,
                                           size: 24, color: Style.weather),
                                       FutureBuilder<String>(
-                                          future: FirebaseService().getLatestTemperature(),
+                                          future: FirebaseService()
+                                              .getLatestTemperature(),
                                           builder: (context, snapshot) {
                                             if (snapshot.connectionState ==
                                                 ConnectionState.done) {
@@ -938,17 +972,16 @@ class _HomePageState extends State<HomePage> {
                                                   style: GoogleFonts.outfit(
                                                     textStyle: const TextStyle(
                                                         fontWeight:
-                                                        FontWeight.normal,
+                                                            FontWeight.normal,
                                                         fontSize: 21,
-                                                        color: Style
-                                                            .primaryText),
+                                                        color:
+                                                            Style.primaryText),
                                                   ),
                                                 );
                                               }
                                             } else {
                                               return const CircularProgressIndicator(
                                                 color: Style.primaryColor,
-
                                               );
                                             }
                                           }),
@@ -973,7 +1006,8 @@ class _HomePageState extends State<HomePage> {
                                       const Icon(Icons.air,
                                           size: 24, color: Style.air),
                                       FutureBuilder<String>(
-                                          future: FirebaseService().getLatestAQI(),
+                                          future:
+                                              FirebaseService().getLatestAQI(),
                                           builder: (context, snapshot) {
                                             if (snapshot.connectionState ==
                                                 ConnectionState.done) {
@@ -1004,10 +1038,10 @@ class _HomePageState extends State<HomePage> {
                                                   style: GoogleFonts.outfit(
                                                     textStyle: const TextStyle(
                                                         fontWeight:
-                                                        FontWeight.normal,
+                                                            FontWeight.normal,
                                                         fontSize: 21,
-                                                        color: Style
-                                                            .primaryText),
+                                                        color:
+                                                            Style.primaryText),
                                                   ),
                                                 );
                                               }
@@ -1040,8 +1074,8 @@ class _HomePageState extends State<HomePage> {
                                           size: 24,
                                           color: Style.pef),
                                       FutureBuilder(
-                                          future: FirebaseService()
-                                              .getLatestPEF(),
+                                          future:
+                                              FirebaseService().getLatestPEF(),
                                           builder: (context, snapshot) {
                                             var value = snapshot.data?['data'];
                                             if (snapshot.connectionState ==
@@ -1268,7 +1302,8 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                         trailing: const Icon(Icons.arrow_forward_ios,
-                            color: Style.secondaryText, size: 20), // Right arrow icon
+                            color: Style.secondaryText,
+                            size: 20), // Right arrow icon
                       ),
                     ),
                   ),
