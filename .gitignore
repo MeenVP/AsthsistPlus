@@ -47,3 +47,4 @@ app.*.map.json
 /ios/Runner/GoogleService-Info.plist
 /lib/backend/weather.dart
 /lib/.env
+/lib/backend/api_key.dart
