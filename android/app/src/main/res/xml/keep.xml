@@ -1,0 +1,10 @@
+<resources xmlns:tools="http://schemas.android.com/tools"
+           tools:keep="
+           @drawable/ic_stat_name,
+           @drawable/launcher_notification,
+           @drawable-hdpi/ic_stat_name,
+           @drawable-mdpi/ic_stat_name,
+           @drawable-xhdpi/ic_stat_name,
+           @drawable-xxhdpi/ic_stat_name,
+           @drawable-xxxhdpi/ic_stat_name,
+"/>
