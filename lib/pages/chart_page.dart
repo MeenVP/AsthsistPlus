@@ -634,24 +634,8 @@ class _HeartRateChartState extends State<HeartRateChart>
 
   // Handles custom formatting for bottom axis titles based on the tab and data.
   Widget bottomTitleWidgets(double value, TitleMeta meta) {
-    const style = TextStyle(
-      color: Color(0xff68737d),
-      fontWeight: FontWeight.bold,
-      fontSize: 13,
-    );
     var label = '';
 
-    // var dateTime = DateTime.fromMillisecondsSinceEpoch(value.toInt());
-    // var formattedTime = DateFormat('HH:mm').format(dateTime); // Example: 15:04
-    //
-    // var label = '';
-    // if (_tabController?.index == 0) { // Day view
-    //   if (value == heartRateData.first.x) {
-    //     label = '$formattedTime';
-    //   }
-    // } else{
-    //   label = '';
-    // }
     DateTime time = DateTime.fromMillisecondsSinceEpoch(value.toInt());
     switch (time.hour) {
       case 0:
@@ -856,11 +840,6 @@ class _HeartRateChartState extends State<HeartRateChart>
   }
 
   Widget getWeekdayTitle(double value, TitleMeta meta) {
-    const style = TextStyle(
-      color: Color(0xff68737d),
-      fontWeight: FontWeight.bold,
-      fontSize: 13,
-    );
     String weekday;
     switch (value.toInt()) {
       case 0:

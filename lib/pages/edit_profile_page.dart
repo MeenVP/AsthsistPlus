@@ -256,28 +256,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 
-  // Helper function to create input decoration for text fields with a suffix icon
-  InputDecoration _inputDecorationWithSuffix(
-      String label, String hint, IconData? prefixIcon, IconData suffixIcon) {
-    return InputDecoration(
-      labelText: label,
-      hintText: hint,
-      labelStyle: GoogleFonts.outfit(
-        textStyle: const TextStyle(
-          fontWeight: FontWeight.normal,
-          color: Style.accent2,
-        ),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10.0),
-        borderSide: const BorderSide(color: Colors.transparent),
-      ),
-      filled: true,
-      fillColor: Style.accent4,
-      prefixIcon: prefixIcon != null ? Icon(prefixIcon) : null,
-      suffixIcon: Icon(suffixIcon),
-    );
-  }
 
   // Helper function to create radio buttons
   Widget _genderRadio() {

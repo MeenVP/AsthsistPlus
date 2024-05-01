@@ -238,8 +238,6 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
                     const Size(double.infinity, 50), // Set a larger height
               ),
               onPressed: () async {
-                final navigator = Navigator.of(context);
-                final buildContext = context;
                 _showSaveConfirmationDialog(context);
                 errorMessage == '' ? error = false : error = true;
                 // Implement save logic

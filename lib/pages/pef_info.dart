@@ -131,8 +131,6 @@ class _PeakFlowInfoState extends State<PeakFlowInfoPage> {
                   ),
                 ),
                 onPressed: () async {
-                  final navigator = Navigator.of(context);
-                  final buildContext = context;
                   await addPeakFlow();
                   errorMessage == '' ? error = false : error = true;
                   setState(() {});
@@ -279,7 +277,6 @@ class _PeakFlowInfoState extends State<PeakFlowInfoPage> {
             }
             if (snapshot.hasData) {
               String resultText = snapshot.data[0].toString();
-              int result = snapshot.data[0];
               return Column(
                 children: [
                   Padding(

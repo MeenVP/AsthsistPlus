@@ -199,13 +199,6 @@ class _CalendarState extends State<CalendarPage> with TickerProviderStateMixin {
                     ])))));
   }
 
-  // This function will update the selected day
-  void _updateSelectedDay(DateTime newDay) {
-    setState(() {
-      _selectedDay = newDay;
-    });
-  }
-
   // This function will build the maximized calendar
   Widget _buildMaximizedCalendar() {
     return TableCalendar(

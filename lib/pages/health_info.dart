@@ -16,9 +16,6 @@ class HealthInfoPage extends StatefulWidget {
 class _CalendarState extends State<HealthInfoPage>
     with TickerProviderStateMixin {
   TabController? _tabController;
-  final DateTime _selectedDay = DateTime.now();
-
-  final bool _isMinimized = true;
 
   @override
   void initState() {
