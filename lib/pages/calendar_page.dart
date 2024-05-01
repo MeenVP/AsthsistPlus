@@ -15,9 +15,8 @@ class CalendarPage extends StatefulWidget {
 class _CalendarState extends State<CalendarPage> with TickerProviderStateMixin {
   TabController? _tabController;
   DateTime _selectedDay = DateTime.now();
-  CalendarFormat _calendarFormat = CalendarFormat.month;
+  final CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
-
   bool _isMinimized = true;
 
   @override
@@ -27,6 +26,7 @@ class _CalendarState extends State<CalendarPage> with TickerProviderStateMixin {
     _initTabController();
   }
 
+  // This function will initialize the TabController
   _initTabController() async {
     await Future.delayed(Duration.zero);
     setState(() {
@@ -90,11 +90,12 @@ class _CalendarState extends State<CalendarPage> with TickerProviderStateMixin {
                                       _buildMinimizedCalendar(),
                                       ElevatedButton(
                                         style: ElevatedButton.styleFrom(
-                                          backgroundColor: Style.secondaryBackground,
+                                          backgroundColor:
+                                              Style.secondaryBackground,
                                           shape: const CircleBorder(),
                                         ),
                                         child: const Icon(Icons.calendar_month,
-                                        color: Style.primaryColor),
+                                            color: Style.primaryColor),
                                         onPressed: () {
                                           setState(() {
                                             _isMinimized = !_isMinimized;
@@ -134,8 +135,7 @@ class _CalendarState extends State<CalendarPage> with TickerProviderStateMixin {
                                     unselectedLabelColor: Style.accent2,
                                     tabs: const <Widget>[
                                       Tab(
-                                        icon:
-                                        Icon(
+                                        icon: Icon(
                                           Icons.favorite_outline,
                                           color: Style.heartrate,
                                         ),
@@ -151,7 +151,7 @@ class _CalendarState extends State<CalendarPage> with TickerProviderStateMixin {
                                       ),
                                       Tab(
                                         icon: Icon(Icons.heart_broken_outlined,
-                                        color: Style.primaryColor),
+                                            color: Style.primaryColor),
                                       ),
                                       Tab(
                                         icon: Icon(Icons.inventory_outlined,
@@ -162,12 +162,12 @@ class _CalendarState extends State<CalendarPage> with TickerProviderStateMixin {
                                             color: Style.air),
                                       ),
                                       Tab(
-                                        icon: Icon(Icons.directions_walk_outlined,
+                                        icon: Icon(
+                                            Icons.directions_walk_outlined,
                                             color: Style.warning),
                                       ),
                                       Tab(
-                                        icon: Icon(
-                                          Icons.online_prediction,
+                                        icon: Icon(Icons.online_prediction,
                                             color: Style.tertiaryColor),
                                       ),
                                     ],
@@ -176,27 +176,37 @@ class _CalendarState extends State<CalendarPage> with TickerProviderStateMixin {
                         child: TabBarView(
                           controller: _tabController,
                           children: <Widget>[
-                            CategoryList(category: 'Heart rates',date: _selectedDay,),
-                            CategoryList(category: 'Medications',date: _selectedDay),
-                            CategoryList(category: 'PEFs',date: _selectedDay),
-                            CategoryList(category: 'Attacks',date: _selectedDay),
-                            CategoryList(category: 'Asthma Control Tests',date: _selectedDay),
-                            CategoryList(category: 'Weathers',date: _selectedDay),
-                            CategoryList(category: 'Steps',date: _selectedDay),
-                            CategoryList(category: 'Predictions',date: _selectedDay),
+                            CategoryList(
+                              category: 'Heart rates',
+                              date: _selectedDay,
+                            ),
+                            CategoryList(
+                                category: 'Medications', date: _selectedDay),
+                            CategoryList(category: 'PEFs', date: _selectedDay),
+                            CategoryList(
+                                category: 'Attacks', date: _selectedDay),
+                            CategoryList(
+                                category: 'Asthma Control Tests',
+                                date: _selectedDay),
+                            CategoryList(
+                                category: 'Weathers', date: _selectedDay),
+                            CategoryList(category: 'Steps', date: _selectedDay),
+                            CategoryList(
+                                category: 'Predictions', date: _selectedDay),
                           ],
                         ),
                       ),
                     ])))));
   }
 
+  // This function will update the selected day
   void _updateSelectedDay(DateTime newDay) {
     setState(() {
       _selectedDay = newDay;
     });
   }
 
-
+  // This function will build the maximized calendar
   Widget _buildMaximizedCalendar() {
     return TableCalendar(
       firstDay: DateTime.utc(2010, 10, 16),
@@ -231,11 +241,12 @@ class _CalendarState extends State<CalendarPage> with TickerProviderStateMixin {
     );
   }
 
+  // This function will build the minimized calendar
   Widget _buildMinimizedCalendar() {
     return Padding(
       padding: const EdgeInsetsDirectional.fromSTEB(16, 16, 16, 16),
       child: primaryTileText(
-        DateFormat('MMMM d, y').format(_selectedDay!),
+        DateFormat('MMMM d, y').format(_selectedDay),
       ),
     );
   }

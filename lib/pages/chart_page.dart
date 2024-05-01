@@ -9,7 +9,7 @@ import '../backend/firebase.dart';
 import '../style.dart';
 
 class HeartRateChart extends StatefulWidget {
-final String fetchType;
+  final String fetchType;
 
   const HeartRateChart({super.key, required this.fetchType});
 
@@ -17,8 +17,8 @@ final String fetchType;
   State<HeartRateChart> createState() => _HeartRateChartState();
 }
 
-class _HeartRateChartState extends State<HeartRateChart> with TickerProviderStateMixin {
-
+class _HeartRateChartState extends State<HeartRateChart>
+    with TickerProviderStateMixin {
   List<Color> gradientColors = [
     Style.secondaryText,
     Style.pef,
@@ -36,11 +36,6 @@ class _HeartRateChartState extends State<HeartRateChart> with TickerProviderStat
   void initState() {
     super.initState();
     fetchDataForCurrentTab(); // Fetch initial data// Fetch data on tab change
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 
   // Fetches heart rate data based on the currently selected tab.
@@ -63,7 +58,8 @@ class _HeartRateChartState extends State<HeartRateChart> with TickerProviderStat
       heartRateData = heartRateSpots;
       if (hrData.isNotEmpty) {
         currentTimestamp = hrData.first['time'];
-        currentHeartRate = double.parse(hrData.first['data'].replaceAll(' bpm', '')).toInt();
+        currentHeartRate =
+            double.parse(hrData.first['data'].replaceAll(' bpm', '')).toInt();
       } else {
         currentHeartRate = 0; // Placeholder or default value
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -78,7 +74,8 @@ class _HeartRateChartState extends State<HeartRateChart> with TickerProviderStat
     // Assume hrData is pre-processed to minimize necessary transformations
     setState(() {
       weeklyData = hrData;
-      selectedBarIndex = DateTime.now().weekday; // Automatically select current day
+      selectedBarIndex =
+          DateTime.now().weekday; // Automatically select current day
       if (hrData.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text("No heart rate data available."),
@@ -118,7 +115,7 @@ class _HeartRateChartState extends State<HeartRateChart> with TickerProviderStat
         startTime = DateTime(now.year, now.month, now.day);
         break;
       case 'W':
-        startTime = now.subtract(Duration(days: 7));
+        startTime = now.subtract(const Duration(days: 7));
         break;
       default:
         startTime = DateTime(now.year, now.month, now.day);
@@ -194,7 +191,9 @@ class _HeartRateChartState extends State<HeartRateChart> with TickerProviderStat
     List<double> allValues = hrData
         .map((data) => double.parse(data['data'].replaceAll(' bpm', '')))
         .toList();
-    return allValues.isNotEmpty ? allValues.reduce((a, b) => a + b) / allValues.length : 0;
+    return allValues.isNotEmpty
+        ? allValues.reduce((a, b) => a + b) / allValues.length
+        : 0;
   }
 
   // Creates and returns a widget displaying a summary of heart rate data.
@@ -202,19 +201,16 @@ class _HeartRateChartState extends State<HeartRateChart> with TickerProviderStat
     // Switch between different summaries based on the selected tab.
     switch (widget.fetchType) {
       case 'day': // Day
-        return summaryWidget("Daily Summary",
-            calculateAverage(heartRateData),
-            calculateMaximum(heartRateData),
-            calculateMinimum(heartRateData)
-        );
+        return summaryWidget("Daily Summary", calculateAverage(heartRateData),
+            calculateMaximum(heartRateData), calculateMinimum(heartRateData));
       case 'week': // Week
-          // Calculate weekly stats based on the selectedBarIndex
-          // Assuming you have a method to calculate these
-          return summaryWidget("Weekly Summary",
-              calculateOverallWeeklyAverage(weeklyData).toInt(),
-              calculateOverallWeeklyMaximum(weeklyData).toInt(),
-              calculateOverallWeeklyMinimum(weeklyData).toInt()
-          );
+        // Calculate weekly stats based on the selectedBarIndex
+        // Assuming you have a method to calculate these
+        return summaryWidget(
+            "Weekly Summary",
+            calculateOverallWeeklyAverage(weeklyData).toInt(),
+            calculateOverallWeeklyMaximum(weeklyData).toInt(),
+            calculateOverallWeeklyMinimum(weeklyData).toInt());
       default:
         return const SizedBox.shrink();
     }
@@ -228,12 +224,12 @@ class _HeartRateChartState extends State<HeartRateChart> with TickerProviderStat
           title,
           textAlign: TextAlign.center,
           style: GoogleFonts.outfit(
-    textStyle: const TextStyle(
-    fontWeight: FontWeight.w500,
-      fontSize: 18,
-      color: Style.primaryText,
-    ),
-    ),
+            textStyle: const TextStyle(
+              fontWeight: FontWeight.w500,
+              fontSize: 18,
+              color: Style.primaryText,
+            ),
+          ),
         ),
         Padding(
           padding: const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
@@ -309,7 +305,8 @@ class _HeartRateChartState extends State<HeartRateChart> with TickerProviderStat
   Widget build(BuildContext context) {
     // Custom widget for displaying heart rate information based on the selected time span.
     Widget heartRateInfoWidget() {
-      if (widget.fetchType=='day') { // Daily view
+      if (widget.fetchType == 'day') {
+        // Daily view
         // Always display the current heart rate for the daily view
         return Column(
           children: [
@@ -333,7 +330,8 @@ class _HeartRateChartState extends State<HeartRateChart> with TickerProviderStat
               ),
             ),
             Text(
-              DateFormat('MMM dd, yyyy  HH:mm').format(currentTimestamp), // Dynamic timestamp
+              DateFormat('MMM dd, yyyy  HH:mm')
+                  .format(currentTimestamp), // Dynamic timestamp
               style: GoogleFonts.outfit(
                 textStyle: const TextStyle(
                   fontWeight: FontWeight.normal,
@@ -344,26 +342,31 @@ class _HeartRateChartState extends State<HeartRateChart> with TickerProviderStat
             ),
           ],
         );
-      } else if (widget.fetchType == 'week' && selectedBarIndex != null) { // Weekly view and a bar is selected
+      } else if (widget.fetchType == 'week' && selectedBarIndex != null) {
+        // Weekly view and a bar is selected
         // Get the min and max heart rate for the selected day of the week
         List<double> heartRates = weeklyData
-            .where((data) => (data['time'] as DateTime).weekday == selectedBarIndex!)
+            .where((data) =>
+                (data['time'] as DateTime).weekday == selectedBarIndex!)
             .map((data) => double.parse(data['data'].replaceAll(' bpm', '')))
             .toList();
 
-        double minRate = heartRates.isNotEmpty ? heartRates.reduce(math.min) : 0.0;
-        double maxRate = heartRates.isNotEmpty ? heartRates.reduce(math.max) : 0.0;
+        double minRate =
+            heartRates.isNotEmpty ? heartRates.reduce(math.min) : 0.0;
+        double maxRate =
+            heartRates.isNotEmpty ? heartRates.reduce(math.max) : 0.0;
 
         // Calculate the start of the week, then add the selected index (minus 1 because selectedBarIndex is 0-based and DateTime.now().weekday is 1-based)
         DateTime now = DateTime.now();
         int todayWeekday = now.weekday;
         DateTime firstDayOfWeek = now.subtract(Duration(days: todayWeekday));
-        DateTime selectedDate = firstDayOfWeek.add(Duration(days: selectedBarIndex!));
+        DateTime selectedDate =
+            firstDayOfWeek.add(Duration(days: selectedBarIndex!));
 
         return Column(
           children: [
             Text(
-                heartRates.isNotEmpty ? '$minRate - $maxRate' : 'No Data',
+              heartRates.isNotEmpty ? '$minRate - $maxRate' : 'No Data',
               style: GoogleFonts.outfit(
                 textStyle: const TextStyle(
                   fontWeight: FontWeight.w500,
@@ -373,7 +376,7 @@ class _HeartRateChartState extends State<HeartRateChart> with TickerProviderStat
               ),
             ),
             Text(
-                'bpm',
+              'bpm',
               style: GoogleFonts.outfit(
                 textStyle: const TextStyle(
                   fontWeight: FontWeight.normal,
@@ -397,66 +400,63 @@ class _HeartRateChartState extends State<HeartRateChart> with TickerProviderStat
       }
       return Container();
     }
+
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsetsDirectional.fromSTEB(10, 0, 10, 0),
-        child: Column(
-          children: [
-            chartView(widget.fetchType),
-            Padding(
-              padding: const EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
-              child: Material(
-                color: Colors.transparent,
-                elevation: 2,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      color: Style.secondaryBackground
-                  ),
-                  child: Padding(
-                    padding: EdgeInsetsDirectional.fromSTEB(20, 10, 20, 10),
-                    child: Column(
-                      children: [
-                        heartRateInfoWidget(),
-                        const Divider(
-                          height: 32,
-                          color: Style.accent4,
-                          thickness: 2,
-                          indent : 10,
-                          endIndent : 10,
-                        ),
-                        _buildSummaryWidget(context),
-                      ],
-                    ),
+        child: Column(children: [
+          chartView(widget.fetchType),
+          Padding(
+            padding: const EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
+            child: Material(
+              color: Colors.transparent,
+              elevation: 2,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    color: Style.secondaryBackground),
+                child: Padding(
+                  padding: const EdgeInsetsDirectional.fromSTEB(20, 10, 20, 10),
+                  child: Column(
+                    children: [
+                      heartRateInfoWidget(),
+                      const Divider(
+                        height: 32,
+                        color: Style.accent4,
+                        thickness: 2,
+                        indent: 10,
+                        endIndent: 10,
+                      ),
+                      _buildSummaryWidget(context),
+                    ],
                   ),
                 ),
               ),
             ),
-          ]
-        ),
+          ),
+        ]),
       ),
     );
   }
 
   Widget chartView(String index) {
-
     switch (index) {
       case 'day': // Day
         List<FlSpot> daySpots = getSpotsFromData('D');
         if (daySpots.isEmpty) {
           // Handle the case where there's no data
-          return Center(child: Text('No data available for this day.'));
+          return const Center(child: Text('No data available for this day.'));
         }
         return Stack(
           children: <Widget>[
             AspectRatio(
               aspectRatio: 1.6,
               child: Padding(
-                padding: EdgeInsetsDirectional.fromSTEB(0, 20, 0, 0),
+                padding: const EdgeInsetsDirectional.fromSTEB(0, 20, 0, 0),
                 child: LineChart(
                   mainData(daySpots),
                 ),
@@ -470,9 +470,8 @@ class _HeartRateChartState extends State<HeartRateChart> with TickerProviderStat
             AspectRatio(
               aspectRatio: 1.6,
               child: Padding(
-                  padding: EdgeInsetsDirectional.fromSTEB(0, 20, 0, 0),
-                  child:BarChart(mainWeeklyBarData())
-              ),
+                  padding: const EdgeInsetsDirectional.fromSTEB(0, 20, 0, 0),
+                  child: BarChart(mainWeeklyBarData())),
             ),
           ],
         );
@@ -481,15 +480,15 @@ class _HeartRateChartState extends State<HeartRateChart> with TickerProviderStat
     }
   }
 
-  HorizontalLine showExtraLines(){
-    if(maxHeartRate!=0){
+  HorizontalLine showExtraLines() {
+    if (maxHeartRate != 0) {
       return HorizontalLine(
         y: maxHeartRate.toDouble(),
         color: Style.heartrate,
         strokeWidth: 1,
-        dashArray: [5,5],
+        dashArray: [5, 5],
       );
-    }else{
+    } else {
       return HorizontalLine(
         y: 0,
         color: Colors.transparent,
@@ -506,33 +505,30 @@ class _HeartRateChartState extends State<HeartRateChart> with TickerProviderStat
     double maxY = 150;
     DateTime now = DateTime.now();
     DateTime minTime = DateTime(now.year, now.month, now.day);
-    DateTime maxTime = DateTime(now.year, now.month, now.day, 23, 59,59);
+    DateTime maxTime = DateTime(now.year, now.month, now.day, 23, 59, 59);
 
     // Calculate minX and maxX based on the spots data
     double minX = minTime.millisecondsSinceEpoch.toDouble();
     double maxX = maxTime.millisecondsSinceEpoch.toDouble();
 
-    FlSpot lasttSpot = reversedSpots.isNotEmpty ? reversedSpots.last : FlSpot(0, 0);
+    FlSpot lasttSpot =
+        reversedSpots.isNotEmpty ? reversedSpots.last : const FlSpot(0, 0);
     // print('test list reversed: ${reversedSpots}');
 
-
-
     return LineChartData(
-      extraLinesData: ExtraLinesData(
-        horizontalLines: [
-          HorizontalLine(
-            y: 0,
-            color: const Color(0xffe7e8ec),
-            strokeWidth: 1,
-          ),
-          HorizontalLine(
-            y: 150,
-            color: const Color(0xffe7e8ec),
-            strokeWidth: 1,
-          ),
-          showExtraLines()
-        ]
-      ),
+      extraLinesData: ExtraLinesData(horizontalLines: [
+        HorizontalLine(
+          y: 0,
+          color: const Color(0xffe7e8ec),
+          strokeWidth: 1,
+        ),
+        HorizontalLine(
+          y: 150,
+          color: const Color(0xffe7e8ec),
+          strokeWidth: 1,
+        ),
+        showExtraLines()
+      ]),
       gridData: FlGridData(
         show: true,
         drawVerticalLine: true,
@@ -546,18 +542,15 @@ class _HeartRateChartState extends State<HeartRateChart> with TickerProviderStat
         },
         getDrawingVerticalLine: (value) {
           DateTime time = DateTime.fromMillisecondsSinceEpoch(value.toInt());
-          switch (time.hour){
-            case 0||6||12||18||23:
+          switch (time.hour) {
+            case 0 || 6 || 12 || 18 || 23:
+              return const FlLine(
+                  color: Color(0xffe7e8ec), strokeWidth: 1, dashArray: [5, 5]);
+            default:
               return const FlLine(
                 color: Color(0xffe7e8ec),
-                strokeWidth: 1,
-                dashArray: [5,5]
+                strokeWidth: 0,
               );
-              default:
-                return const FlLine(
-                  color: Color(0xffe7e8ec),
-                  strokeWidth: 0,
-                );
           }
           // return const FlLine(
           //   color: Color(0xffe7e8ec),
@@ -660,20 +653,20 @@ class _HeartRateChartState extends State<HeartRateChart> with TickerProviderStat
     //   label = '';
     // }
     DateTime time = DateTime.fromMillisecondsSinceEpoch(value.toInt());
-    switch(time.hour) {
+    switch (time.hour) {
       case 0:
         if (time.minute == 0 && time.second == 0) {
           label = '00:00';
         }
         break;
       case 6:
-          label = '06:00';
+        label = '06:00';
         break;
       case 12:
-          label = '12:00';
+        label = '12:00';
         break;
       case 18:
-          label = '18:00';
+        label = '18:00';
         break;
       case 23:
         if (time.minute == 59 && time.second == 59) {
@@ -681,7 +674,6 @@ class _HeartRateChartState extends State<HeartRateChart> with TickerProviderStat
         }
         break;
     }
-
 
     return Padding(
       padding: const EdgeInsets.all(5.0),
@@ -692,11 +684,12 @@ class _HeartRateChartState extends State<HeartRateChart> with TickerProviderStat
   Widget rightTitleWidgets(double value, TitleMeta meta) {
     return Container();
   }
+
   // Handles custom formatting for left axis titles.
   Widget leftTitleWidgets(double value, TitleMeta meta) {
     Color color = Style.accent1;
     String text;
-    if (value.toInt()==maxHeartRate){
+    if (value.toInt() == maxHeartRate) {
       return Padding(
         padding: const EdgeInsets.only(left: 15), // Add padding if needed
         child: Text(
@@ -728,23 +721,31 @@ class _HeartRateChartState extends State<HeartRateChart> with TickerProviderStat
         return Container(); // Return an empty container for non-labeled values
     }
     return Padding(
-      padding: const EdgeInsets.only(left: 15), // Add padding if needed
-      child: Text(
-        text,
-        style: GoogleFonts.outfit(
-          textStyle: TextStyle(
-            fontWeight: FontWeight.normal,
-            fontSize: 14,
-            color: color,
+        padding: const EdgeInsets.only(left: 15), // Add padding if needed
+        child: Text(
+          text,
+          style: GoogleFonts.outfit(
+            textStyle: TextStyle(
+              fontWeight: FontWeight.normal,
+              fontSize: 14,
+              color: color,
+            ),
           ),
-        ),
-    ));
+        ));
   }
 
   // Custom bar chart configuration for weekly data visualization.
   BarChartData mainWeeklyBarData() {
     // Your existing code to find the min and max values per day
-    Map<int, List<double>> minMaxByDay = {1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: []};
+    Map<int, List<double>> minMaxByDay = {
+      1: [],
+      2: [],
+      3: [],
+      4: [],
+      5: [],
+      6: [],
+      7: []
+    };
     for (var data in weeklyData) {
       int dayOfWeek = (data['time'] as DateTime).weekday;
       double value = double.parse(data['data'].replaceAll(' bpm', ''));
@@ -780,14 +781,16 @@ class _HeartRateChartState extends State<HeartRateChart> with TickerProviderStat
         bottomTitles: AxisTitles(
           sideTitles: SideTitles(
             showTitles: true,
-            getTitlesWidget: getWeekdayTitle, // Implement this function to show day names
+            getTitlesWidget:
+                getWeekdayTitle, // Implement this function to show day names
             reservedSize: 30,
           ),
         ),
         leftTitles: AxisTitles(
           sideTitles: SideTitles(
             showTitles: true,
-            getTitlesWidget: leftTitleWidgets, // Implement this function to show left titles
+            getTitlesWidget:
+                leftTitleWidgets, // Implement this function to show left titles
             reservedSize: 50,
             interval: 1,
           ),
@@ -795,11 +798,12 @@ class _HeartRateChartState extends State<HeartRateChart> with TickerProviderStat
         rightTitles: AxisTitles(
           sideTitles: SideTitles(
             showTitles: true,
-            getTitlesWidget: rightTitleWidgets, // Custom function for left titles
+            getTitlesWidget:
+                rightTitleWidgets, // Custom function for left titles
             reservedSize: 20,
           ),
         ),
-        topTitles: AxisTitles(
+        topTitles: const AxisTitles(
           sideTitles: SideTitles(showTitles: false),
         ),
       ),
@@ -819,20 +823,21 @@ class _HeartRateChartState extends State<HeartRateChart> with TickerProviderStat
         ],
       ),
       barTouchData: BarTouchData(
-        handleBuiltInTouches: false,
-        touchCallback: (FlTouchEvent event, BarTouchResponse? response) {
-        if (!mounted) return;
-          if (event is FlTapUpEvent && response != null && response.spot != null) {
-            // If a bar is tapped, update the selectedBarIndex to that bar's index
-            setState(() {
-              selectedBarIndex = response.spot!.touchedBarGroupIndex + 1;
-            });
-          } else {
-            // Do not set selectedBarIndex to null, as we want to always display the current day's data
-            // Comment out or remove the setState call that sets selectedBarIndex to null
-          }
-        }
-      ),
+          handleBuiltInTouches: false,
+          touchCallback: (FlTouchEvent event, BarTouchResponse? response) {
+            if (!mounted) return;
+            if (event is FlTapUpEvent &&
+                response != null &&
+                response.spot != null) {
+              // If a bar is tapped, update the selectedBarIndex to that bar's index
+              setState(() {
+                selectedBarIndex = response.spot!.touchedBarGroupIndex + 1;
+              });
+            } else {
+              // Do not set selectedBarIndex to null, as we want to always display the current day's data
+              // Comment out or remove the setState call that sets selectedBarIndex to null
+            }
+          }),
       gridData: FlGridData(
         show: true,
         drawVerticalLine: true,

@@ -11,10 +11,11 @@ import '../style.dart';
 class CompleteProfilePage extends StatefulWidget {
   @override
   _CompleteProfilePageState createState() => _CompleteProfilePageState();
-  const CompleteProfilePage({Key? key}) : super(key: key);
+  const CompleteProfilePage({super.key});
   // static const String routeName = '/edit-profile';
 }
 
+// This function will connect to the health service
 Future<void> connect() async {
   try {
     await HealthService().authorize();
@@ -23,17 +24,18 @@ Future<void> connect() async {
   }
 }
 
+// This class will create a Date of Birth input field
 class DOBInputField extends StatelessWidget {
   final TextEditingController dobController;
   final String label;
   final IconData icon;
 
-  DOBInputField({
-    Key? key,
+  const DOBInputField({
+    super.key,
     required this.dobController,
     required this.label,
     this.icon = Icons.calendar_today, // Default icon if one is not provided
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -72,9 +74,8 @@ class DOBInputField extends StatelessWidget {
   }
 }
 
-
-
 class _CompleteProfilePageState extends State<CompleteProfilePage> {
+  // Initialize variables
   String _gender = 'Male';
   bool _isSmoker = false;
   String? errorMessage = '';
@@ -92,17 +93,17 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
       context: context,
       builder: (BuildContext dialogContext) {
         return AlertDialog(
-          title: Text('Confirm'),
-          content: Text('Are you sure you want to save the changes?'),
+          title: const Text('Confirm'),
+          content: const Text('Are you sure you want to save the changes?'),
           actions: <Widget>[
             TextButton(
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
               onPressed: () {
                 Navigator.of(dialogContext).pop(); // Dismiss the dialog
               },
             ),
             TextButton(
-              child: Text('Save'),
+              child: const Text('Save'),
               onPressed: () async {
                 await completeUserProfile();
                 // Implement your edit profile functionality here
@@ -114,20 +115,20 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
     );
   }
 
+  // This function will save the user profile
   Future<void> completeUserProfile() async {
     try {
       await FirebaseService().addUserDetails(
-          firstname: _firstNameController.text,
-          lastname: _lastNameController.text,
-          dob: _dobController.text,
-          gender: _gender,
-          weight: _weightController.text,
-          height: _heightController.text,
-          bestpef: _peakFlowController.text,
-          smoker: _isSmoker,
-          maxHR: _maxHRController.text,
+        firstname: _firstNameController.text,
+        lastname: _lastNameController.text,
+        dob: _dobController.text,
+        gender: _gender,
+        weight: _weightController.text,
+        height: _heightController.text,
+        bestpef: _peakFlowController.text,
+        smoker: _isSmoker,
+        maxHR: _maxHRController.text,
       );
-      // await connect();
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (context) => const HomePageTutorial(),
@@ -141,6 +142,7 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
     }
   }
 
+  // This function will display an error message
   Widget _error() {
     return Padding(
         padding: const EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
@@ -162,91 +164,84 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
       appBar: AppBar(
         surfaceTintColor: Colors.transparent,
         automaticallyImplyLeading: false,
-        title: Text('Complete Profile'),
+        title: const Text('Complete Profile'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: <Widget>[
-            SizedBox(height: 40),
+            const SizedBox(height: 40),
             TextFormField(
               controller: _firstNameController,
               decoration: _inputDecoration(
-                'Firstname', 'Please enter a valid name',
-                Icons.person
-              ),
+                  'Firstname', 'Please enter a valid name', Icons.person),
             ),
-            SizedBox(height: 15.0),
+            const SizedBox(height: 15.0),
             TextFormField(
               controller: _lastNameController,
-              decoration: _inputDecoration(
-                'Lastname', 'Please enter a valid name',
-                Icons.person_outline
-              ),
+              decoration: _inputDecoration('Lastname',
+                  'Please enter a valid name', Icons.person_outline),
             ),
-            SizedBox(height: 15.0),
+            const SizedBox(height: 15.0),
             DOBInputField(
               dobController: _dobController,
               label: 'Date of Birth',
             ),
-            SizedBox(height: 15.0),
+            const SizedBox(height: 15.0),
             Row(
               children: <Widget>[
                 Expanded(
                   child: TextFormField(
                     controller: _weightController,
-                    decoration: _inputDecoration(
-                      'Weight', 'Weight in kg',
-                      null
-                    ),
+                    decoration:
+                        _inputDecoration('Weight', 'Weight in kg', null),
                   ),
                 ),
-                SizedBox(width: 15.0),
+                const SizedBox(width: 15.0),
                 Expanded(
                   child: TextFormField(
                     controller: _heightController,
-                    decoration: _inputDecoration(
-                      'Height', 'Height in cm',
-                      null
-                    ),
+                    decoration:
+                        _inputDecoration('Height', 'Height in cm', null),
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 15.0),
+            const SizedBox(height: 15.0),
             TextFormField(
               controller: _peakFlowController,
               decoration: _inputDecorationWithSuffix(
-                'Personal best Peak Flow', 'Please enter a valid number',
-                Icons.fitness_center, Icons.help_outline
-              ),
+                  'Personal best Peak Flow',
+                  'Please enter a valid number',
+                  Icons.fitness_center,
+                  Icons.help_outline),
             ),
-            SizedBox(height: 15.0),
+            const SizedBox(height: 15.0),
             TextFormField(
-
               controller: _maxHRController,
               decoration: _inputDecoration(
-                  'Max heart rate(optional)', 'bpm',
-                  Icons.monitor_heart
-              ),
+                  'Max heart rate(optional)', 'bpm', Icons.monitor_heart),
             ),
-            SizedBox(height: 24.0),
+            const SizedBox(height: 24.0),
             _genderRadio(),
-            SizedBox(height: 24.0),
+            const SizedBox(height: 24.0),
             _smokerCheckbox(),
-            SizedBox(height: 24.0),
+            const SizedBox(height: 24.0),
             _error(),
-            SizedBox(height: 24.0),
+            const SizedBox(height: 24.0),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.white, backgroundColor: Colors.deepPurple, shape: const StadiumBorder(),
-                minimumSize: const Size(double.infinity, 50), // Set a larger height
+                foregroundColor: Colors.white,
+                backgroundColor: Colors.deepPurple,
+                shape: const StadiumBorder(),
+                minimumSize:
+                    const Size(double.infinity, 50), // Set a larger height
               ),
               onPressed: () async {
-                  final navigator = Navigator.of(context);
-                  final buildContext = context;
-                  _showSaveConfirmationDialog(context);
-                  errorMessage == '' ? error = false : error = true;
+                final navigator = Navigator.of(context);
+                final buildContext = context;
+                _showSaveConfirmationDialog(context);
+                errorMessage == '' ? error = false : error = true;
                 // Implement save logic
               },
               child: const Padding(
@@ -263,59 +258,30 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
     );
   }
 
+  // This function will create an input decoration
   InputDecoration _inputDecoration(String label, String hint, IconData? icon) {
-    // return InputDecoration(
-    //   border: OutlineInputBorder(
-    //     borderRadius: BorderRadius.circular(15.0),
-    //     borderSide: BorderSide.none,
-    //   ),
-    //   labelText: label,
-    //   hintText: hint,
-    //   floatingLabelStyle: const TextStyle(
-    //     height: 4,
-    //     color: Colors.grey,
-    //   ),
-    //   filled: true,
-    //   fillColor: Colors.grey[200],
-    //   prefixIcon: icon != null ? Icon(icon) : null,
-    // );
     return InputDecoration(
-        labelText: label,
-        hintText: hint,
-        labelStyle: GoogleFonts.outfit(
-          textStyle: const TextStyle(
-            fontWeight: FontWeight.normal,
-            color: Style.accent2,
-          ),
+      labelText: label,
+      hintText: hint,
+      labelStyle: GoogleFonts.outfit(
+        textStyle: const TextStyle(
+          fontWeight: FontWeight.normal,
+          color: Style.accent2,
         ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10.0),
-          borderSide: const BorderSide(color: Colors.transparent),
-        ),
-        filled: true,
-        fillColor: Style.accent4,
-        prefixIcon: icon != null ? Icon(icon) : null,
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10.0),
+        borderSide: const BorderSide(color: Colors.transparent),
+      ),
+      filled: true,
+      fillColor: Style.accent4,
+      prefixIcon: icon != null ? Icon(icon) : null,
     );
-
   }
 
-  InputDecoration _inputDecorationWithSuffix(String label, String hint, IconData? prefixIcon, IconData suffixIcon) {
-    // return InputDecoration(
-    //   border: OutlineInputBorder(
-    //     borderRadius: BorderRadius.circular(15.0),
-    //     borderSide: BorderSide.none,
-    //   ),
-    //   labelText: label,
-    //   hintText: hint,
-    //   floatingLabelStyle: const TextStyle(
-    //     height: 4,
-    //     color: Style.accent2,
-    //   ),
-    //   filled: true,
-    //   fillColor: Style.accent4,
-    //   prefixIcon: prefixIcon != null ? Icon(prefixIcon) : null,
-    //   suffixIcon: Icon(suffixIcon),
-    // );
+  // This function will create an input decoration with a suffix icon
+  InputDecoration _inputDecorationWithSuffix(
+      String label, String hint, IconData? prefixIcon, IconData suffixIcon) {
     return InputDecoration(
       labelText: label,
       hintText: hint,
@@ -336,6 +302,7 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
     );
   }
 
+  // This function will create a radio button
   Widget _genderRadio() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -349,7 +316,7 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
             });
           },
         ),
-        Text('Male'),
+        const Text('Male'),
         Radio(
           value: 'Female',
           groupValue: _gender,
@@ -359,12 +326,13 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
             });
           },
         ),
-        Text('Female'),
+        const Text('Female'),
       ],
     );
   }
 
-  Widget _smokerCheckbox(){
+  // This function will create a checkbox
+  Widget _smokerCheckbox() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -376,7 +344,7 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
             });
           },
         ),
-        Text('Are you a smoker?'),
+        const Text('Are you a smoker?'),
       ],
     );
   }
@@ -389,6 +357,7 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
     _weightController.dispose();
     _heightController.dispose();
     _peakFlowController.dispose();
+    _maxHRController.dispose();
     super.dispose();
   }
 }

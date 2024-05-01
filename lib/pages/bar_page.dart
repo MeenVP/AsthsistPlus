@@ -9,7 +9,6 @@ import '../style.dart';
 
 class BarPage extends StatefulWidget {
   final String category;
-
   const BarPage({super.key, required this.category});
 
   @override
@@ -24,6 +23,12 @@ class _BarPageState extends State<BarPage> {
     super.initState();
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  // bar chart touch style
   BarTouchData get barTouchData => BarTouchData(
         enabled: true,
         touchTooltipData: BarTouchTooltipData(
@@ -50,6 +55,7 @@ class _BarPageState extends State<BarPage> {
         ),
       );
 
+  // bar chart titles (days of the week)
   Widget getTitles(double value, TitleMeta meta) {
     String text;
     switch (value.toInt()) {
@@ -85,25 +91,18 @@ class _BarPageState extends State<BarPage> {
     );
   }
 
+  // bar chart side titles (medication count)
   Widget getMedicationSideTitle(double value, TitleMeta meta) {
-    // switch (value%2) {
-    //   case 0:
-        return SideTitleWidget(
-          axisSide: AxisSide.left,
-          space: 4,
-          child: secondaryTileText(value.toInt().toString()),
-        );
-    //   default:
-    //     return SideTitleWidget(
-    //       axisSide: AxisSide.left,
-    //       space: 4,
-    //       child: secondaryTileText(''),
-    //     );
-    // }
+    return SideTitleWidget(
+      axisSide: AxisSide.left,
+      space: 4,
+      child: secondaryTileText(value.toInt().toString()),
+    );
   }
 
+  // bar chart side titles (steps count)
   Widget getStepsSideTitle(double value, TitleMeta meta) {
-    switch (value%2000) {
+    switch (value % 2000) {
       case 0:
         return SideTitleWidget(
           axisSide: AxisSide.left,
@@ -119,9 +118,11 @@ class _BarPageState extends State<BarPage> {
     }
   }
 
-  FlTitlesData titleData(String category){
-    switch (category){
-      case 'Medications'||'Attacks':
+  // chart title style
+  FlTitlesData titleData(String category) {
+    switch (category) {
+      // medication and attack categories
+      case 'Medications' || 'Attacks':
         return FlTitlesData(
           show: true,
           bottomTitles: AxisTitles(
@@ -147,6 +148,7 @@ class _BarPageState extends State<BarPage> {
             sideTitles: SideTitles(showTitles: false),
           ),
         );
+      // steps category
       case 'Steps':
         return FlTitlesData(
           show: true,
@@ -174,6 +176,7 @@ class _BarPageState extends State<BarPage> {
           ),
         );
     }
+    // default
     return FlTitlesData(
       show: true,
       bottomTitles: AxisTitles(
@@ -201,6 +204,7 @@ class _BarPageState extends State<BarPage> {
     );
   }
 
+  // chart border style
   FlBorderData get borderData => FlBorderData(
       show: true,
       border: const Border(
@@ -214,6 +218,7 @@ class _BarPageState extends State<BarPage> {
         ),
       ));
 
+  // chart data for medication category
   List<BarChartGroupData> getMedication(List<int> barData) {
     var dailyUsage = barData;
     List<BarChartGroupData> barGroups = [];
@@ -239,6 +244,7 @@ class _BarPageState extends State<BarPage> {
     return barGroups;
   }
 
+  // chart data for steps category
   List<BarChartGroupData> getSteps(List<int> barData) {
     List<BarChartGroupData> barGroups = [];
     for (var i = 0; i < barData.length; i++) {
@@ -263,7 +269,8 @@ class _BarPageState extends State<BarPage> {
     return barGroups;
   }
 
-  List<BarChartGroupData> getAttacks(List<Map<String,dynamic>> barData){
+  // chart data for attack category
+  List<BarChartGroupData> getAttacks(List<Map<String, dynamic>> barData) {
     List<BarChartGroupData> barGroups = [];
     for (var i = 0; i < barData.length; i++) {
       var data = barData[i];
@@ -274,9 +281,16 @@ class _BarPageState extends State<BarPage> {
             BarChartRodData(
               toY: data['Total'].toDouble(),
               rodStackItems: [
-                BarChartRodStackItem(0, data['Severe'].toDouble(), Style.danger),
-                BarChartRodStackItem(data['Severe'].toDouble(), data['Moderate'].toDouble()+data['Severe'].toDouble(), Style.warning),
-                BarChartRodStackItem(data['Moderate'].toDouble()+data['Severe'].toDouble(), data['Total'].toDouble(), Style.warning2),
+                BarChartRodStackItem(
+                    0, data['Severe'].toDouble(), Style.danger),
+                BarChartRodStackItem(
+                    data['Severe'].toDouble(),
+                    data['Moderate'].toDouble() + data['Severe'].toDouble(),
+                    Style.warning),
+                BarChartRodStackItem(
+                    data['Moderate'].toDouble() + data['Severe'].toDouble(),
+                    data['Total'].toDouble(),
+                    Style.warning2),
               ],
               color: Style.warning,
               width: 20,
@@ -293,10 +307,10 @@ class _BarPageState extends State<BarPage> {
     return barGroups;
   }
 
-
+  // bar chart widget for medication category
   _buildMedicationChart() {
     return FutureBuilder(
-        future: FirebaseService().getWeeklyMedication(),
+        future: FirebaseService().getWeeklyMedicationCount(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
@@ -312,55 +326,48 @@ class _BarPageState extends State<BarPage> {
           }
           if (snapshot.hasData) {
             List<int> barData = snapshot.data;
-            return
-                Stack(children: <Widget>[
-                  AspectRatio(
-                      aspectRatio: 1.8,
-                      child: Padding(
-                          padding: const EdgeInsetsDirectional.fromSTEB(
-                              20, 20, 20, 0),
-                          child: BarChart(
-                            BarChartData(
-                              barTouchData: barTouchData,
-                              titlesData: titleData(widget.category),
-                              borderData: borderData,
-                              barGroups: getMedication(barData),
-                              gridData: FlGridData(
-                                show: true,
-                                verticalInterval: 1,
-                                horizontalInterval: 1,
-                                getDrawingVerticalLine: (value) {
-                                  return const FlLine(
-                                    color: Style.secondaryText,
-                                    strokeWidth: 1,
-                                  );
-                                },
-                              ),
-                              maxY:(barData.reduce(max)<4)
-                                ? 4
-                                : barData.reduce(max)+1,
-                            ),
-                          ))),
+            return Stack(children: <Widget>[
+              AspectRatio(
+                  aspectRatio: 1.8,
+                  child: Padding(
+                      padding:
+                          const EdgeInsetsDirectional.fromSTEB(20, 20, 20, 0),
+                      child: BarChart(
+                        BarChartData(
+                          barTouchData: barTouchData,
+                          titlesData: titleData(widget.category),
+                          borderData: borderData,
+                          barGroups: getMedication(barData),
+                          gridData: FlGridData(
+                            show: true,
+                            verticalInterval: 1,
+                            horizontalInterval: 1,
+                            getDrawingVerticalLine: (value) {
+                              return const FlLine(
+                                color: Style.secondaryText,
+                                strokeWidth: 1,
+                              );
+                            },
+                          ),
+                          maxY: (barData.reduce(max) < 4)
+                              ? 4
+                              : barData.reduce(max) + 1,
+                        ),
+                      ))),
             ]);
           }
-          return Container(
-            child: Text('No data for this category'),
-          );
+          return const Text('No data for this category');
         });
   }
 
-  _buildPefChart() {
-    return Container(
-      child: Text('Pef Chart'),
-    );
-  }
-
+  // bar chart widget for attacks category
   _buildAttackChart() {
-
-    int findMax(List<Map<String, dynamic>> weeklyAttack){
-      int maxValue = weeklyAttack.reduce((curr, next) => curr['Total'] > next['Total'] ? curr : next)['Total'];
+    int findMax(List<Map<String, dynamic>> weeklyAttack) {
+      int maxValue = weeklyAttack.reduce(
+          (curr, next) => curr['Total'] > next['Total'] ? curr : next)['Total'];
       return maxValue;
     }
+
     return FutureBuilder(
         future: FirebaseService().getWeeklyAttacks(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
@@ -378,55 +385,41 @@ class _BarPageState extends State<BarPage> {
           }
           if (snapshot.hasData) {
             var barData = snapshot.data;
-            return
-              Stack(children: <Widget>[
-                AspectRatio(
-                    aspectRatio: 1.8,
-                    child: Padding(
-                        padding: const EdgeInsetsDirectional.fromSTEB(
-                            10, 20, 20, 0),
-                        child: BarChart(
-                          BarChartData(
-                            barTouchData: barTouchData,
-                            titlesData: titleData(widget.category),
-                            borderData: borderData,
-                            barGroups: getAttacks(barData),
-                            gridData: FlGridData(
-                              show: true,
-                              verticalInterval: 1,
-                              horizontalInterval: 1,
-                              getDrawingVerticalLine: (value) {
-                                return const FlLine(
-                                  color: Style.secondaryText,
-                                  strokeWidth: 1,
-                                );
-                              },
-                            ),
-                            maxY:(findMax(barData)<4)
-                                ? 4
-                                : findMax(barData).toDouble()+2,
+            return Stack(children: <Widget>[
+              AspectRatio(
+                  aspectRatio: 1.8,
+                  child: Padding(
+                      padding:
+                          const EdgeInsetsDirectional.fromSTEB(10, 20, 20, 0),
+                      child: BarChart(
+                        BarChartData(
+                          barTouchData: barTouchData,
+                          titlesData: titleData(widget.category),
+                          borderData: borderData,
+                          barGroups: getAttacks(barData),
+                          gridData: FlGridData(
+                            show: true,
+                            verticalInterval: 1,
+                            horizontalInterval: 1,
+                            getDrawingVerticalLine: (value) {
+                              return const FlLine(
+                                color: Style.secondaryText,
+                                strokeWidth: 1,
+                              );
+                            },
                           ),
-                        ))),
-              ]);
+                          maxY: (findMax(barData) < 4)
+                              ? 4
+                              : findMax(barData).toDouble() + 2,
+                        ),
+                      ))),
+            ]);
           }
-          return Container(
-            child: Text('No data for this category'),
-          );
+          return const Text('No data for this category');
         });
   }
 
-  _buildActChart() {
-    return Container(
-      child: Text('Act Chart'),
-    );
-  }
-
-  _buildWeatherChart() {
-    return Container(
-      child: Text('Weather Chart'),
-    );
-  }
-
+  // bar chart widget for steps category
   _buildStepsChart() {
     return FutureBuilder(
         future: FirebaseService().getWeeklySteps(),
@@ -445,453 +438,382 @@ class _BarPageState extends State<BarPage> {
           }
           if (snapshot.hasData) {
             List<int> barData = snapshot.data;
-            return
-              Stack(children: <Widget>[
-                AspectRatio(
-                    aspectRatio: 1.8,
-                    child: Padding(
-                        padding: const EdgeInsetsDirectional.fromSTEB(
-                            10, 20, 20, 0),
-                        child: BarChart(
-                          BarChartData(
-                            barTouchData: barTouchData,
-                            titlesData: titleData(widget.category),
-                            borderData: borderData,
-                            barGroups: getSteps(barData),
-                            gridData: FlGridData(
-                              show: true,
-                              verticalInterval: 1,
-                              horizontalInterval: 500,
-                              getDrawingVerticalLine: (value) {
-                                return const FlLine(
-                                  color: Style.secondaryText,
-                                  strokeWidth: 1,
-                                );
-                              },
-                            ),
-                            maxY:(barData.reduce(max)<2500)
-                                ? 2500
-                                : barData.reduce(max)+2500,
+            return Stack(children: <Widget>[
+              AspectRatio(
+                  aspectRatio: 1.8,
+                  child: Padding(
+                      padding:
+                          const EdgeInsetsDirectional.fromSTEB(10, 20, 20, 0),
+                      child: BarChart(
+                        BarChartData(
+                          barTouchData: barTouchData,
+                          titlesData: titleData(widget.category),
+                          borderData: borderData,
+                          barGroups: getSteps(barData),
+                          gridData: FlGridData(
+                            show: true,
+                            verticalInterval: 1,
+                            horizontalInterval: 500,
+                            getDrawingVerticalLine: (value) {
+                              return const FlLine(
+                                color: Style.secondaryText,
+                                strokeWidth: 1,
+                              );
+                            },
                           ),
-                        ))),
-              ]);
+                          maxY: (barData.reduce(max) < 2500)
+                              ? 2500
+                              : barData.reduce(max) + 2500,
+                        ),
+                      ))),
+            ]);
           }
           return Container(
-            child: Text('No data for this category'),
+            child: const Text('No data for this category'),
           );
         });
-  }
-
-  _buildPredictionChart() {
-    return Container(
-      child: Text('Prediction Chart'),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
-
-    Widget infoWidget(String category){
-      switch (category){
-      case 'Medications': // Daily view
-        return FutureBuilder(future: FirebaseService().getTodayMedicationCount(), builder: (BuildContext context, AsyncSnapshot snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          }
-          if (snapshot.hasData) {
-            return Column(
-              children: [
-                Text(
-            snapshot.data,
-                  style: GoogleFonts.outfit(
-                    textStyle: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 40,
-                    ),
-                  ),
-                ),
-                Text(
-                  'used',
-                  style: GoogleFonts.outfit(
-                    textStyle: const TextStyle(
-                      fontWeight: FontWeight.normal,
-                      fontSize: 18,
-                      color: Style.secondaryText,
-                    ),
-                  ),
-                ),
-                Text(
-                  DateFormat('MMM dd, yyyy  HH:mm').format(DateTime.now()),
-                  // Dynamic timestamp
-                  style: GoogleFonts.outfit(
-                    textStyle: const TextStyle(
-                      fontWeight: FontWeight.normal,
-                      fontSize: 18,
-                      color: Style.secondaryText,
-                    ),
-                  ),
-                ),
-              ],
-            );
-          }
-          return Container(
-            child: Text('No data for this category'),
-          );
-        });
-
-
-      case 'Steps':
-        return FutureBuilder(future: FirebaseService().getTotalStepsForToday(), builder: (BuildContext context, AsyncSnapshot snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          }
-          if (snapshot.hasData) {
-            return Column(
-              children: [
-                Text(
-                  snapshot.data.toString(),
-                  style: GoogleFonts.outfit(
-                    textStyle: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 40,
-                    ),
-                  ),
-                ),
-                Text(
-                  'steps',
-                  style: GoogleFonts.outfit(
-                    textStyle: const TextStyle(
-                      fontWeight: FontWeight.normal,
-                      fontSize: 18,
-                      color: Style.secondaryText,
-                    ),
-                  ),
-                ),
-                Text(
-                  DateFormat('MMM dd, yyyy  HH:mm').format(DateTime.now()),
-                  // Dynamic timestamp
-                  style: GoogleFonts.outfit(
-                    textStyle: const TextStyle(
-                      fontWeight: FontWeight.normal,
-                      fontSize: 18,
-                      color: Style.secondaryText,
-                    ),
-                  ),
-                ),
-              ],
-            );
-          }
-          return Container(
-            child: Text('No data for this category'),
-          );
-        });
-        case 'Attacks':// Daily view
-          return FutureBuilder(future: FirebaseService().getAttackForDay(DateTime.now()), builder: (BuildContext context, AsyncSnapshot snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            if (snapshot.hasError) {
-              return Center(child: Text('Error: ${snapshot.error}'));
-            }
-            if (snapshot.hasData) {
-              return Column(
-                children: [
-                  Text(
-                    snapshot.data.length.toString(),
-                    style: GoogleFonts.outfit(
-                      textStyle: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 40,
+    Widget infoWidget(String category) {
+      switch (category) {
+        // medication category
+        case 'Medications': // Daily view
+          return FutureBuilder(
+              future: FirebaseService().getTodayMedicationCount(),
+              builder: (BuildContext context, AsyncSnapshot snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                }
+                if (snapshot.hasData) {
+                  return Column(
+                    children: [
+                      Text(
+                        snapshot.data,
+                        style: GoogleFonts.outfit(
+                          textStyle: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 40,
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                  Text(
-                    'attacks',
-                    style: GoogleFonts.outfit(
-                      textStyle: const TextStyle(
-                        fontWeight: FontWeight.normal,
-                        fontSize: 18,
-                        color: Style.secondaryText,
+                      Text(
+                        'used',
+                        style: GoogleFonts.outfit(
+                          textStyle: const TextStyle(
+                            fontWeight: FontWeight.normal,
+                            fontSize: 18,
+                            color: Style.secondaryText,
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                  Text(
-                    DateFormat('MMM dd, yyyy  HH:mm').format(DateTime.now()),
-                    // Dynamic timestamp
-                    style: GoogleFonts.outfit(
-                      textStyle: const TextStyle(
-                        fontWeight: FontWeight.normal,
-                        fontSize: 18,
-                        color: Style.secondaryText,
+                      Text(
+                        DateFormat('MMM dd, yyyy  HH:mm')
+                            .format(DateTime.now()),
+                        // Dynamic timestamp
+                        style: GoogleFonts.outfit(
+                          textStyle: const TextStyle(
+                            fontWeight: FontWeight.normal,
+                            fontSize: 18,
+                            color: Style.secondaryText,
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                ],
-              );
-            }
-            return Container(
-              child: Text('No data for this category'),
-            );
-          });
+                    ],
+                  );
+                }
+                return const Text('No data for this category');
+              });
 
+        // steps category
+        case 'Steps':
+          return FutureBuilder(
+              future: FirebaseService().getTotalStepsForToday(),
+              builder: (BuildContext context, AsyncSnapshot snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                }
+                if (snapshot.hasData) {
+                  return Column(
+                    children: [
+                      Text(
+                        snapshot.data.toString(),
+                        style: GoogleFonts.outfit(
+                          textStyle: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 40,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        'steps',
+                        style: GoogleFonts.outfit(
+                          textStyle: const TextStyle(
+                            fontWeight: FontWeight.normal,
+                            fontSize: 18,
+                            color: Style.secondaryText,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        DateFormat('MMM dd, yyyy  HH:mm')
+                            .format(DateTime.now()),
+                        // Dynamic timestamp
+                        style: GoogleFonts.outfit(
+                          textStyle: const TextStyle(
+                            fontWeight: FontWeight.normal,
+                            fontSize: 18,
+                            color: Style.secondaryText,
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                }
+                return const Text('No data for this category');
+              });
+
+        // attack category
+        case 'Attacks': // Daily view
+          return FutureBuilder(
+              future: FirebaseService().getAttackForDay(DateTime.now()),
+              builder: (BuildContext context, AsyncSnapshot snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                }
+                if (snapshot.hasData) {
+                  return Column(
+                    children: [
+                      Text(
+                        snapshot.data.length.toString(),
+                        style: GoogleFonts.outfit(
+                          textStyle: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 40,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        'attacks',
+                        style: GoogleFonts.outfit(
+                          textStyle: const TextStyle(
+                            fontWeight: FontWeight.normal,
+                            fontSize: 18,
+                            color: Style.secondaryText,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        DateFormat('MMM dd, yyyy  HH:mm')
+                            .format(DateTime.now()),
+                        // Dynamic timestamp
+                        style: GoogleFonts.outfit(
+                          textStyle: const TextStyle(
+                            fontWeight: FontWeight.normal,
+                            fontSize: 18,
+                            color: Style.secondaryText,
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                }
+                return const Text('No data for this category');
+              });
         // Always display the current heart rate for the daily view
       }
+
+      // default
       return Container();
-      // } else if (widget.category == 'week' && selectedBarIndex != null) { // Weekly view and a bar is selected
-      //   // Get the min and max heart rate for the selected day of the week
-      //   List<double> heartRates = weeklyData
-      //       .where((data) => (data['time'] as DateTime).weekday == selectedBarIndex!)
-      //       .map((data) => double.parse(data['data'].replaceAll(' bpm', '')))
-      //       .toList();
-      //
-      //   double minRate = heartRates.isNotEmpty ? heartRates.reduce(math.min) : 0.0;
-      //   double maxRate = heartRates.isNotEmpty ? heartRates.reduce(math.max) : 0.0;
-      //
-      //   // Calculate the start of the week, then add the selected index (minus 1 because selectedBarIndex is 0-based and DateTime.now().weekday is 1-based)
-      //   DateTime now = DateTime.now();
-      //   int todayWeekday = now.weekday;
-      //   DateTime firstDayOfWeek = now.subtract(Duration(days: todayWeekday));
-      //   DateTime selectedDate = firstDayOfWeek.add(Duration(days: selectedBarIndex!));
-      //
-      //   return Column(
-      //     children: [
-      //       Text(
-      //         heartRates.isNotEmpty ? '$minRate - $maxRate' : 'No Data',
-      //         style: GoogleFonts.outfit(
-      //           textStyle: const TextStyle(
-      //             fontWeight: FontWeight.w500,
-      //             fontSize: 32,
-      //             color: Style.primaryText,
-      //           ),
-      //         ),
-      //       ),
-      //       Text(
-      //         'bpm',
-      //         style: GoogleFonts.outfit(
-      //           textStyle: const TextStyle(
-      //             fontWeight: FontWeight.normal,
-      //             fontSize: 18,
-      //             color: Style.secondaryText,
-      //           ),
-      //         ),
-      //       ),
-      //       Text(
-      //         DateFormat('EEE, MMM dd').format(selectedDate),
-      //         style: GoogleFonts.outfit(
-      //           textStyle: const TextStyle(
-      //             fontWeight: FontWeight.normal,
-      //             fontSize: 18,
-      //             color: Style.secondaryText,
-      //           ),
-      //         ),
-      //       ),
-      //     ],
-      //   );
-      // }
     }
 
-    // Widget _buildSummaryWidget(BuildContext context) {
-    //   // Switch between different summaries based on the selected tab.
-    //   switch (widget.fetchType) {
-    //     case 'day': // Day
-    //       return summaryWidget("Daily Summary",
-    //           calculateAverage(heartRateData),
-    //           calculateMaximum(heartRateData),
-    //           calculateMinimum(heartRateData)
-    //       );
-    //     case 'week': // Week
-    //     // Calculate weekly stats based on the selectedBarIndex
-    //     // Assuming you have a method to calculate these
-    //       return summaryWidget("Weekly Summary",
-    //           calculateOverallWeeklyAverage(weeklyData).toInt(),
-    //           calculateOverallWeeklyMaximum(weeklyData).toInt(),
-    //           calculateOverallWeeklyMinimum(weeklyData).toInt()
-    //       );
-    //     default:
-    //       return const SizedBox.shrink();
-    //   }
-    // }
-
     switch (widget.category) {
+      // medication category
       case 'Medications':
         return SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsetsDirectional.fromSTEB(10, 0, 10, 10),
-            child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 10),
-                    child:Text(widget.category, style: GoogleFonts.outfit(
-                      textStyle: const TextStyle(
-                        fontWeight: FontWeight.normal,
-                        fontSize: 24,
-                        color: Style.primaryText,
-                      ),
-                    ),),
+            child: Column(children: [
+              Padding(
+                padding: const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 10),
+                child: Text(
+                  widget.category,
+                  style: GoogleFonts.outfit(
+                    textStyle: const TextStyle(
+                      fontWeight: FontWeight.normal,
+                      fontSize: 24,
+                      color: Style.primaryText,
+                    ),
                   ),
-                  _buildMedicationChart(),
-                  Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
-                    child: Material(
-                      color: Colors.transparent,
-                      elevation: 2,
-                      shape: RoundedRectangleBorder(
+                ),
+              ),
+              _buildMedicationChart(),
+              Padding(
+                padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
+                child: Material(
+                  color: Colors.transparent,
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Container(
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                            color: Style.secondaryBackground
-                        ),
-                        child: Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(20, 20, 20, 10),
-                          child: Column(
-                            children: [
-                              infoWidget(widget.category),
-                              const Divider(
-                                height: 32,
-                                color: Style.accent4,
-                                thickness: 2,
-                                indent : 10,
-                                endIndent : 10,
-                              ),
-                              summaryWidget(widget.category),
-                            ],
+                        color: Style.secondaryBackground),
+                    child: Padding(
+                      padding:
+                          const EdgeInsetsDirectional.fromSTEB(20, 20, 20, 10),
+                      child: Column(
+                        children: [
+                          infoWidget(widget.category),
+                          const Divider(
+                            height: 32,
+                            color: Style.accent4,
+                            thickness: 2,
+                            indent: 10,
+                            endIndent: 10,
                           ),
-                        ),
+                          summaryWidget(widget.category),
+                        ],
                       ),
                     ),
                   ),
-                ]
-            ),
+                ),
+              ),
+            ]),
           ),
         );
-      case 'PEFs':
-        return _buildPefChart();
+
+      // attack category
       case 'Attacks':
         return SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsetsDirectional.fromSTEB(10, 0, 10, 10),
-            child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 10),
-                    child:Text(widget.category, style: GoogleFonts.outfit(
-                      textStyle: const TextStyle(
-                        fontWeight: FontWeight.normal,
-                        fontSize: 24,
-                        color: Style.primaryText,
-                      ),
-                    ),),
+            child: Column(children: [
+              Padding(
+                padding: const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 10),
+                child: Text(
+                  widget.category,
+                  style: GoogleFonts.outfit(
+                    textStyle: const TextStyle(
+                      fontWeight: FontWeight.normal,
+                      fontSize: 24,
+                      color: Style.primaryText,
+                    ),
                   ),
-                  _buildAttackChart(),
-                  Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
-                    child: Material(
-                      color: Colors.transparent,
-                      elevation: 2,
-                      shape: RoundedRectangleBorder(
+                ),
+              ),
+              _buildAttackChart(),
+              Padding(
+                padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
+                child: Material(
+                  color: Colors.transparent,
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Container(
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                            color: Style.secondaryBackground
-                        ),
-                        child: Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(20, 20, 20, 10),
-                          child: Column(
-                            children: [
-                              infoWidget(widget.category),
-                              const Divider(
-                                height: 32,
-                                color: Style.accent4,
-                                thickness: 2,
-                                indent : 10,
-                                endIndent : 10,
-                              ),
-                              summaryWidget(widget.category),
-                            ],
+                        color: Style.secondaryBackground),
+                    child: Padding(
+                      padding:
+                          const EdgeInsetsDirectional.fromSTEB(20, 20, 20, 10),
+                      child: Column(
+                        children: [
+                          infoWidget(widget.category),
+                          const Divider(
+                            height: 32,
+                            color: Style.accent4,
+                            thickness: 2,
+                            indent: 10,
+                            endIndent: 10,
                           ),
-                        ),
+                          summaryWidget(widget.category),
+                        ],
                       ),
                     ),
                   ),
-                ]
-            ),
+                ),
+              ),
+            ]),
           ),
         );
-      case 'Asthma Control Tests':
-        return _buildActChart();
-      case 'Weathers':
-        return _buildWeatherChart();
+
+      // steps category
       case 'Steps':
         return SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsetsDirectional.fromSTEB(10, 0, 10, 10),
-            child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 10),
-                    child:Text(widget.category, style: GoogleFonts.outfit(
-                      textStyle: const TextStyle(
-                        fontWeight: FontWeight.normal,
-                        fontSize: 24,
-                        color: Style.primaryText,
-                      ),
-                    ),),
+            child: Column(children: [
+              Padding(
+                padding: const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 10),
+                child: Text(
+                  widget.category,
+                  style: GoogleFonts.outfit(
+                    textStyle: const TextStyle(
+                      fontWeight: FontWeight.normal,
+                      fontSize: 24,
+                      color: Style.primaryText,
+                    ),
                   ),
-                  _buildStepsChart(),
-                  Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
-                    child: Material(
-                      color: Colors.transparent,
-                      elevation: 2,
-                      shape: RoundedRectangleBorder(
+                ),
+              ),
+              _buildStepsChart(),
+              Padding(
+                padding: const EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
+                child: Material(
+                  color: Colors.transparent,
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Container(
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                            color: Style.secondaryBackground
-                        ),
-                        child: Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(20, 20, 20, 10),
-                          child: Column(
-                            children: [
-                              infoWidget(widget.category),
-                              const Divider(
-                                height: 32,
-                                color: Style.accent4,
-                                thickness: 2,
-                                indent : 10,
-                                endIndent : 10,
-                              ),
-                              summaryWidget(widget.category),
-                            ],
+                        color: Style.secondaryBackground),
+                    child: Padding(
+                      padding:
+                          const EdgeInsetsDirectional.fromSTEB(20, 20, 20, 10),
+                      child: Column(
+                        children: [
+                          infoWidget(widget.category),
+                          const Divider(
+                            height: 32,
+                            color: Style.accent4,
+                            thickness: 2,
+                            indent: 10,
+                            endIndent: 10,
                           ),
-                        ),
+                          summaryWidget(widget.category),
+                        ],
                       ),
                     ),
                   ),
-                ]
-            ),
+                ),
+              ),
+            ]),
           ),
-        );;
-      case 'Prediction':
-        return _buildPredictionChart();
+        );
+        {}
+
+      // default
       default:
         return Container(
-          child: Text('No data for this category'),
+          child: const Text('No data for this category'),
         );
     }
   }
@@ -899,346 +821,368 @@ class _BarPageState extends State<BarPage> {
   Widget summaryWidget(String category) {
     switch (category) {
       case 'Medications':
-        return FutureBuilder(future: FirebaseService().getMedicationForWeek(DateTime.now()), builder: (BuildContext context, AsyncSnapshot snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator(
-              color: Style.primaryColor,
-            ));
-          }
-          if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          }
-          if (snapshot.hasData) {
-            Map<String, int> medicationCountPerDay = {
-              'Monday': 0,
-              'Tuesday': 0,
-              'Wednesday': 0,
-              'Thursday': 0,
-              'Friday': 0,
-              'Saturday': 0,
-              'Sunday': 0,
-            };
-
-            for (var medication in snapshot.data) {
-              // Extract the date from the datetime and format it as a string
-              DateTime date = medication['time'] as DateTime;
-
-              // If the date is already in the map, increment the count
-              if (medicationCountPerDay.containsKey(DateFormat('EEEE').format(date))) {
-                medicationCountPerDay[DateFormat('EEEE').format(date)] =
-                    (medicationCountPerDay[date] ?? 0) + 1;
+        return FutureBuilder(
+            future: FirebaseService().getMedicationForWeek(DateTime.now()),
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(
+                    child: CircularProgressIndicator(
+                  color: Style.primaryColor,
+                ));
               }
-            }
-            var dailyUsage = medicationCountPerDay.values.toList();
-            return Column(
-              children: [
-                Text(
-                  'Weekly Summary',
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.outfit(
-                    textStyle: const TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 18,
-                      color: Style.primaryText,
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Average:',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.black,
+              if (snapshot.hasError) {
+                return Center(child: Text('Error: ${snapshot.error}'));
+              }
+              if (snapshot.hasData) {
+                Map<String, int> medicationCountPerDay = {
+                  'Monday': 0,
+                  'Tuesday': 0,
+                  'Wednesday': 0,
+                  'Thursday': 0,
+                  'Friday': 0,
+                  'Saturday': 0,
+                  'Sunday': 0,
+                };
+
+                for (var medication in snapshot.data) {
+                  // Extract the date from the datetime and format it as a string
+                  DateTime date = medication['time'] as DateTime;
+
+                  // If the date is already in the map, increment the count
+                  if (medicationCountPerDay
+                      .containsKey(DateFormat('EEEE').format(date))) {
+                    medicationCountPerDay[DateFormat('EEEE').format(date)] =
+                        (medicationCountPerDay[date] ?? 0) + 1;
+                  }
+                }
+                var dailyUsage = medicationCountPerDay.values.toList();
+                return Column(
+                  children: [
+                    Text(
+                      'Weekly Summary',
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.outfit(
+                        textStyle: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 18,
+                          color: Style.primaryText,
                         ),
-                      ),
-                      Text(
-                        (dailyUsage.reduce((a, b) => a + b) / dailyUsage.length).toStringAsFixed(2),
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Maximum:',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.black,
-                        ),
-                      ),
-                      Text(
-                        dailyUsage.reduce(max).toString(),
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Total:',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.black,
-                        ),
-                      ),
-                      Text(
-                        snapshot.data.length.toString(),
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            );
-          }
-          return Container(
-            child: Text('No data for this category'),
-          );
-        });
-        case 'Steps':
-          return FutureBuilder(future: FirebaseService().getWeeklySteps(), builder: (BuildContext context, AsyncSnapshot snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator(
-                color: Style.primaryColor,
-              ));
-            }
-            if (snapshot.hasError) {
-              return Center(child: Text('Error: ${snapshot.error}'));
-            }
-            if (snapshot.hasData) {
-              List<int> weeklySteps = snapshot.data;
-              return Column(
-                children: [
-                  Text(
-                    'Weekly Summary',
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.outfit(
-                      textStyle: const TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 18,
-                        color: Style.primaryText,
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'Average:',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.black,
+                    Padding(
+                      padding:
+                          const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Average:',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.black,
+                            ),
                           ),
-                        ),
-                        Text(
-                          (weeklySteps.reduce((a, b) => a + b)/weeklySteps.length)
+                          Text(
+                            (dailyUsage.reduce((a, b) => a + b) /
+                                    dailyUsage.length)
                                 .toStringAsFixed(2),
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: Colors.black,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.black,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'Maximum:',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.black,
+                    Padding(
+                      padding:
+                          const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Maximum:',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.black,
+                            ),
                           ),
-                        ),
-                        Text(
-                          weeklySteps.reduce(max).toString(),
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: Colors.black,
+                          Text(
+                            dailyUsage.reduce(max).toString(),
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.black,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 10),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'Total:',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.black,
+                    Padding(
+                      padding:
+                          const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Total:',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.black,
+                            ),
                           ),
-                        ),
-                        Text(
-                          weeklySteps.reduce((a, b) => a + b).toString(),
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: Colors.black,
+                          Text(
+                            snapshot.data.length.toString(),
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.black,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                );
+              }
+              return Container(
+                child: const Text('No data for this category'),
               );
-            }
-            return Container(
-              child: Text('No data for this category'),
-            );
-          });
-      case 'Attacks':
-        return FutureBuilder(future: FirebaseService().getTotalSeverityForWeek(), builder: (BuildContext context, AsyncSnapshot snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator(
-              color: Style.primaryColor,
-            ));
-          }
-          if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          }
-          if (snapshot.hasData) {
-            Map<String,int> weeklyTotal = snapshot.data;
-            return Column(
-              children: [
-                Text(
-                  'Weekly Summary',
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.outfit(
-                    textStyle: const TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 18,
-                      color: Style.primaryText,
+            });
+      case 'Steps':
+        return FutureBuilder(
+            future: FirebaseService().getWeeklySteps(),
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(
+                    child: CircularProgressIndicator(
+                  color: Style.primaryColor,
+                ));
+              }
+              if (snapshot.hasError) {
+                return Center(child: Text('Error: ${snapshot.error}'));
+              }
+              if (snapshot.hasData) {
+                List<int> weeklySteps = snapshot.data;
+                return Column(
+                  children: [
+                    Text(
+                      'Weekly Summary',
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.outfit(
+                        textStyle: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 18,
+                          color: Style.primaryText,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Mild',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Style.warning2,
-                        ),
+                    Padding(
+                      padding:
+                          const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Average:',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.black,
+                            ),
+                          ),
+                          Text(
+                            (weeklySteps.reduce((a, b) => a + b) /
+                                    weeklySteps.length)
+                                .toStringAsFixed(2),
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ],
                       ),
-                      Text(
-                        weeklyTotal['Mild'].toString(),
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.black,
-                        ),
+                    ),
+                    Padding(
+                      padding:
+                          const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Maximum:',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.black,
+                            ),
+                          ),
+                          Text(
+                            weeklySteps.reduce(max).toString(),
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Moderate',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Style.warning,
-                        ),
+                    ),
+                    Padding(
+                      padding:
+                          const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Total:',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.black,
+                            ),
+                          ),
+                          Text(
+                            weeklySteps.reduce((a, b) => a + b).toString(),
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ],
                       ),
-                      Text(
-                        weeklyTotal['Moderate'].toString(),
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Severe',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Style.danger,
-                        ),
-                      ),
-                      Text(
-                        weeklyTotal['Severe'].toString(),
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Total',
-                        style: TextStyle(
+                    ),
+                  ],
+                );
+              }
+              return Container(
+                child: const Text('No data for this category'),
+              );
+            });
+      case 'Attacks':
+        return FutureBuilder(
+            future: FirebaseService().getTotalSeverityForWeek(),
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(
+                    child: CircularProgressIndicator(
+                  color: Style.primaryColor,
+                ));
+              }
+              if (snapshot.hasError) {
+                return Center(child: Text('Error: ${snapshot.error}'));
+              }
+              if (snapshot.hasData) {
+                Map<String, int> weeklyTotal = snapshot.data;
+                return Column(
+                  children: [
+                    Text(
+                      'Weekly Summary',
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.outfit(
+                        textStyle: const TextStyle(
+                          fontWeight: FontWeight.w500,
                           fontSize: 18,
-                          color: Colors.black,
+                          color: Style.primaryText,
                         ),
                       ),
-                      Text(
-                        weeklyTotal['Total'].toString(),
-                        style: const TextStyle(
-                          fontSize: 18,
-                          color: Colors.black,
-                        ),
+                    ),
+                    Padding(
+                      padding:
+                          const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Mild',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Style.warning2,
+                            ),
+                          ),
+                          Text(
+                            weeklyTotal['Mild'].toString(),
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
-              ],
-            );
-          }
-          return Container(
-            child: Text('No data for this category'),
-          );
-        });
+                    ),
+                    Padding(
+                      padding:
+                          const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Moderate',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Style.warning,
+                            ),
+                          ),
+                          Text(
+                            weeklyTotal['Moderate'].toString(),
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding:
+                          const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Severe',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Style.danger,
+                            ),
+                          ),
+                          Text(
+                            weeklyTotal['Severe'].toString(),
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding:
+                          const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Total',
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.black,
+                            ),
+                          ),
+                          Text(
+                            weeklyTotal['Total'].toString(),
+                            style: const TextStyle(
+                              fontSize: 18,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+              }
+              return Container(
+                child: const Text('No data for this category'),
+              );
+            });
     }
     return Container(
-      child: Text('No data for this category'),
+      child: const Text('No data for this category'),
     );
-
   }
 }
