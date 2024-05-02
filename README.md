@@ -14,11 +14,11 @@ Asthsist+ is a mobile application for assisting asthma management, enabling pati
  This project is a part of the senior project submitted in partial fullfillment of the Requirement for THE DEGREE OF BACHELOR OF SCIENCE (INFORMATION AND COMMUNICATION TECHNOLOGY) Faculty of Information and Communication Technology, Mahidol University 2023
 
 ### Features :stethoscope:
-- Environmental trigger monitoring
-- Asthma activity and medication tracking
-- Integration with wearable devices via Google Fit
-- Asthma control test
-- Peak flow zone prediction using machine learning
+- Environmental trigger monitoring :cloud:
+- Asthma activity and medication tracking :pill:
+- Integration with wearable devices via Google Fit :watch:
+- Asthma control test :memo:
+- Peak flow zone prediction using machine learning :gear:
 
 ### Application
 
