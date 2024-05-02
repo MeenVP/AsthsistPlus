@@ -1,7 +1,7 @@
 import 'package:asthsist_plus/backend/firebase.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 
 import '../style.dart';
 
@@ -9,15 +9,22 @@ class CategoryList extends StatefulWidget {
   final String category;
   final DateTime date;
 
-  CategoryList({Key? key, required this.category, required this.date}) : super(key: key);
+  const CategoryList({super.key, required this.category, required this.date});
 
   @override
   _CategoryListState createState() => _CategoryListState();
 }
 
 class _CategoryListState extends State<CategoryList> {
-  late DateTime _selectedDay;
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
+  late DateTime _selectedDay;
+  late int _age;
+
+  // This will hold the data for each category
   late Map<String, List<Map<String, dynamic>>> data = {
     'HeartRate': [],
     'Medications': [],
@@ -26,149 +33,180 @@ class _CategoryListState extends State<CategoryList> {
     'ACT': [],
     'Weather': [],
     'steps': [],
-
+    'Prediction': [],
   };
 
+  // This function will update the data for the selected day
   @override
   void didUpdateWidget(CategoryList oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.date != oldWidget.date) {
       setState(() {
         _selectedDay = widget.date;
-        FirebaseService().getPefValuesForDay(_selectedDay).then((pefValues) {
-          FirebaseService().getMedicationForDay(_selectedDay).then((medications) {
-            FirebaseService().getHRForDay(_selectedDay).then((hr) {
-              FirebaseService().getAttackForDay(_selectedDay).then((attack) {
-                FirebaseService().getActForDay(_selectedDay).then((act) {
-                  FirebaseService().getWeatherForDay(_selectedDay).then((weather) {
-                    FirebaseService().getStepsForDay(_selectedDay).then((steps) {
-                      updateData(pefValues, medications, hr,attack,act,weather,steps);
-                    });
-                  });
-                });
-              });
-            });
-          });
-        });
-        // Fetch data for _selectedDay
+        updateData(_selectedDay);
       });
     }
   }
 
-
+  // This function will fetch the age of the user
+  void updateAge() async {
+    int age = await FirebaseService().getUserAge();
+    setState(() {
+      _age = age;
+    });
+  }
 
   @override
   void initState() {
     _selectedDay = widget.date;
     super.initState();
-    FirebaseService().getPefValuesForDay(_selectedDay).then((pefValues) {
-      FirebaseService().getMedicationForDay(_selectedDay).then((medications) {
-        FirebaseService().getHRForDay(_selectedDay).then((hr) {
-          FirebaseService().getAttackForDay(_selectedDay).then((attack) {
-            FirebaseService().getActForDay(_selectedDay).then((act) {
-              FirebaseService().getWeatherForDay(_selectedDay).then((weather) {
-                FirebaseService().getStepsForDay(_selectedDay).then((steps) {
-                  updateData(pefValues, medications, hr,attack,act,weather,steps);
-                });
-              });
-            });
-          });
-        });
-      });
-    });
-    super.initState();
+    updateData(_selectedDay);
+    updateAge();
   }
 
-  void updateData(List<Map<String, dynamic>> pefValues,
-      List<Map<String, dynamic>>medications,
-      List<Map<String, dynamic>> hr,
-      List<Map<String, dynamic>> attack,
-      List<Map<String, dynamic>> act,
-      List<Map<String, dynamic>> weather,
-      List<Map<String, dynamic>> steps,
-      ) {
-    setState(() {
-      data = {
-        'HeartRate': hr,
-        'Medications': medications,
-        'Attack': attack,
-        'pef': pefValues,
-        'ACT': act,
-        'Weather': weather,
-        'Steps': steps,
-      };
-    });
+  // This function will update the data for the selected day
+  Future<Map<String, List<Map<String, dynamic>>>> updateData(
+    DateTime selectedDay,
+  ) async {
+    var heartRate = await FirebaseService().getHRForDay(selectedDay);
+    var medications = await FirebaseService().getMedicationForDay(selectedDay);
+    var attack = await FirebaseService().getAttackForDay(selectedDay);
+    var pef = await FirebaseService().getPefValuesForDay(selectedDay);
+    var act = await FirebaseService().getActForDay(selectedDay);
+    var weather = await FirebaseService().getWeatherForDay(selectedDay);
+    var steps = await FirebaseService().getStepsForDay(selectedDay);
+    var prediction = await FirebaseService().getPredictionForDay(selectedDay);
+    return {
+      'Heart rates': heartRate,
+      'Medications': medications,
+      'Attacks': attack,
+      'PEFs': pef,
+      'Asthma Control Tests': act,
+      'Weathers': weather,
+      'Steps': steps,
+      'Predictions': prediction,
+    };
   }
 
-  Widget build(BuildContext context) {
-    return buildCategoryView(widget.category, context);
-  }
-
-  Widget buildCategoryView(String category, BuildContext context) {
+  // This function will build the tile for each category
+  Widget buildTile(String category, dynamic item) {
+    Color backgroundColor = Style.secondaryBackground;
+    switch (category) {
+      case 'Heart rates':
+        int age = _age;
+        int maxHR = 220 - age;
+        if (int.parse(item['data']) > maxHR) {
+          backgroundColor = Style.dangerSecondary;
+        } else if (int.parse(item['data']) > maxHR * 0.8) {
+          backgroundColor = Style.warningSecondary;
+        } else {
+          backgroundColor = Style.safeSecondary;
+        }
+        break;
+      case 'Weathers':
+        List<String> parts = item['data'].split(', ');
+        String aqiPart = parts.firstWhere((part) => part.startsWith('AQI:'));
+        String aqiValueString = aqiPart.split(':')[1];
+        int aqiValue = int.parse(aqiValueString);
+        if (aqiValue >= 101) {
+          backgroundColor = Style.dangerSecondary;
+        } else if (aqiValue > 50 && aqiValue <= 100) {
+          backgroundColor = Style.warningSecondary;
+        }
+        break;
+      case 'Predictions':
+        switch (item['data']) {
+          case 'Safe':
+            backgroundColor = Style.safeSecondary;
+            break;
+          case 'Caution':
+            backgroundColor = Style.warningSecondary;
+            break;
+          case 'Danger':
+            backgroundColor = Style.dangerSecondary;
+            break;
+        }
+        break;
+    }
     return Padding(
-      padding: const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
-      child: ListView.builder(
-        itemCount: data[category]?.length ?? 0,
-        itemBuilder: (context, index) {
-          final item = data[category]![index];
-          return Padding(
-            padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 4),
-            child: Slidable(
-              actionPane: SlidableDrawerActionPane(), // Choose a slide transition
-              secondaryActions: <Widget>[
-                IconSlideAction(
-                  caption: 'Delete',
-                  color: Colors.red,
-                  icon: Icons.delete,
-                  onTap: () =>
-                      _confirmDeletion(context, category, index),
-                ),
-              ],
-              child: Material(
-                borderRadius: const BorderRadius.all(Radius.circular(8)),
-                elevation: 0,
-                child: Container(
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      color: Style.secondaryBackground
+      padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 4),
+      child: Material(
+        borderRadius: const BorderRadius.all(Radius.circular(8)),
+        elevation: 0,
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            color: backgroundColor,
+          ),
+          child: ListTile(
+            title: Text(item['data'],
+                style: GoogleFonts.outfit(
+                  textStyle: const TextStyle(
+                    fontWeight: FontWeight.normal,
+                    fontSize: 18,
+                    color: Style.primaryText,
                   ),
-                  child: ListTile(
-                    title: Text(item['data']),
-                    trailing: Text(DateFormat('HH:mm').format(item['time'])),
+                )),
+            trailing: Text(DateFormat('HH:mm').format(item['time']),
+                style: GoogleFonts.outfit(
+                  textStyle: const TextStyle(
+                    fontWeight: FontWeight.normal,
+                    fontSize: 16,
+                    color: Style.primaryText,
                   ),
-                ),
-              ),
-            ),
-          );
-        },
+                )),
+          ),
+        ),
       ),
     );
   }
-  void _confirmDeletion(BuildContext context, String category, int index) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Delete Data'),
-          content: const Text('Are you sure you want to delete this data?'),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop(); // Dismiss the dialog
-              },
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(children: [
+      Padding(
+        padding: const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
+        child: Text(
+          widget.category,
+          style: GoogleFonts.outfit(
+            textStyle: const TextStyle(
+              fontWeight: FontWeight.normal,
+              fontSize: 24,
+              color: Style.primaryText,
             ),
-            TextButton(
-              child: const Text('Delete'),
-              onPressed: () {
-                setState(() {
-                  data[category]!.removeAt(index);
-                });
-                Navigator.of(context).pop(); // Dismiss the dialog after confirming deletion
-              },
-            ),
-          ],
-        );
+          ),
+        ),
+      ),
+      Flexible(child: buildCategoryView(widget.category, context))
+    ]);
+  }
+
+  // This function will build the view for each category
+  Widget buildCategoryView(String category, BuildContext context) {
+    return FutureBuilder(
+      future: updateData(_selectedDay), // Use your function here
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return const Center(child: Text('Error in fetching data'));
+        } else {
+          if (snapshot.data[category] == null ||
+              snapshot.data[category]!.isEmpty) {
+            return const Center(child: Text('No data available'));
+          } else {
+            return Padding(
+              padding: const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
+              child: ListView.builder(
+                itemCount: snapshot.data[category]?.length ?? 0,
+                itemBuilder: (context, index) {
+                  final item = snapshot.data[category]![index];
+                  return buildTile(category, item);
+                },
+              ),
+            );
+          }
+        }
       },
     );
   }

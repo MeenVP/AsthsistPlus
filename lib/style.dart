@@ -19,12 +19,16 @@ class Style {
   static const Color success = Color(0xFF0EC863);
   static const Color danger = Color(0xFFF44336);
   static const Color warning = Color(0xFFf99e2f);
+  static const Color warning2 = Color(0xfff9d72f);
   static const Color heartrate = Color(0xffFB6C81);
   static const Color medication = Color(0xff64C68F);
   static const Color pef = Color(0xff1976D2);
   static const Color weather = Color(0xffe8a548);
   static const Color air = Color(0xff757575);
-
+  static const Color act = Color(0xFF89CDE5);
+  static const Color dangerSecondary = Color(0xFFF69894);
+  static const Color warningSecondary = Color(0xfff5c695);
+  static const Color safeSecondary = Color(0xFF7AE0A6);
 }
 
 Text primaryTileText(String input) {

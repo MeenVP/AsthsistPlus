@@ -37,27 +37,32 @@ dependencies:
   cupertino_icons: ^1.0.2
   firebase_core: ^2.24.2
   google_fonts: ^6.1.0
-  health: ^8.1.0
+  health: ^10.2.0
   permission_handler: ^11.2.0
 #  cloud_firestore: ^4.14.0
 #  firebase_auth: ^4.16.0
-  syncfusion_flutter_calendar: ^24.1.45
+  syncfusion_flutter_calendar: ^25.1.40
   table_calendar: ^3.0.9
-  intl: ^0.18.1
-  flutter_slidable: ^0.6.0
-  dob_input_field: ^1.0.0
+  intl: ^0.19.0
+  flutter_slidable: ^3.1.0
+  dob_input_field: ^2.0.0
   cloud_firestore: ^4.14.0
   firebase_auth: ^4.16.0
   workmanager: ^0.5.2
-  fl_chart: ^0.66.1
+  fl_chart: ^0.67.0
   weather: ^3.1.1
-  geolocator: ^10.1.0
+  geolocator: ^11.0.0
   air_quality: ^4.0.0
   flutter_dotenv: ^5.1.0
   sklite: ^1.0.0
   flutter_spinkit: ^5.1.0
+  firebase_analytics: ^10.8.0
+  flutter_local_notifications: ^17.1.0
+  flutter_launcher_icons: ^0.13.1
 
+  http: any
 dev_dependencies:
+  change_app_package_name: ^1.1.0
   flutter_test:
     sdk: flutter
 
@@ -71,6 +76,15 @@ dev_dependencies:
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon/icon.png"
+  min_sdk_android: 21
+  adaptive_icon_background: "#ffffff"
+  adaptive_icon_foreground: "assets/icon/icon.png"
+  remove_alpha_ios: true
+
 # The following section is specific to Flutter packages.
 flutter:
 
@@ -81,9 +95,11 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-     - assets/images/asthsist.jpg
      - assets/rf_model.json
-     #- assets/images/act.jpg
+     - assets/icon/icon.png
+     - assets/images/Homepage.png
+     - assets/images/Calendarpage.png
+     - assets/images/Infopage.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
@@ -110,3 +126,5 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+
+

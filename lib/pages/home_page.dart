@@ -1,25 +1,29 @@
 import 'package:asthsist_plus/backend/firebase.dart';
-import 'package:asthsist_plus/backend/weather.dart';
 import 'package:asthsist_plus/pages/asthma_control_test_page.dart';
+import 'package:asthsist_plus/pages/pef_info.dart';
 import 'package:asthsist_plus/style.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../backend/sklearn.dart';
+import 'package:intl/intl.dart';
+import 'navigation_bar.dart';
 import 'notification_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
-
-  static const String routeName = '/home';
 
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
+  //show a dialog to add an asthma attack
   void _showAddAttackDialog(BuildContext context) {
     String? errorMessage = '';
     bool error = false;
@@ -31,6 +35,11 @@ class _HomePageState extends State<HomePage> {
       try {
         await FirebaseService().addAttack(selectedSeverity);
         Navigator.of(context).pop();
+        setState(() {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text("Asthma attack added successfully!"),
+          ));
+        });
       } on FirebaseAuthException catch (e) {
         print(e.message);
         setState(() {
@@ -39,6 +48,7 @@ class _HomePageState extends State<HomePage> {
       }
     }
 
+    // Declare a widget to show the error message
     Widget showError() {
       return Text(
         errorMessage!,
@@ -55,9 +65,13 @@ class _HomePageState extends State<HomePage> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return StatefulBuilder( // Add this line
-          builder: (BuildContext context, StateSetter setState) { // Modify this line
+        return StatefulBuilder(
+          // Add this line
+          builder: (BuildContext context, StateSetter setState) {
+            // Modify this line
             return AlertDialog(
+              backgroundColor: Style.primaryBackground,
+              surfaceTintColor: Colors.transparent,
               title: Container(
                 decoration: const BoxDecoration(
                     borderRadius: BorderRadius.only(
@@ -66,7 +80,8 @@ class _HomePageState extends State<HomePage> {
                     color: Style.primaryColor),
                 // color: Colors.red,
                 child: Padding(
-                  padding: EdgeInsetsDirectional.all(20), // Add horizontal padding
+                  padding: const EdgeInsetsDirectional.all(
+                      20), // Add horizontal padding
                   child: Text(
                     'Add Attack',
                     style: GoogleFonts.outfit(
@@ -86,24 +101,25 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     showError(),
                     ...severities.map((severity) => RadioListTile<String>(
-                      title: Text(severity),
-                      value: severity,
-                      groupValue: selectedSeverity,
-                      onChanged: (String? value) {
-                        setState(() {
-                          selectedSeverity = value!;
-                        });
-                      },
-                    )).toList(),
+                          title: Text(severity),
+                          value: severity,
+                          groupValue: selectedSeverity,
+                          onChanged: (String? value) {
+                            setState(() {
+                              selectedSeverity = value!;
+                            });
+                          },
+                        )),
                   ],
                 ),
               ),
               actions: <Widget>[
                 TextButton(
-                  child: Text('Cancel',
+                  child: Text(
+                    'Cancel',
                     style: GoogleFonts.outfit(
                       textStyle: const TextStyle(
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.normal,
                         fontSize: 16,
                         color: Style.primaryColor,
                       ),
@@ -114,18 +130,17 @@ class _HomePageState extends State<HomePage> {
                   },
                 ),
                 TextButton(
-                  child: Text('Add',
+                  child: Text(
+                    'Add',
                     style: GoogleFonts.outfit(
                       textStyle: const TextStyle(
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.normal,
                         fontSize: 16,
                         color: Style.primaryColor,
                       ),
                     ),
                   ),
                   onPressed: () async {
-                    final navigator = Navigator.of(context);
-                    final buildContext = context;
                     await addAttack();
                     errorMessage == '' ? error = false : error = true;
                     setState(() {});
@@ -139,6 +154,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  // Show a dialog to add a peak flow value
   void _showAddPeakFlowDialog(BuildContext context) {
     TextEditingController peakFlowController = TextEditingController();
     String? errorMessage = '';
@@ -156,6 +172,7 @@ class _HomePageState extends State<HomePage> {
       }
     }
 
+    // Declare a widget to show the error message
     Widget showError() {
       return Text(
         errorMessage!,
@@ -173,15 +190,18 @@ class _HomePageState extends State<HomePage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: Style.primaryBackground,
+          surfaceTintColor: Colors.transparent,
           title: Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
                 borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(20),
                     topRight: Radius.circular(20)),
                 color: Style.primaryColor),
             // color: Colors.red,
             child: Padding(
-              padding: EdgeInsetsDirectional.all(20), // Add horizontal padding
+              padding:
+                  const EdgeInsetsDirectional.all(20), // Add horizontal padding
               child: Text(
                 'Add Peak Flow Data',
                 style: GoogleFonts.outfit(
@@ -215,10 +235,11 @@ class _HomePageState extends State<HomePage> {
           ),
           actions: <Widget>[
             TextButton(
-              child: Text('Cancel',
+              child: Text(
+                'Cancel',
                 style: GoogleFonts.outfit(
                   textStyle: const TextStyle(
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.normal,
                     fontSize: 16,
                     color: Style.primaryColor,
                   ),
@@ -229,10 +250,11 @@ class _HomePageState extends State<HomePage> {
               },
             ),
             TextButton(
-              child: Text('Add',
+              child: Text(
+                'Add',
                 style: GoogleFonts.outfit(
                   textStyle: const TextStyle(
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.normal,
                     fontSize: 16,
                     color: Style.primaryColor,
                   ),
@@ -240,10 +262,13 @@ class _HomePageState extends State<HomePage> {
               ),
               onPressed: () async {
                 final navigator = Navigator.of(context);
-                final buildContext = context;
                 await addPeakFlow();
                 errorMessage == '' ? error = false : error = true;
-                setState(() {});
+                navigator.push(
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          const PeakFlowInfoPage(showBackButton: true)),
+                );
               },
             ),
           ],
@@ -251,25 +276,31 @@ class _HomePageState extends State<HomePage> {
       },
     );
   }
-  Widget showPEFPrediction(){
-    return FutureBuilder<int>(
-      future: SKLearn().peakFlowPrediction(),
-      builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
+
+  // Show a peak flow prediction
+  Widget showPEFPrediction() {
+    return FutureBuilder<Map<String, dynamic>>(
+      future: FirebaseService().getLatestPrediction(),
+      builder:
+          (BuildContext context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator();  // or your custom loader
+          return const CircularProgressIndicator(
+            color: Style.primaryColor,
+          ); // or your custom loader
         } else if (snapshot.hasError) {
           // return
           return Container(
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(topLeft: Radius.circular(16), topRight: Radius.circular(16)),
+            decoration: const BoxDecoration(
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(16),
+                    topRight: Radius.circular(16)),
                 color: Style.primaryColor),
             child: Column(
               children: [
                 Align(
                   alignment: const AlignmentDirectional(-1, -1),
                   child: Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(
-                        16, 10, 0, 0),
+                    padding: const EdgeInsetsDirectional.fromSTEB(16, 10, 0, 0),
                     child: Text(
                       'Your current risk',
                       style: GoogleFonts.outfit(
@@ -285,8 +316,7 @@ class _HomePageState extends State<HomePage> {
                 Align(
                   alignment: const AlignmentDirectional(0, 0),
                   child: Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(
-                        0, 32, 0, 32),
+                    padding: const EdgeInsetsDirectional.fromSTEB(0, 32, 0, 32),
                     child: Text(
                       'Error: ${snapshot.error}',
                       style: GoogleFonts.outfit(
@@ -302,8 +332,7 @@ class _HomePageState extends State<HomePage> {
                 Align(
                   alignment: const AlignmentDirectional(1, 1),
                   child: Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(
-                        0, 0, 10, 10),
+                    padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 10, 10),
                     child: Text(
                       '-_-\'',
                       textAlign: TextAlign.end,
@@ -321,9 +350,13 @@ class _HomePageState extends State<HomePage> {
             ),
           );
         } else {
-          int? prediction = snapshot.data;
+          Map<String, dynamic>? data = snapshot.data;
+          var prediction = data?['value'];
+          var updateTime =
+              DateFormat('HH:mm, dd MMM yyyy').format(data?['datetime']);
           String riskLevel;
           String recommendation;
+          double fontSize = 48;
           Color riskColor;
 
           switch (prediction) {
@@ -343,22 +376,24 @@ class _HomePageState extends State<HomePage> {
               recommendation = 'Seek medical attention';
               break;
             default:
-              riskLevel = 'UNKNOWN';
-              riskColor = Style.tertiaryText;
+              riskLevel = 'Insufficient data';
+              riskColor = Style.primaryColor;
               recommendation = 'Error';
+              fontSize = 24;
           }
 
           return Container(
             decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(topLeft: Radius.circular(16), topRight: Radius.circular(16)),
+                borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(16),
+                    topRight: Radius.circular(16)),
                 color: riskColor),
             child: Column(
               children: [
                 Align(
                   alignment: const AlignmentDirectional(-1, -1),
                   child: Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(
-                        16, 10, 0, 0),
+                    padding: const EdgeInsetsDirectional.fromSTEB(16, 10, 0, 0),
                     child: Text(
                       'Your current risk',
                       style: GoogleFonts.outfit(
@@ -374,14 +409,13 @@ class _HomePageState extends State<HomePage> {
                 Align(
                   alignment: const AlignmentDirectional(0, 0),
                   child: Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(
-                        0, 32, 0, 32),
+                    padding: const EdgeInsetsDirectional.fromSTEB(0, 32, 0, 32),
                     child: Text(
                       riskLevel,
                       style: GoogleFonts.outfit(
-                        textStyle: const TextStyle(
+                        textStyle: TextStyle(
                           fontWeight: FontWeight.normal,
-                          fontSize: 48,
+                          fontSize: fontSize,
                           color: Style.tertiaryText,
                         ),
                       ),
@@ -391,10 +425,9 @@ class _HomePageState extends State<HomePage> {
                 Align(
                   alignment: const AlignmentDirectional(1, 1),
                   child: Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(
-                        0, 0, 10, 10),
+                    padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 10, 10),
                     child: Text(
-                      recommendation,
+                      updateTime.toString(),
                       textAlign: TextAlign.end,
                       style: GoogleFonts.outfit(
                         textStyle: const TextStyle(
@@ -414,7 +447,8 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void _showAddMedicationDialog(BuildContext context) async{
+  // Show a dialog to add a medication
+  void _showAddMedicationDialog(BuildContext context) async {
     // Declare a variable to store the selected medicine name
     String? selectedMedicine;
     List<String> medicationNames = await FirebaseService().getMedicationNames();
@@ -430,6 +464,11 @@ class _HomePageState extends State<HomePage> {
       try {
         await FirebaseService().addMedication(name);
         Navigator.of(context).pop();
+        setState(() {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text("Medicine added successfully!"),
+          ));
+        });
       } on FirebaseAuthException catch (e) {
         print(e.message);
         setState(() {
@@ -457,15 +496,18 @@ class _HomePageState extends State<HomePage> {
       context: context,
       builder: (context) {
         return AlertDialog(
+          backgroundColor: Style.primaryBackground,
+          surfaceTintColor: Colors.transparent,
           title: Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
                 borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(20),
                     topRight: Radius.circular(20)),
                 color: Style.primaryColor),
             // color: Colors.red,
             child: Padding(
-              padding: EdgeInsetsDirectional.all(20), // Add horizontal padding
+              padding:
+                  const EdgeInsetsDirectional.all(20), // Add horizontal padding
               child: Text(
                 'Add Medication',
                 style: GoogleFonts.outfit(
@@ -487,15 +529,16 @@ class _HomePageState extends State<HomePage> {
                 // Add a text field for the user to type the medicine name
                 TextField(
                   controller: medicationController,
-                  decoration: InputDecoration(
-                    labelText: 'Medicine name',
+                  decoration: const InputDecoration(
+                    labelText: 'Enter medicine name',
                   ), // If the user types a medicine name that is not in the list, ask if they want to add it
                 ),
                 // Add a dropdown menu for the user to choose the medicine name from the list
                 Padding(
                   padding: const EdgeInsetsDirectional.fromSTEB(0, 8, 0, 0),
                   child: Container(
-                    padding: EdgeInsets.only(left: 10, right: 10), // Add padding around the dropdown
+                    padding: const EdgeInsets.only(
+                        left: 10, right: 10), // Add padding around the dropdown
                     decoration: BoxDecoration(
                       // color: Colors.white, // Background color of dropdown button
                       borderRadius: BorderRadius.circular(8), // Rounded corners
@@ -503,11 +546,13 @@ class _HomePageState extends State<HomePage> {
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton<String>(
                         value: selectedMedicine,
-                        hint: Text('Choose a medicine'),
-                        items: medicationNames.map((name) => DropdownMenuItem<String>(
-                          value: name,
-                          child: Text(name),
-                        )).toList(),
+                        hint: const Text('Or choose a medicine'),
+                        items: medicationNames
+                            .map((name) => DropdownMenuItem<String>(
+                                  value: name,
+                                  child: Text(name),
+                                ))
+                            .toList(),
                         onChanged: (value) {
                           // Update the selected medicine name
                           medicationController.text = value!;
@@ -523,10 +568,11 @@ class _HomePageState extends State<HomePage> {
           ),
           actions: <Widget>[
             TextButton(
-              child: Text('Cancel',
+              child: Text(
+                'Cancel',
                 style: GoogleFonts.outfit(
                   textStyle: const TextStyle(
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.normal,
                     fontSize: 16,
                     color: Style.primaryColor,
                   ),
@@ -537,10 +583,11 @@ class _HomePageState extends State<HomePage> {
               },
             ),
             TextButton(
-              child: Text('Add',
+              child: Text(
+                'Add',
                 style: GoogleFonts.outfit(
                   textStyle: const TextStyle(
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.normal,
                     fontSize: 16,
                     color: Style.primaryColor,
                   ),
@@ -548,40 +595,49 @@ class _HomePageState extends State<HomePage> {
               ),
               onPressed: () async {
                 // Add the selected or typed medicine to the database
-                  if (!medicationNames.contains(medicationController.text)) {
-                    await showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          title: Text('Add new medicine'),
-                          content: Text(
-                              'The medicine ${medicationController.text} is not in the list. Do you want to add it?'),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                // Add the new medicine to the database
-                                FirebaseService().addMedicationName(medicationController.text);
-                                addMedication(selectedMedicine ?? medicationController.text);
-                                // Close the dialog
-                                Navigator.of(context).pop();
-                              },
-                              child: Text('Yes'),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                // Close the dialog
-                                addMedication(selectedMedicine ?? medicationController.text);
-                                Navigator.of(context).pop();
-                              },
-                              child: Text('No'),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  }else{
-                    addMedication(selectedMedicine ?? medicationController.text);
-                  }
+                if (!medicationNames.contains(medicationController.text)) {
+                  await showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: const Text('Add new medicine'),
+                        content: Text(
+                            'The medicine ${medicationController.text} is not in the list. Do you want to add it?'),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              // Add the new medicine to the database
+                              FirebaseService()
+                                  .addMedicationName(medicationController.text);
+                              addMedication(selectedMedicine ??
+                                  medicationController.text);
+                              // Close the dialog
+                              Navigator.of(context).pop();
+                              setState(() {
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(const SnackBar(
+                                  content: Text("Medicine added successfully!"),
+                                ));
+                              });
+                            },
+                            child: const Text('Yes'),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              // Close the dialog
+                              addMedication(selectedMedicine ??
+                                  medicationController.text);
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text('No'),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                } else {
+                  addMedication(selectedMedicine ?? medicationController.text);
+                }
                 // Close the dialog
               },
             ),
@@ -590,8 +646,6 @@ class _HomePageState extends State<HomePage> {
       },
     );
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -646,7 +700,8 @@ class _HomePageState extends State<HomePage> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => NotificationsPage()),
+                  MaterialPageRoute(
+                      builder: (context) => const NotificationsPage()),
                 );
               },
             ),
@@ -656,7 +711,7 @@ class _HomePageState extends State<HomePage> {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsetsDirectional.fromSTEB(10, 0, 10, 0),
+            padding: const EdgeInsetsDirectional.fromSTEB(10, 0, 10, 10),
             child: Column(
               mainAxisSize: MainAxisSize.max,
               children: [
@@ -701,7 +756,9 @@ class _HomePageState extends State<HomePage> {
                           );
                         } else {
                           // If the Future is not complete, display a loading indicator
-                          return CircularProgressIndicator();
+                          return const CircularProgressIndicator(
+                            color: Style.primaryColor,
+                          );
                         }
                       },
                     )
@@ -731,54 +788,95 @@ class _HomePageState extends State<HomePage> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Padding(
-                                  padding: const EdgeInsetsDirectional.fromSTEB(
-                                      10, 10, 10, 10),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.max,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      const Icon(
-                                        Icons.favorite,
-                                        size: 24,
-                                        color: Style.heartrate,
-                                      ),
-                                      FutureBuilder<Map<String,dynamic>>(
-                                          future: FirebaseService()
-                                              .getLatestHR(),
-                                          builder: (context, snapshot) {
-                                            var heartRate = snapshot.data?['value'].toString().split('.');
+                                GestureDetector(
+                                  onTap: () {
+                                    print('Tapped');
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const NavigationBarApp(
+                                                  initialPageIndex: 2),
+                                        ));
+                                  },
+                                  child: Padding(
+                                    padding:
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            10, 10, 10, 10),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.max,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        const Icon(
+                                          Icons.favorite,
+                                          size: 24,
+                                          color: Style.heartrate,
+                                        ),
+                                        FutureBuilder<Map<String, dynamic>>(
+                                            future:
+                                                FirebaseService().getLatestHR(),
+                                            builder: (context, snapshot) {
+                                              var heartRate = snapshot
+                                                  .data?['value']
+                                                  .toString()
+                                                  .split('.');
 
-                                            if (snapshot.connectionState ==
-                                                ConnectionState.done) {
-                                              // If the Future is complete, display the data
+                                              if (snapshot.connectionState ==
+                                                  ConnectionState.done) {
+                                                if (snapshot.data == null) {
+                                                  return Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            top: 6, bottom: 6),
+                                                    child: Text(
+                                                      'No Data',
+                                                      style: GoogleFonts.outfit(
+                                                        textStyle:
+                                                            const TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .normal,
+                                                                fontSize: 9,
+                                                                color: Style
+                                                                    .primaryText),
+                                                      ),
+                                                    ),
+                                                  );
+                                                } else {
+                                                  // If the Future is complete, display the data
 
-                                                return Text(
-                                                  '${heartRate?[0]}',
-                                                  style: GoogleFonts.outfit(
-                                                    textStyle: const TextStyle(
-                                                        fontWeight:
-                                                        FontWeight.normal,
-                                                        fontSize: 24,
-                                                        color: Style.primaryText),
-                                            )
+                                                  return Text(
+                                                      '${heartRate?[0]}',
+                                                      style: GoogleFonts.outfit(
+                                                        textStyle:
+                                                            const TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .normal,
+                                                                fontSize: 21,
+                                                                color: Style
+                                                                    .primaryText),
+                                                      ));
+                                                }
+                                              } else {
+                                                return const CircularProgressIndicator(
+                                                  color: Style.primaryColor,
                                                 );
-                                            }else{
-                                              return const CircularProgressIndicator();
-                                            }
-                                          }),
-                                      Text(
-                                        'bpm',
-                                        style: GoogleFonts.outfit(
-                                          textStyle: const TextStyle(
-                                            fontWeight: FontWeight.w300,
-                                            fontSize: 16,
-                                            color: Style.accent2,
+                                              }
+                                            }),
+                                        Text(
+                                          'bpm',
+                                          style: GoogleFonts.outfit(
+                                            textStyle: const TextStyle(
+                                              fontWeight: FontWeight.w300,
+                                              fontSize: 16,
+                                              color: Style.accent2,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
                                 ),
                                 Padding(
@@ -813,7 +911,7 @@ class _HomePageState extends State<HomePage> {
                                                   textStyle: const TextStyle(
                                                       fontWeight:
                                                           FontWeight.normal,
-                                                      fontSize: 24,
+                                                      fontSize: 21,
                                                       color: Style.primaryText),
                                                 ),
                                               );
@@ -840,25 +938,47 @@ class _HomePageState extends State<HomePage> {
                                       const Icon(Icons.thermostat,
                                           size: 24, color: Style.weather),
                                       FutureBuilder<String>(
-                                          future: FirebaseService().getLatestTemperature(),
+                                          future: FirebaseService()
+                                              .getLatestTemperature(),
                                           builder: (context, snapshot) {
                                             if (snapshot.connectionState ==
                                                 ConnectionState.done) {
-                                              // If the Future is complete, display the data
-                                              return Text(
-                                                '${snapshot.data}°C',
-                                                style: GoogleFonts.outfit(
-                                                  textStyle: const TextStyle(
-                                                      fontWeight:
-                                                      FontWeight.normal,
-                                                      fontSize: 21,
-                                                      color: Style.primaryText),
-                                                ),
-                                              );
+                                              if (snapshot.data == null) {
+                                                return Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          top: 6, bottom: 6),
+                                                  child: Text(
+                                                    'No Data',
+                                                    style: GoogleFonts.outfit(
+                                                      textStyle:
+                                                          const TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .normal,
+                                                              fontSize: 9,
+                                                              color: Style
+                                                                  .primaryText),
+                                                    ),
+                                                  ),
+                                                );
+                                              } else {
+                                                // If the Future is complete, display the data
+                                                return Text(
+                                                  '${snapshot.data}°C',
+                                                  style: GoogleFonts.outfit(
+                                                    textStyle: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.normal,
+                                                        fontSize: 21,
+                                                        color:
+                                                            Style.primaryText),
+                                                  ),
+                                                );
+                                              }
                                             } else {
                                               return const CircularProgressIndicator(
-                                                color: Style.accent2,
-
+                                                color: Style.primaryColor,
                                               );
                                             }
                                           }),
@@ -883,24 +1003,48 @@ class _HomePageState extends State<HomePage> {
                                       const Icon(Icons.air,
                                           size: 24, color: Style.air),
                                       FutureBuilder<String>(
-                                          future: FirebaseService().getLatestAQI(),
+                                          future:
+                                              FirebaseService().getLatestAQI(),
                                           builder: (context, snapshot) {
                                             if (snapshot.connectionState ==
                                                 ConnectionState.done) {
                                               // If the Future is complete, display the data
-                                              return Text(
-                                                '${snapshot.data}',
-                                                style: GoogleFonts.outfit(
-                                                  textStyle: const TextStyle(
-                                                      fontWeight:
-                                                      FontWeight.normal,
-                                                      fontSize: 21,
-                                                      color: Style.primaryText),
-                                                ),
-                                              );
+                                              var value = snapshot.data;
+                                              if (value == null) {
+                                                return Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          top: 6, bottom: 6),
+                                                  child: Text(
+                                                    'No Data',
+                                                    style: GoogleFonts.outfit(
+                                                      textStyle:
+                                                          const TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .normal,
+                                                              fontSize: 9,
+                                                              color: Style
+                                                                  .primaryText),
+                                                    ),
+                                                  ),
+                                                );
+                                              } else {
+                                                return Text(
+                                                  '${snapshot.data}',
+                                                  style: GoogleFonts.outfit(
+                                                    textStyle: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.normal,
+                                                        fontSize: 21,
+                                                        color:
+                                                            Style.primaryText),
+                                                  ),
+                                                );
+                                              }
                                             } else {
                                               return const CircularProgressIndicator(
-                                                color: Style.accent2,
+                                                color: Style.primaryColor,
                                               );
                                             }
                                           }),
@@ -926,14 +1070,15 @@ class _HomePageState extends State<HomePage> {
                                           Icons.health_and_safety_outlined,
                                           size: 24,
                                           color: Style.pef),
-                                      FutureBuilder<String>(
-                                          future: FirebaseService()
-                                              .getLatestPefValue(),
+                                      FutureBuilder(
+                                          future:
+                                              FirebaseService().getLatestPEF(),
                                           builder: (context, snapshot) {
+                                            var value = snapshot.data?['data'];
                                             if (snapshot.connectionState ==
                                                 ConnectionState.done) {
                                               // If the Future is complete, display the data
-                                              if (snapshot.data == 'NaN') {
+                                              if (value == null) {
                                                 return Padding(
                                                   padding:
                                                       const EdgeInsets.only(
@@ -946,7 +1091,7 @@ class _HomePageState extends State<HomePage> {
                                                               fontWeight:
                                                                   FontWeight
                                                                       .normal,
-                                                              fontSize: 14,
+                                                              fontSize: 9,
                                                               color: Style
                                                                   .primaryText),
                                                     ),
@@ -954,19 +1099,21 @@ class _HomePageState extends State<HomePage> {
                                                 );
                                               } else {
                                                 return Text(
-                                                  '${snapshot.data}',
+                                                  '$value',
                                                   style: GoogleFonts.outfit(
                                                     textStyle: const TextStyle(
                                                         fontWeight:
                                                             FontWeight.normal,
-                                                        fontSize: 24,
+                                                        fontSize: 21,
                                                         color:
                                                             Style.primaryText),
                                                   ),
                                                 );
                                               }
                                             } else {
-                                              return const CircularProgressIndicator();
+                                              return const CircularProgressIndicator(
+                                                color: Style.primaryColor,
+                                              );
                                             }
                                           }),
                                       Text(
@@ -1034,7 +1181,7 @@ class _HomePageState extends State<HomePage> {
                               style: ElevatedButton.styleFrom(
                                 elevation: 0,
                                 // backgroundColor: Colors.transparent,
-                                primary: Style.tertiaryText,
+                                foregroundColor: Style.tertiaryText,
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 20.0),
                                 shape: RoundedRectangleBorder(
@@ -1074,7 +1221,7 @@ class _HomePageState extends State<HomePage> {
                               style: ElevatedButton.styleFrom(
                                 elevation: 0,
                                 // backgroundColor: Colors.transparent,
-                                primary: Style.tertiaryText,
+                                foregroundColor: Style.tertiaryText,
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 20.0),
                                 shape: RoundedRectangleBorder(
@@ -1129,13 +1276,13 @@ class _HomePageState extends State<HomePage> {
                         contentPadding: const EdgeInsets.symmetric(
                             horizontal: 20.0,
                             vertical: 10.0), // Add padding if necessary
-                        leading: const Icon(Icons.subtitles_outlined,
-                            size: 50, color: Style.primaryColorLight),
+                        leading: const Icon(Icons.inventory_outlined,
+                            size: 50, color: Style.act),
                         title: Text(
                           'Asthma Control Test',
                           style: GoogleFonts.outfit(
                             textStyle: const TextStyle(
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.normal,
                               // fontSize: 16,
                               color: Style.primaryText,
                             ),
@@ -1147,12 +1294,13 @@ class _HomePageState extends State<HomePage> {
                             textStyle: const TextStyle(
                               fontWeight: FontWeight.normal,
                               // fontSize: 16,
-                              color: Style.primaryText,
+                              color: Style.secondaryText,
                             ),
                           ),
                         ),
                         trailing: const Icon(Icons.arrow_forward_ios,
-                            color: Style.primaryText), // Right arrow icon
+                            color: Style.secondaryText,
+                            size: 20), // Right arrow icon
                       ),
                     ),
                   ),
