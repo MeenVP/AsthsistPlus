@@ -64,8 +64,55 @@ To run the Python notebook in Google Colab, you will need the following:
 
 Please ensure that you have all these requirements met before trying to run this Flutter project and the Google Colab Python notebook.
 
- This project is a part of a senior project submitted in partial fullfillment of the Requirement forTHE DEGREE OF BACHELOR OF SCIENCE(INFORMATION AND COMMUNICATION TECHNOLOGY) Faculty of Information and Communication Technology, Mahidol University 2023
+### Running Flutter project
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Follow these steps to get the project up and running on your local machine:
+
+1. **Clone the Repository**: First, clone the repository to your local machine. You can do this by running the following command in your terminal:
+
+```bash
+git clone https://github.com/MeenVP/AsthsistPlus.git
+```
+
+2. **Navigate to the Project Directory**: Use the `cd` command to navigate to the directory of the project:
+
+```bash
+cd AsthsistPlus
+```
+
+3. **Get Flutter Packages**: Run the following command in your terminal to get all the required Flutter packages:
+
+```bash
+flutter pub get
+```
+
+4. **Run the Project**: Finally, you can run the AsthsistPlus project on your emulator or physical device using the following command:
+
+```bash
+flutter run
+```
+Please note that you need to have an emulator running or a physical device connected to your machine to run the project.
+
+### Running Google Colab Python Notebook
+
+1. **Download the Dataset**: Click on the `Clean_data_2.csv` file in the `ml` folder in the GitHub repository, then click on 'Download'. This will download the dataset to your local machine.
+
+2. **Upload the Dataset to Google Drive**: Go to your Google Drive, click on 'New' -> 'File upload', then select the downloaded `Clean_data_2.csv` file to upload it to your Google Drive.
+   
+3. **Open the Notebook**: Click on the link to the `.ipynb` file in the GitHub repository. This will open the notebook in GitHub.
+
+4. **Open in Colab**: Click on the 'Open in Colab' button at the top of the notebook. This will open the notebook in Google Colab.
+
+5. **Mount Google Drive in Google Colab**: In your Google Colab notebook, you can mount your Google Drive by running the following code in a cell:
+
+```python
+from google.colab import drive
+drive.mount('/content/drive')
+```
+6. **Access the Dataset**: Now you can access the dataset file in your Google Drive from your Google Colab notebook. If you uploaded the dataset to the root of your Google Drive, you can access it like this:
+
+```python
+dataset = pd.read_csv('/content/drive/MyDrive/Clean_data_2.csv')
+```
+
+Remember to always keep your dataset file updated in your Google Drive if there are changes in the GitHub repository.
